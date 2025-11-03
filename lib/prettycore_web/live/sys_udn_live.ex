@@ -6,7 +6,7 @@ defmodule PrettycoreWeb.SysUdnLive do
 
   def mount(_params, _session, socket) do
     rows = SysUdn.listar_todo()
-    headers = if rows == [], do: [], else: rows |> hd() |> Map.keys()
+    headers = if rows == [], do: [], else: rows |> hd() |> Map.keys() |> Enum.reject(&(&1 in [:__meta__, :__struct__]))
 
     {:ok,
      socket
@@ -79,7 +79,11 @@ defmodule PrettycoreWeb.SysUdnLive do
   defp to_str(%Date{} = d), do: Date.to_iso8601(d)
   defp to_str(v) when is_binary(v), do: v
   defp to_str(v) when is_nil(v), do: ""
-  defp to_str(v), do: "#{v}"
+  defp to_str(v) when is_integer(v), do: Integer.to_string(v)
+  defp to_str(v) when is_float(v), do: Float.to_string(v)
+  defp to_str(v) when is_atom(v), do: Atom.to_string(v)
+  defp to_str(%_{} = _struct), do: "[struct]"
+  defp to_str(v), do: inspect(v)
 
   # ============ render ============
 
