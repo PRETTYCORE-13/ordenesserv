@@ -8,8 +8,11 @@ config :prettycore, :tds,
   password: "N0vacore",
   database: "ECORE_PRD_10",
   pool_size: 10,
-  # true si usas Azure/SSL
-  ssl: false,
+  # Encryption settings (use true for Azure/SSL)
+  encrypt: false,
+  trust_server_certificate: true,
+  timeout: 15_000,
+  idle_timeout: 5_000,
   show_sensitive_data_on_connection_error: true
 
 # For development, we disable any cache and enable

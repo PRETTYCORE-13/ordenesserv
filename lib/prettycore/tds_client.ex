@@ -19,7 +19,7 @@ defmodule Prettycore.TdsClient do
       password: pass,
       database: db,
       encrypt: cfg[:encrypt] || false,
-      trust_server_certificate: cfg[:trust_server_certificate] || false,
+      trust_server_certificate: cfg[:trust_server_certificate] || true,
       timeout: cfg[:timeout] || 15_000,
       idle_timeout: cfg[:idle_timeout] || 5_000
     ]

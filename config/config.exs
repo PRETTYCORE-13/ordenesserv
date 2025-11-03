@@ -8,10 +8,16 @@
 import Config
 
 config :prettycore, Prettycore.Repo,
-  database: "prettycore_repo",
-  username: "user",
-  password: "pass",
-  hostname: "localhost"
+  hostname: "ecore.ath.cx",
+  port: 1433,
+  username: "sa",
+  password: "N0vacore",
+  database: "ECORE_PRD_10",
+  pool_size: 10,
+  encrypt: false,
+  trust_server_certificate: true,
+  timeout: 15_000,
+  idle_timeout: 5_000
 
 config :prettycore,
   generators: [timestamp_type: :utc_datetime]
