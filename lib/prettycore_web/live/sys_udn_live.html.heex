@@ -1,0 +1,62 @@
+<div class="pc-wrap">
+  <div class="pc-toolbar">
+    <input
+      type="text"
+      name="q"
+      value={@q}
+      phx-debounce="250"
+      phx-change="search"
+      class="pc-input"
+      placeholder="Buscar en SYS_UDN"
+    /> <.link navigate="/api/sys_udn" class="pc-btn">JSON</.link>
+  </div>
+   <% filtered = apply_filters(@rows, @q, @sort_by, @sort_dir) %> <% total_pages =
+    max(1, div(length(filtered) + @per - 1, @per)) %> <% page = min(@page, total_pages) %> <% start =
+    (page - 1) * @per %> <% page_rows = filtered |> Enum.drop(start) |> Enum.take(@per) %>
+  <div class="pc-table-wrap">
+    <table class="pc-table">
+      <thead>
+        <tr>
+            <th scope="col"></th>
+          <%= for h <- @headers do %>
+            <th>
+              <button phx-click="sort" phx-value-col={h}>
+                <span>{h}</span>
+                <%= if @sort_by == h do %>
+                  <span>{if @sort_dir == :asc, do: "▲", else: "▼"}</span>
+                <% end %>
+              </button>
+            </th>
+          <% end %>
+        </tr>
+      </thead>
+      
+      <tbody>
+        <%= for row <- page_rows do %>
+          <tr>
+
+            <td>
+              <button phx-click="btn-acept">
+              ACEPTAR
+            </button>
+            </td>
+            <%= for h <- @headers do %>
+              <td>
+                {to_str(Map.get(row, h))}</td>
+
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="pc-pager">
+    <button class="pc-btn" phx-click="page" phx-value-to={page - 1} disabled={page <= 1}>
+      «
+    </button> <span>Página {page} / {total_pages}</span>
+    <button class="pc-btn" phx-click="page" phx-value-to={page + 1} disabled={page >= total_pages}>
+      »
+    </button>
+  </div>
+</div>

@@ -6,7 +6,11 @@ defmodule PrettycoreWeb.SysUdnLive do
 
   def mount(_params, _session, socket) do
     rows = SysUdn.listar_todo()
-    headers = if rows == [], do: [], else: rows |> hd() |> Map.keys() |> Enum.reject(&(&1 in [:__meta__, :__struct__]))
+
+    headers =
+      if rows == [],
+        do: [],
+        else: rows |> hd() |> Map.keys() |> Enum.reject(&(&1 in [:__meta__, :__struct__]))
 
     {:ok,
      socket
@@ -35,6 +39,11 @@ defmodule PrettycoreWeb.SysUdnLive do
   def handle_event("page", %{"to" => to}, socket) do
     page = String.to_integer(to)
     {:noreply, assign(socket, page: max(1, page))}
+  end
+
+  #boton
+    def handle_event("btn-acept", %{"value" => to}, socket) do
+    {:noreply, socket}
   end
 
   # ============ helpers ============
@@ -85,64 +94,7 @@ defmodule PrettycoreWeb.SysUdnLive do
   defp to_str(%_{} = _struct), do: "[struct]"
   defp to_str(v), do: inspect(v)
 
+
+
   # ============ render ============
-
-  def render(assigns) do
-    ~H"""
-    <div class="pc-wrap">
-      <div class="pc-toolbar">
-        <input
-          type="text"
-          name="q"
-          value={@q}
-          phx-debounce="250"
-          phx-change="search"
-          class="pc-input"
-          placeholder="Buscar en SYS_UDN"
-        /> <.link navigate="/api/sys_udn" class="pc-btn">JSON</.link>
-      </div>
-      <% filtered = apply_filters(@rows, @q, @sort_by, @sort_dir) %> <% total_pages =
-        max(1, div(length(filtered) + @per - 1, @per)) %> <% page = min(@page, total_pages) %> <% start =
-        (page - 1) * @per %> <% page_rows = filtered |> Enum.drop(start) |> Enum.take(@per) %>
-      <div class="pc-table-wrap">
-        <table class="pc-table">
-          <thead>
-            <tr>
-              <%= for h <- @headers do %>
-                <th>
-                  <button phx-click="sort" phx-value-col={h}>
-                    <span>{h}</span>
-                    <%= if @sort_by == h do %>
-                      <span>{if @sort_dir == :asc, do: "▲", else: "▼"}</span>
-                    <% end %>
-                  </button>
-                </th>
-              <% end %>
-            </tr>
-          </thead>
-
-          <tbody>
-            <%= for row <- page_rows do %>
-              <tr>
-                <%= for h <- @headers do %>
-                  <td>{to_str(Map.get(row, h))}</td>
-                <% end %>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pc-pager">
-        <button class="pc-btn" phx-click="page" phx-value-to={page - 1} disabled={page <= 1}>
-          «
-        </button>
-         <span>Página {page} / {total_pages}</span>
-        <button class="pc-btn" phx-click="page" phx-value-to={page + 1} disabled={page >= total_pages}>
-          »
-        </button>
-      </div>
-    </div>
-    """
-  end
 end
