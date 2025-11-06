@@ -1,0 +1,250 @@
+/* Layout general */
+.pc-platform {
+  display: flex;
+  height: 100vh;
+  background: #000000;
+}
+
+/* Contenido principal */
+.pc-platform-main {
+  flex: 1;
+  background: #ffffff;;
+  color: #000000;
+}
+
+/* SIDEBAR: barra tipo pastilla con gradiente */
+.pc-platform-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 72px; /* colapsada */
+  height: calc(100vh - 32px);
+  margin: 16px 0 16px 16px;
+  padding: 12px 10px;
+ /* background: linear-gradient(180deg, #111827 0%, #020617 50%, #4c1d95 100%); */
+  color: #e5e7eb;
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 1px rgba(148, 163, 184, 0.12),
+    0 18px 45px rgba(15, 23, 42, 0.6);
+  transition: width 0.2s ease, border-radius 0.2s ease;
+  overflow: visible;
+}
+
+/* Al pasar el mouse, se expande y se suaviza la pastilla */
+.pc-platform-sidebar:hover {
+  width: 220px;
+  border-radius: 32px;
+}
+
+/* Bloque fijo arriba (logo + texto) */
+.pc-platform-sidebar-top {
+  flex-shrink: 0;
+}
+
+/* BLOQUE MENÚ (puede hacer scroll) */
+.pc-platform-sidebar-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;  /* menú arriba, config abajo */
+  margin-top: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Logo */
+.pc-platform-logo-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 10px;
+}
+
+.pc-platform-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  object-fit: contain;
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
+}
+
+/* Texto del logo solo visible al expandir */
+.pc-platform-logo-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.pc-platform-sidebar:hover .pc-platform-logo-text {
+  opacity: 1;
+}
+
+.pc-platform-logo-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+}
+
+.pc-platform-logo-subtitle {
+  font-size: 10px;
+  color: #9ca3af;
+}
+
+/* Label "Navegación" */
+.pc-platform-sidebar-section-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #6b7280;
+  text-align: center;
+  margin: 6px 0 4px;
+}
+
+/* Menú principal */
+.pc-platform-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+/* Items del menú : ícono centrado tipo botón */
+.pc-menu-item {
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: #9ca3af;
+  position: relative;
+}
+
+/* burbuja de fondo para el icono (no morada) */
+.pc-menu-item::before {
+  content: "";
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.16);
+  opacity: 0;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+/* contenedor del icono */
+.pc-menu-item-icon {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+/* SVG sólido, color negro */
+.pc-menu-item-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #000000;   /* negro */
+}
+
+/* al expandir la barra, movemos el icono a la izquierda */
+.pc-platform-sidebar:hover .pc-menu-item-icon {
+  left: 14px;
+  transform: none;
+}
+
+/* hover y activo: icono negro igual, si quieres ligeramente más claro cambia aquí */
+.pc-menu-item:hover .pc-menu-item-icon svg {
+  color: #020617;
+}
+
+.pc-menu-item-active .pc-menu-item-icon svg {
+  color: #020617;
+}
+
+/* Texto del item */
+.pc-menu-item-label {
+  margin-left: 10px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  font-size: 15px;
+}
+
+/* Indicador lateral fino para activo (gris claro, no morado) */
+.pc-menu-item-indicator {
+  width: 3px;
+  height: 18px;
+  border-radius: 999px;
+  background: transparent;
+  margin-right: 4px;
+}
+
+/* Hover y estado activo: burbuja oscura */
+.pc-menu-item:hover::before {
+  background: rgba(15, 23, 42, 0.9);
+  opacity: 1;
+}
+
+.pc-menu-item-active::before {
+  background: rgba(15, 23, 42, 0.95);
+  opacity: 1;
+}
+
+.pc-menu-item-active .pc-menu-item-indicator {
+  background: #e5e7eb;
+}
+
+/* Textos visibles solo en hover de la barra */
+.pc-platform-sidebar:hover .pc-menu-item-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Botón de configuración abajo */
+.pc-menu-item-bottom {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.6);
+}
+
+/* Submenú (hijos de Programación) */
+.pc-submenu {
+  margin: 4px 0 8px;
+  padding-left: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pc-submenu-item {
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+  color: #9ca3af;
+  padding: 3px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pc-submenu-item:hover {
+  background: rgba(15, 23, 42, 0.7);
+  color: #f9fafb;
+}
+
+.pc-submenu-item-active {
+  background: #111827;
+  color: #f9fafb;
+}

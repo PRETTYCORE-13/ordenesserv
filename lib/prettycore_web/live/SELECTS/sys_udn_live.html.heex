@@ -17,7 +17,6 @@
     <table class="pc-table">
       <thead>
         <tr>
-            <th scope="col"></th>
           <%= for h <- @headers do %>
             <th>
               <button phx-click="sort" phx-value-col={h}>
@@ -35,11 +34,17 @@
         <%= for row <- page_rows do %>
           <tr>
 
+<%!--
             <td>
-              <button phx-click="btn-acept">
-              ACEPTAR
-            </button>
-            </td>
+  <button
+    phx-click="btn-acept"
+    phx-value-ref={row.woke_referencia}
+    class="pc-btn"
+  >
+    ACEPTAR
+  </button>
+</td>
+--%>
             <%= for h <- @headers do %>
               <td>
                 {to_str(Map.get(row, h))}</td>

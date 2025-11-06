@@ -2,7 +2,7 @@ defmodule Prettycore.SysUdn do
   @moduledoc false
   alias Prettycore.TdsClient
 
-  @sql_all "SELECT * FROM [dbo].[XEN_WOKORDERENC]"
+  @sql_all "SELECT * FROM [dbo].[XEN_WOKORDERDET]"
 
   # Convierte valores para JSON
   defp norm(v) when is_binary(v), do: :unicode.characters_to_binary(v, :latin1, :utf8)

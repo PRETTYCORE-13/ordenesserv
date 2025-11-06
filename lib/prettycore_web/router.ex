@@ -16,11 +16,34 @@ defmodule PrettycoreWeb.Router do
     plug :accepts, ["json"]
   end
 
+  # Interfaz Login
+scope "/ui", PrettycoreWeb do
+  pipe_through :browser
+
+  live "/login", LoginLive
+  live "/platform", PlatformIndexLive
+  live "/programacion", ProgrammingHomeLive
+  live "/programacion/sql", ProgrammingIndexLive
+  live "/workorder", WorkorderLive
+end
+
+scope "/ui", PrettycoreWeb do
+  pipe_through :browser
+  live "/sys_udn", SysUdnLive
+end
+
   # Interfaz visual tipo Excel
   scope "/ui", PrettycoreWeb do
     pipe_through :browser
     live "/sys_udn", SysUdnLive
   end
+
+    # Interfaz visual tipo Excel
+  scope "/ui", PrettycoreWeb do
+    pipe_through :browser
+    live "/sys_udn", SysUdnLive
+  end
+
 
   # Health simple en raíz
   scope "/", PrettycoreWeb do
@@ -31,6 +54,7 @@ defmodule PrettycoreWeb.Router do
   # Endpoints JSON
   scope "/api", PrettycoreWeb do
     pipe_through :api
+
     get "/sys_udn", SysUdnController, :index
     get "/sys_udn/codigos", SysUdnController, :codigos
   end

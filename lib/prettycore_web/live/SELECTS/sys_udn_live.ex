@@ -41,9 +41,13 @@ defmodule PrettycoreWeb.SysUdnLive do
     {:noreply, assign(socket, page: max(1, page))}
   end
 
-  #boton
-    def handle_event("btn-acept", %{"value" => to}, socket) do
-    {:noreply, socket}
+  # boton
+  @impl true
+  def handle_event("btn-acept", %{"ref" => ref}, socket) do
+    {:noreply,
+     push_navigate(socket,
+       to: ~p"/ui/sys_udn/workorder?ref=#{ref}"
+     )}
   end
 
   # ============ helpers ============
@@ -93,8 +97,6 @@ defmodule PrettycoreWeb.SysUdnLive do
   defp to_str(v) when is_atom(v), do: Atom.to_string(v)
   defp to_str(%_{} = _struct), do: "[struct]"
   defp to_str(v), do: inspect(v)
-
-
 
   # ============ render ============
 end
