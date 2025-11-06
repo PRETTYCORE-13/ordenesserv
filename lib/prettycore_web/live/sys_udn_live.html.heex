@@ -30,13 +30,13 @@
           <% end %>
         </tr>
       </thead>
-      
+
       <tbody>
         <%= for row <- page_rows do %>
           <tr>
 
             <td>
-              <button phx-click="btn-acept">
+              <button phx-click="btn-acept" phx-value={Map.get(row, "WOKE_REFERENCIA")} >
               ACEPTAR
             </button>
             </td>
@@ -50,7 +50,7 @@
       </tbody>
     </table>
   </div>
-  
+
   <div class="pc-pager">
     <button class="pc-btn" phx-click="page" phx-value-to={page - 1} disabled={page <= 1}>
       «

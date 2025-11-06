@@ -42,7 +42,10 @@ defmodule PrettycoreWeb.SysUdnLive do
   end
 
   #boton
-    def handle_event("btn-acept", %{"value" => to}, socket) do
+  def handle_event("btn-acept", %{"value" => reference}, socket) do
+    result = Prettycore.WorkorderApi.workorder(reference)
+    raise inspect(result)
+
     {:noreply, socket}
   end
 
