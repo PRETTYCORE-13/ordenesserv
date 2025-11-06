@@ -41,13 +41,13 @@ defmodule PrettycoreWeb.SysUdnLive do
     {:noreply, assign(socket, page: max(1, page))}
   end
 
-  # boton
-  @impl true
-  def handle_event("btn-acept", %{"ref" => ref}, socket) do
-    {:noreply,
-     push_navigate(socket,
-       to: ~p"/ui/sys_udn/workorder?ref=#{ref}"
-     )}
+
+  #boton
+  def handle_event("btn-acept", %{"value" => reference}, socket) do
+    result = Prettycore.WorkorderApi.workorder(reference)
+    raise inspect(result)
+
+    {:noreply, socket}
   end
 
   # ============ helpers ============

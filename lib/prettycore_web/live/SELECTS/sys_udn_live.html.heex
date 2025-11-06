@@ -29,22 +29,18 @@
           <% end %>
         </tr>
       </thead>
-      
+
       <tbody>
         <%= for row <- page_rows do %>
           <tr>
 
 <%!--
             <td>
-  <button
-    phx-click="btn-acept"
-    phx-value-ref={row.woke_referencia}
-    class="pc-btn"
-  >
-    ACEPTAR
-  </button>
-</td>
---%>
+
+              <button phx-click="btn-acept" phx-value={Map.get(row, "WOKE_REFERENCIA")} >
+              ACEPTAR
+            </button>
+            </td>
             <%= for h <- @headers do %>
               <td>
                 {to_str(Map.get(row, h))}</td>
@@ -55,7 +51,7 @@
       </tbody>
     </table>
   </div>
-  
+
   <div class="pc-pager">
     <button class="pc-btn" phx-click="page" phx-value-to={page - 1} disabled={page <= 1}>
       «
