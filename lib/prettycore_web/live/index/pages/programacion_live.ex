@@ -1,4 +1,4 @@
-defmodule PrettycoreWeb.ProgrammingHomeLive do
+defmodule PrettycoreWeb.Programacion do
   use PrettycoreWeb, :live_view
 
   import PrettycoreWeb.PlatformLayout
@@ -7,7 +7,15 @@ defmodule PrettycoreWeb.ProgrammingHomeLive do
     {:ok,
      socket
      |> assign(:current_page, "programacion")
+     |> assign(:sidebar_open, true)             # estado inicial
      |> assign(:show_programacion_children, true)}
+  end
+
+  ## Navegación + toggle sidebar
+
+  # Toggle del menú
+  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
+    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
   end
 
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
@@ -23,10 +31,10 @@ defmodule PrettycoreWeb.ProgrammingHomeLive do
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-  {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
-end
+    {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
+  end
 
-
+  # Catch-all
   def handle_event("change_page", _params, socket) do
     {:noreply, socket}
   end
@@ -36,6 +44,7 @@ end
     <.platform_shell
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
+      sidebar_open={@sidebar_open}
     >
       <section>
         <header class="pc-page-header">

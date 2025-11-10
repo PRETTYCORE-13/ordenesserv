@@ -12,6 +12,7 @@ defmodule Prettycore.Workorders do
   - referencia
   - tipo
   - sysudn, systra, serie, folio (llaves para detalle)
+  - estado (S_MAQEDO)
   """
   def list_enc do
     from(w in WorkOrder,
@@ -21,7 +22,8 @@ defmodule Prettycore.Workorders do
         sysudn: w.sysudn_codigo_k,
         systra: w.systra_codigo_k,
         serie: w.woke_serie_k,
-        folio: w.woke_folio_k
+        folio: w.woke_folio_k,
+        estado: w.s_maqedo
       }
     )
     |> Repo.all()
@@ -51,7 +53,6 @@ defmodule Prettycore.Workorders do
             |> Enum.zip(row)
             |> Enum.into(%{})
 
-          # 1) Intenta por nombre de columna (IMG / IMAGE)
           img1 =
             row_map
             |> Enum.find_value(fn {k, v} ->
@@ -65,7 +66,6 @@ defmodule Prettycore.Workorders do
               end
             end)
 
-          # 2) Si no encuentra, usa la primera cadena larga
           img =
             img1 ||
               Enum.find_value(row_map, fn {_k, v} ->

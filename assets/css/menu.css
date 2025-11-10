@@ -2,25 +2,25 @@
 .pc-platform {
   display: flex;
   height: 100vh;
-  background: #000000;
+  background: #ffffff;
 }
 
 /* Contenido principal */
 .pc-platform-main {
   flex: 1;
-  background: #ffffff;;
+  background: #ffffff;
   color: #000000;
 }
 
-/* SIDEBAR: barra tipo pastilla con gradiente */
+/* SIDEBAR: barra tipo pastilla */
 .pc-platform-sidebar {
   display: flex;
   flex-direction: column;
-  width: 72px; /* colapsada */
+  width: 72px; /* cerrada */
   height: calc(100vh - 32px);
   margin: 16px 0 16px 16px;
   padding: 12px 10px;
- /* background: linear-gradient(180deg, #111827 0%, #020617 50%, #4c1d95 100%); */
+  /* background: linear-gradient(180deg, #111827 0%, #020617 50%, #4c1d95 100%); */
   color: #e5e7eb;
   border-radius: 999px;
   box-shadow:
@@ -30,13 +30,13 @@
   overflow: visible;
 }
 
-/* Al pasar el mouse, se expande y se suaviza la pastilla */
-.pc-platform-sidebar:hover {
+/* ABIERTA por clase, ya no por :hover */
+.pc-platform-sidebar-open {
   width: 220px;
   border-radius: 32px;
 }
 
-/* Bloque fijo arriba (logo + texto) */
+/* Bloque fijo arriba (logo + toggle) */
 .pc-platform-sidebar-top {
   flex-shrink: 0;
 }
@@ -58,7 +58,7 @@
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 4px 0 10px;
+  padding: 4px 0 6px;
 }
 
 .pc-platform-logo-img {
@@ -69,7 +69,7 @@
   box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
 }
 
-/* Texto del logo solo visible al expandir */
+/* Texto del logo solo visible cuando está abierto */
 .pc-platform-logo-text {
   display: flex;
   flex-direction: column;
@@ -79,7 +79,7 @@
   transition: opacity 0.15s ease;
 }
 
-.pc-platform-sidebar:hover .pc-platform-logo-text {
+.pc-platform-sidebar-open .pc-platform-logo-text {
   opacity: 1;
 }
 
@@ -92,6 +92,11 @@
 .pc-platform-logo-subtitle {
   font-size: 10px;
   color: #9ca3af;
+}
+
+/* Botón toggle debajo del logo */
+.pc-menu-toggle {
+  margin-top: 8px;
 }
 
 /* Label "Navegación" */
@@ -157,8 +162,8 @@
   color: #000000;   /* negro */
 }
 
-/* al expandir la barra, movemos el icono a la izquierda */
-.pc-platform-sidebar:hover .pc-menu-item-icon {
+/* cuando está abierto, movemos el icono a la izquierda */
+.pc-platform-sidebar-open .pc-menu-item-icon {
   left: 14px;
   transform: none;
 }
@@ -180,6 +185,12 @@
   transform: translateX(-4px);
   transition: opacity 0.15s ease, transform 0.15s ease;
   font-size: 15px;
+}
+
+/* Textos visibles solo cuando está abierto */
+.pc-platform-sidebar-open .pc-menu-item-label {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Indicador lateral fino para activo (gris claro, no morado) */
@@ -204,12 +215,6 @@
 
 .pc-menu-item-active .pc-menu-item-indicator {
   background: #e5e7eb;
-}
-
-/* Textos visibles solo en hover de la barra */
-.pc-platform-sidebar:hover .pc-menu-item-label {
-  opacity: 1;
-  transform: translateX(0);
 }
 
 /* Botón de configuración abajo */
@@ -248,3 +253,4 @@
   background: #111827;
   color: #f9fafb;
 }
+

@@ -21,10 +21,10 @@ scope "/ui", PrettycoreWeb do
   pipe_through :browser
 
   live "/login", LoginLive
-  live "/platform", PlatformIndexLive
-  live "/programacion", ProgrammingHomeLive
-  live "/programacion/sql", ProgrammingIndexLive
-  live "/workorder", WorkorderLive
+  live "/platform", Inicio
+  live "/programacion", Programacion
+  live "/programacion/sql", HerramientaSql
+  live "/workorder", WorkOrder
 end
 
 scope "/ui", PrettycoreWeb do

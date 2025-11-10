@@ -1,21 +1,28 @@
-defmodule PrettycoreWeb.ProgrammingIndexLive do
+defmodule PrettycoreWeb.HerramientaSql do
   use PrettycoreWeb, :live_view
 
   import PrettycoreWeb.PlatformLayout
   alias Prettycore.TdsClient
+  alias Decimal
 
   def mount(_params, _session, socket) do
     {:ok,
      socket
      |> assign(:current_page, "programacion_sql")
      |> assign(:show_programacion_children, true)
+     |> assign(:sidebar_open, true)
      |> assign(:sql_query, "SELECT * FROM SYS_UDN;")
      |> assign(:columns, [])
      |> assign(:rows, [])
      |> assign(:error, nil)}
   end
 
-  ## Navegación del menú
+  ## Navegación / toggle sidebar
+
+  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
+    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
+  end
+
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/ui/platform")}
   end
@@ -25,20 +32,19 @@ defmodule PrettycoreWeb.ProgrammingIndexLive do
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, socket} # ya estás aquí
+    {:noreply, socket}
   end
 
-    def handle_event("change_page", %{"id" => "workorder"}, socket) do
+  def handle_event("change_page", %{"id" => "workorder"}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
   end
-
 
   def handle_event("change_page", _params, socket) do
     {:noreply, socket}
   end
 
-
   ## Ejecutar SQL
+
   def handle_event("run_sql", %{"sql_query" => query}, socket) do
     sql =
       query
@@ -50,7 +56,13 @@ defmodule PrettycoreWeb.ProgrammingIndexLive do
         {:noreply, assign(socket, :error, "Escribe una consulta.")}
 
       not allowed_sql?(sql) ->
-        {:noreply, assign(socket, :error, "Solo se permiten consultas SELECT o UPDATE.")}
+        {:noreply,
+         assign(
+           socket,
+           :error,
+           "Solo se permiten SELECT, UPDATE, INSERT, DELETE, " <>
+             "CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE o WITH (CTE)."
+         )}
 
       true ->
         case TdsClient.query(sql, []) do
@@ -91,17 +103,22 @@ defmodule PrettycoreWeb.ProgrammingIndexLive do
     end
   end
 
+  ## Render
+
   def render(assigns) do
     ~H"""
     <.platform_shell
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
+      sidebar_open={@sidebar_open}
     >
       <section>
         <header class="pc-page-header">
           <h1>Programación · Herramienta SQL</h1>
           <p>
-            Ejecuta consultas SELECT o UPDATE directamente contra tu base SQL Server.
+            Ejecuta consultas SELECT, UPDATE, INSERT, DELETE,
+            CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE
+            o WITH (CTE) directamente contra tu base SQL Server.
           </p>
         </header>
 
@@ -121,7 +138,8 @@ defmodule PrettycoreWeb.ProgrammingIndexLive do
                 Ejecutar consulta
               </button>
               <span class="sql-console-hint">
-                Se permiten SELECT y UPDATE.
+                Se permiten SELECT, UPDATE, INSERT, DELETE,
+                CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE y WITH (CTE).
               </span>
             </div>
           </form>
@@ -172,20 +190,50 @@ defmodule PrettycoreWeb.ProgrammingIndexLive do
   ## Helpers
 
   defp allowed_sql?(sql) do
-    up = sql |> String.trim_leading() |> String.upcase()
-    String.starts_with?(up, "SELECT") or String.starts_with?(up, "UPDATE")
+    up =
+      sql
+      |> String.trim_leading()
+      |> drop_leading_semicolons()
+      |> String.upcase()
+
+    cond do
+      String.starts_with?(up, "SELECT") -> true
+      String.starts_with?(up, "UPDATE") -> true
+      String.starts_with?(up, "INSERT") -> true
+      String.starts_with?(up, "DELETE") -> true
+      String.starts_with?(up, "CREATE TABLE") -> true
+      String.starts_with?(up, "CREATE OR ALTER VIEW") -> true
+      String.starts_with?(up, "CREATE VIEW") -> true
+      String.starts_with?(up, "ALTER TABLE") -> true
+      String.starts_with?(up, "WITH") -> true
+      true -> false
+    end
   end
 
-  defp norm(v) when is_binary(v), do: :unicode.characters_to_binary(v, :latin1, :utf8)
+  defp drop_leading_semicolons(str), do: do_drop_semis(str)
+
+  defp do_drop_semis(<<";", rest::binary>>), do: do_drop_semis(rest)
+  defp do_drop_semis(str), do: str
+
+  defp norm(v) when is_binary(v),
+    do: :unicode.characters_to_binary(v, :latin1, :utf8)
 
   defp norm({{y, m, d}, {hh, mm, ss, ms}}),
-    do: NaiveDateTime.new!(y, m, d, hh, mm, ss, {ms, 3}) |> NaiveDateTime.to_iso8601()
+    do:
+      NaiveDateTime.new!(y, m, d, hh, mm, ss, {ms, 3})
+      |> NaiveDateTime.to_iso8601()
 
   defp norm({{y, m, d}, {hh, mm, ss}}),
-    do: NaiveDateTime.new!(y, m, d, hh, mm, ss, 0) |> NaiveDateTime.to_iso8601()
+    do:
+      NaiveDateTime.new!(y, m, d, hh, mm, ss, 0)
+      |> NaiveDateTime.to_iso8601()
 
-  defp norm({y, m, d}), do: Date.new!(y, m, d) |> Date.to_iso8601()
-  defp norm(%Decimal{} = d), do: Decimal.to_string(d)
+  defp norm({y, m, d}),
+    do: Date.new!(y, m, d) |> Date.to_iso8601()
+
+  defp norm(%Decimal{} = d),
+    do: Decimal.to_string(d)
+
   defp norm(nil), do: ""
   defp norm(v), do: v
 end

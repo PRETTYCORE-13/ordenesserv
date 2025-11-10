@@ -1,8 +1,5 @@
 /* ===== Tailwind core (manténlo si usas Tailwind) ===== */
 @import "tailwindcss" source(none);
-@source "../css";
-@source "../js";
-@source "../../lib/prettycore_web";
 
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);

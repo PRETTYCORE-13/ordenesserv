@@ -13,6 +13,9 @@ defmodule Prettycore.WorkOrder do
     field :woke_referencia, :string, source: :"WOKE_REFERENCIA"
     field :woktpo_codigo_k, :string, source: :"WOKTPO_CODIGO_K"
 
-    field :woke_descripcion,  :string,         source: :"WOKE_DESCRIPCION"
+    field :woke_descripcion, :string, source: :"WOKE_DESCRIPCION"
+
+    # Estado: 100 = por aceptar, 1 = aceptada, 0 = rechazada
+    field :s_maqedo, :integer, source: :"S_MAQEDO"
   end
 end

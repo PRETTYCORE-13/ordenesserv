@@ -11,6 +11,7 @@ defmodule PrettycoreWeb.PlatformLayout do
   attr :current_page, :string, required: true
   attr :menu_event, :string, default: "change_page"
   attr :show_programacion_children, :boolean, default: false
+  attr :sidebar_open, :boolean, default: true
   slot :inner_block, required: true
 
   def platform_shell(assigns) do
@@ -19,8 +20,8 @@ defmodule PrettycoreWeb.PlatformLayout do
     ~H"""
     <div class="pc-platform">
       <!-- Sidebar -->
-      <aside class="pc-platform-sidebar">
-        <!-- BLOQUE FIJO (logo + NAVEGACIÓN) -->
+      <aside class={"pc-platform-sidebar" <> if @sidebar_open, do: " pc-platform-sidebar-open", else: ""}>
+        <!-- BLOQUE FIJO (logo + toggle) -->
         <div class="pc-platform-sidebar-top">
           <div class="pc-platform-logo-group">
             <img
@@ -34,7 +35,35 @@ defmodule PrettycoreWeb.PlatformLayout do
             </div>
           </div>
 
-
+          <!-- Botón toggle de abrir/cerrar -->
+          <button
+            type="button"
+            class="pc-menu-item pc-menu-toggle"
+            phx-click={@menu_event}
+            phx-value-id="toggle_sidebar"
+          >
+            <span class="pc-menu-item-indicator" />
+            <span class="pc-menu-item-icon">
+              <%= if @sidebar_open do %>
+                <!-- icono cerrar -->
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M15 4a1 1 0 0 1 .7 1.7L11.4 10l4.3 4.3A1 1 0 1 1 14.3 16L9.6 11.3a1 1 0 0 1 0-1.4L14.3 5A1 1 0 0 1 15 4Z"
+                  />
+                </svg>
+              <% else %>
+                <!-- icono abrir -->
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M9 4a1 1 0 0 0-.7 1.7L12.6 10l-4.3 4.3A1 1 0 0 0 9.7 16l4.7-4.7a1 1 0 0 0 0-1.4L9.7 5A1 1 0 0 0 9 4Z"
+                  />
+                </svg>
+              <% end %>
+            </span>
+            <span class="pc-menu-item-label">Menú</span>
+          </button>
         </div>
 
         <!-- BLOQUE MENÚ (iconos + config) -->
@@ -93,7 +122,7 @@ defmodule PrettycoreWeb.PlatformLayout do
     """
   end
 
-  ## ICONOS SVG SÓLIDOS, COLOR CONTROLADO POR CSS (currentColor)
+  ## ICONOS SVG SÓLIDOS
 
   attr :name, :string, required: true
   def pc_icon(assigns) do
@@ -122,7 +151,7 @@ defmodule PrettycoreWeb.PlatformLayout do
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="currentColor"
-            d="M8 3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V8.5L13.5 3H8Zm5 1.5L17.5 9H13V4.5ZM9 11h6c.6 0 1 .4 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1s.4-1 1-1Zm0 4h4c.6 0 1 .4 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1s.4-1 1-1Z"
+            d="M8 3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V8.5L13.5 3H8Zm5 1.5L17.5 9H13V4.5ZM9 11h6c.6 0 1 .4 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1s.4-1 1-1Zm0 4h4c.6 0 1 .4 1 1s-.4 1-1 1H9c-.6 0-1-.4-1-1Z"
           />
         </svg>
 

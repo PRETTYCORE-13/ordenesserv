@@ -1,4 +1,4 @@
-defmodule PrettycoreWeb.PlatformIndexLive do
+defmodule PrettycoreWeb.Inicio do
   use PrettycoreWeb, :live_view
 
   import PrettycoreWeb.PlatformLayout
@@ -7,9 +7,18 @@ defmodule PrettycoreWeb.PlatformIndexLive do
     {:ok,
      socket
      |> assign(:current_page, "inicio")
+     |> assign(:sidebar_open, true)
      |> assign(:show_programacion_children, false)}
   end
 
+  ## Navegación y toggle sidebar
+
+  # 1) Toggle del menú
+  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
+    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
+  end
+
+  # 2) Resto de navegación
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
     {:noreply,
      socket
@@ -17,31 +26,31 @@ defmodule PrettycoreWeb.PlatformIndexLive do
      |> assign(:show_programacion_children, false)}
   end
 
-  # Programación: navega directo a la página principal de programación
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/ui/programacion")}
   end
 
-  # WorkOrder
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-  {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
-end
+    {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
+  end
 
-
-  # Desde Inicio, si clican el hijo (Herramienta SQL) también navega
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
     {:noreply, push_navigate(socket, to: ~p"/ui/programacion/sql")}
   end
 
+  # 3) Catch-all
   def handle_event("change_page", _params, socket) do
     {:noreply, socket}
   end
+
+  ## Render
 
   def render(assigns) do
     ~H"""
     <.platform_shell
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
+      sidebar_open={@sidebar_open}
     >
       <section>
         <header class="pc-page-header">
