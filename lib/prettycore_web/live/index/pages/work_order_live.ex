@@ -19,38 +19,26 @@ defmodule PrettycoreWeb.WorkOrder do
      |> assign(:filter, "por_aceptar")}
   end
 
-  ## Navegación / toggle sidebar
+  ## Navegación
+  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket),
+    do: {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
 
-  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
-    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
-  end
+  def handle_event("change_page", %{"id" => "inicio"}, socket),
+    do: {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
 
-  def handle_event("change_page", %{"id" => "inicio"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/platform")}
-  end
+  def handle_event("change_page", %{"id" => "programacion"}, socket),
+    do: {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
 
-  def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/programacion")}
-  end
+  def handle_event("change_page", %{"id" => "programacion_sql"}, socket),
+    do: {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
 
-  def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/programacion/sql")}
-  end
+  def handle_event("change_page", _params, socket), do: {:noreply, socket}
 
-  def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, socket}
-  end
-
-  def handle_event("change_page", _params, socket) do
-    {:noreply, socket}
-  end
-
-  ## Cambiar estado (API Aceptar / Rechazar)
-
-  def handle_event("cambiar_estado", %{"ref" => ref, "estado" => estado_str}, socket) do
+  ## Cambiar estado
+  def handle_event("cambiar_estado", %{"folio" => folio, "estado" => estado_str}, socket) do
     estado = String.to_integer(estado_str)
 
-    case WorkorderApi.cambiar_estado(ref, estado) do
+    case WorkorderApi.cambiar_estado(folio, estado) do
       {:ok, _body} ->
         workorders = Workorders.list_enc()
         {:noreply, assign(socket, :workorders, workorders)}
@@ -61,33 +49,17 @@ defmodule PrettycoreWeb.WorkOrder do
     end
   end
 
-  ## Filtros (todas / por aceptar)
+  ## Filtros
+  def handle_event("set_filter", %{"filter" => filter}, socket),
+    do: {:noreply, assign(socket, :filter, filter)}
 
-  def handle_event("set_filter", %{"filter" => filter}, socket) do
-    {:noreply, assign(socket, :filter, filter)}
-  end
-
-  ## Abrir / cerrar detalle (imágenes)
-
-  def handle_event(
-        "toggle_detalle",
-        %{"sysudn" => sysudn, "systra" => systra, "serie" => serie, "folio" => folio},
-        socket
-      ) do
-    key = "#{sysudn}|#{systra}|#{serie}|#{folio}"
+  ## Abrir / cerrar detalle
+  def handle_event("toggle_detalle", %{"sysudn" => sysudn, "serie" => serie, "folio" => folio}, socket) do
+    key = "#{sysudn}|#{serie}|#{folio}"
 
     detalles_cache = socket.assigns.detalles
-
-    detalles =
-      Map.get(detalles_cache, key) ||
-        Workorders.list_det(sysudn, systra, serie, folio)
-
-    open_key =
-      if socket.assigns.open_key == key do
-        nil
-      else
-        key
-      end
+    detalles = Map.get(detalles_cache, key) || Workorders.list_det(sysudn, serie, folio)
+    open_key = if socket.assigns.open_key == key, do: nil, else: key
 
     {:noreply,
      socket
@@ -95,28 +67,18 @@ defmodule PrettycoreWeb.WorkOrder do
      |> assign(:open_key, open_key)}
   end
 
-  ## Helper para src de <img>
-
+  ## Helpers
   defp image_src(nil), do: nil
-
-  defp image_src(url) when is_binary(url) do
-    trimmed = String.trim(url)
-    if trimmed == "", do: nil, else: trimmed
-  end
-
-  ## Helper de filtros
+  defp image_src(url) when is_binary(url),
+    do: (t = String.trim(url); if t == "", do: nil, else: t)
 
   defp filter_workorders(workorders, "todas"), do: workorders
-
-  # S_MAQEDO = 100 -> por aceptar
-  defp filter_workorders(workorders, "por_aceptar") do
-    Enum.filter(workorders, &(&1.estado == 100))
-  end
-
+  defp filter_workorders(workorders, "por_aceptar"),
+    do: Enum.filter(workorders, &(&1.estado == 100))
   defp filter_workorders(workorders, _), do: workorders
 
   ## Render
-
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <.platform_shell
@@ -132,9 +94,7 @@ defmodule PrettycoreWeb.WorkOrder do
             <div class="wo-hero-icon">🛠️</div>
             <div>
               <h1 class="wo-title">Órdenes de trabajo</h1>
-              <p class="wo-subtitle">
-                Visualiza tus órdenes y las imágenes asociadas.
-              </p>
+              <p class="wo-subtitle">Visualiza tus órdenes y las imágenes asociadas.</p>
             </div>
           </div>
 
@@ -146,25 +106,20 @@ defmodule PrettycoreWeb.WorkOrder do
               </div>
             </div>
 
-            <!-- BOTONES DE FILTRO -->
             <div class="wo-filters">
               <button
                 type="button"
                 class={"wo-filter-btn" <> if @filter == "todas", do: " wo-filter-btn-active", else: ""}
                 phx-click="set_filter"
                 phx-value-filter="todas"
-              >
-                Todas
-              </button>
+              >Todas</button>
 
               <button
                 type="button"
                 class={"wo-filter-btn" <> if @filter == "por_aceptar", do: " wo-filter-btn-active", else: ""}
                 phx-click="set_filter"
                 phx-value-filter="por_aceptar"
-              >
-                Pendientes
-              </button>
+              >Pendientes</button>
             </div>
           </div>
         </header>
@@ -174,68 +129,59 @@ defmodule PrettycoreWeb.WorkOrder do
             <div class="wo-empty">
               <div class="wo-empty-icon">📭</div>
               <h2 class="wo-empty-title">Sin órdenes registradas</h2>
-              <p class="wo-empty-text">
-                No hay órdenes para el filtro seleccionado.
-              </p>
+              <p class="wo-empty-text">No hay órdenes para el filtro seleccionado.</p>
             </div>
           <% else %>
             <div class="wo-table-wrapper">
               <table class="wo-table">
                 <thead>
                   <tr>
-                    <th>#</th>
-                    <th>Referencia</th>
+                    <th>Identificador</th>
+                    <th>Descripción</th>
                     <th>Tipo</th>
                     <th class="wo-th-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <%= for {w, idx} <- Enum.with_index(filtered, 1) do %>
-                    <% key = "#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
+                  <%= for w <- filtered do %>
+                    <% key = "#{w.sysudn}|#{w.serie}|#{w.folio}" %>
 
-                    <!-- Fila principal -->
                     <tr
                       class={"wo-row" <> if @open_key == key, do: " wo-row-open", else: ""}
                       phx-click="toggle_detalle"
                       phx-value-sysudn={w.sysudn}
-                      phx-value-systra={w.systra}
                       phx-value-serie={w.serie}
                       phx-value-folio={w.folio}
                     >
-                      <td class="wo-row-indicator"><%= idx %></td>
-                      <td><span class="wo-row-ref"><%= w.referencia %></span></td>
+                      <td><%= "#{w.sysudn} #{w.serie} #{w.folio}" %></td>
+                      <td><%= Map.get(w, :descripcion, "") %></td>
                       <td><span class="wo-row-meta-badge"><%= w.tipo %></span></td>
 
                       <td class="wo-td-center">
                         <%= if @filter != "todas" do %>
-                          <!-- Aceptar = Estado 1 -->
                           <button
                             type="button"
                             class="wo-btn wo-btn-accept"
                             phx-click="cambiar_estado"
-                            phx-value-ref={w.referencia}
+                            phx-value-folio={w.folio}
                             phx-value-estado="1"
                             phx-bubble="false"
-                          >
-                            Aceptar
-                          </button>
+                          >Aceptar</button>
 
-                          <!-- Rechazar = Estado 0 -->
                           <button
                             type="button"
                             class="wo-btn wo-btn-reject"
                             phx-click="cambiar_estado"
-                            phx-value-ref={w.referencia}
+                            phx-value-folio={w.folio}
                             phx-value-estado="0"
                             phx-bubble="false"
-                          >
-                            Rechazar
-                          </button>
+                          >Rechazar</button>
+                        <% else %>
+                          <span class="wo-disabled">—</span>
                         <% end %>
                       </td>
                     </tr>
 
-                    <!-- Fila de detalles con imágenes o "Sin imágenes" -->
                     <%= if @open_key == key do %>
                       <tr class="wo-row-detail">
                         <td colspan="4">
@@ -248,9 +194,7 @@ defmodule PrettycoreWeb.WorkOrder do
                               end) %>
 
                             <%= if visibles == [] do %>
-                              <div class="wo-detail-img wo-detail-img-empty">
-                                Sin imágenes
-                              </div>
+                              <div class="wo-detail-img wo-detail-img-empty">Sin imágenes</div>
                             <% else %>
                               <%= for det <- visibles do %>
                                 <% src =
@@ -258,7 +202,6 @@ defmodule PrettycoreWeb.WorkOrder do
                                     Map.get(det, :image_url) ||
                                       Map.get(det, :image_data)
                                   ) %>
-
                                 <div class="wo-detail-card">
                                   <div class="wo-detail-meta">
                                     <span class="wo-detail-label">
@@ -267,12 +210,7 @@ defmodule PrettycoreWeb.WorkOrder do
                                           "Detalle" %>
                                     </span>
                                   </div>
-
-                                  <img
-                                    class="wo-detail-img"
-                                    src={src}
-                                    alt="Imagen de la orden"
-                                  />
+                                  <img class="wo-detail-img" src={src} alt="Imagen" />
                                 </div>
                               <% end %>
                             <% end %>

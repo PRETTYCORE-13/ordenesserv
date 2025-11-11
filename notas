@@ -1,197 +1,292 @@
-defmodule PrettycoreWeb.HerramientaSql do
+defmodule PrettycoreWeb.WorkOrder do
   use PrettycoreWeb, :live_view
 
   import PrettycoreWeb.PlatformLayout
-  alias Prettycore.TdsClient
+  alias Prettycore.Workorders
+  alias Prettycore.WorkorderApi
 
   def mount(_params, _session, socket) do
+    workorders = Workorders.list_enc()
+
     {:ok,
      socket
-     |> assign(:current_page, "programacion_sql")
-     |> assign(:show_programacion_children, true)
-     |> assign(:sidebar_open, true)          # ← AQUI CREAS EL ASSIGN
-     |> assign(:sql_query, "SELECT * FROM SYS_UDN;")
-     |> assign(:columns, [])
-     |> assign(:rows, [])
-     |> assign(:error, nil)}
+     |> assign(:current_page, "workorder")
+     |> assign(:show_programacion_children, false)
+     |> assign(:sidebar_open, true)
+     |> assign(:workorders, workorders)
+     |> assign(:open_key, nil)
+     |> assign(:detalles, %{})
+     |> assign(:filter, "por_aceptar")}
   end
 
-  ## Navegación del menú / toggle sidebar
+  ## Navegación / toggle sidebar
 
-  # Toggle del menú en esta pantalla también
   def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
     {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
   end
 
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/platform")}
+    {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
   end
 
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/programacion")}
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, socket} # ya estás aquí
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
+    {:noreply, socket}
   end
 
   def handle_event("change_page", _params, socket) do
     {:noreply, socket}
   end
 
-  ## Ejecutar SQL (igual que ya lo tenías)
-  def handle_event("run_sql", %{"sql_query" => query}, socket) do
-    sql =
-      query
-      |> String.trim()
-      |> String.replace(~r/\"([^"]*)\"/, "'\\1'")
+  ## Cambiar estado (API Aceptar / Rechazar)
 
-    cond do
-      sql == "" ->
-        {:noreply, assign(socket, :error, "Escribe una consulta.")}
+  def handle_event("cambiar_estado", %{"ref" => ref, "estado" => estado_str}, socket) do
+    estado = String.to_integer(estado_str)
 
-      not allowed_sql?(sql) ->
-        {:noreply, assign(socket, :error, "Solo se permiten consultas SELECT o UPDATE.")}
+    case WorkorderApi.cambiar_estado(ref, estado) do
+      {:ok, _body} ->
+        workorders = Workorders.list_enc()
+        {:noreply, assign(socket, :workorders, workorders)}
 
-      true ->
-        case TdsClient.query(sql, []) do
-          {:ok, %Tds.Result{columns: cols, rows: rows} = res} ->
-            if is_list(cols) and cols != [] do
-              columns = Enum.map(cols, &to_string/1)
-
-              rows_norm =
-                Enum.map(rows || [], fn row ->
-                  Enum.map(row, &norm/1)
-                end)
-
-              {:noreply,
-               socket
-               |> assign(:sql_query, query)
-               |> assign(:error, nil)
-               |> assign(:columns, columns)
-               |> assign(:rows, rows_norm)}
-            else
-              {:noreply,
-               socket
-               |> assign(:sql_query, query)
-               |> assign(:error, nil)
-               |> assign(:columns, ["Resultado"])
-               |> assign(:rows, [[
-                 "Comando ejecutado con éxito (#{res.num_rows || 0} filas afectadas)"
-               ]])}
-            end
-
-          {:error, reason} ->
-            {:noreply,
-             socket
-             |> assign(:sql_query, query)
-             |> assign(:error, "Error al ejecutar: #{inspect(reason)}")
-             |> assign(:columns, [])
-             |> assign(:rows, [])}
-        end
+      {:error, reason} ->
+        IO.inspect(reason, label: "error cambiar_estado")
+        {:noreply, socket}
     end
   end
 
+  ## Filtros (todas / por aceptar)
+
+  def handle_event("set_filter", %{"filter" => filter}, socket) do
+    {:noreply, assign(socket, :filter, filter)}
+  end
+
+  ## Abrir / cerrar detalle (imágenes)
+
+  def handle_event(
+        "toggle_detalle",
+        %{"sysudn" => sysudn, "systra" => systra, "serie" => serie, "folio" => folio},
+        socket
+      ) do
+    key = "#{sysudn}|#{systra}|#{serie}|#{folio}"
+
+    detalles_cache = socket.assigns.detalles
+
+    detalles =
+      Map.get(detalles_cache, key) ||
+        Workorders.list_det(sysudn, systra, serie, folio)
+
+    open_key =
+      if socket.assigns.open_key == key do
+        nil
+      else
+        key
+      end
+
+    {:noreply,
+     socket
+     |> assign(:detalles, Map.put(detalles_cache, key, detalles))
+     |> assign(:open_key, open_key)}
+  end
+
+  ## Helpers
+
+  defp image_src(nil), do: nil
+
+  defp image_src(url) when is_binary(url) do
+    trimmed = String.trim(url)
+    if trimmed == "", do: nil, else: trimmed
+  end
+
+  defp filter_workorders(workorders, "todas"), do: workorders
+
+  defp filter_workorders(workorders, "por_aceptar") do
+    Enum.filter(workorders, &(&1.estado == 100))
+  end
+
+  defp filter_workorders(workorders, _), do: workorders
+
+  ## Render
+
+  @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
     <.platform_shell
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
-      sidebar_open={@sidebar_open}   <!-- ahora sí existe -->
+      sidebar_open={@sidebar_open}
     >
-      <section>
-        <header class="pc-page-header">
-          <h1>Programación · Herramienta SQL</h1>
-          <p>
-            Ejecuta consultas SELECT o UPDATE directamente contra tu base SQL Server.
-          </p>
+      <% filtered = filter_workorders(@workorders, @filter) %>
+
+      <section class="wo-page">
+        <header class="wo-header">
+          <div class="wo-hero-main">
+            <div class="wo-hero-icon">🛠️</div>
+            <div>
+              <h1 class="wo-title">Órdenes de trabajo</h1>
+              <p class="wo-subtitle">
+                Visualiza tus órdenes y las imágenes asociadas.
+              </p>
+            </div>
+          </div>
+
+          <div class="wo-header-right">
+            <div class="wo-stats">
+              <div class="wo-stat-card">
+                <span class="wo-stat-label">Total de órdenes</span>
+                <span class="wo-stat-value"><%= length(filtered) %></span>
+              </div>
+            </div>
+
+            <!-- BOTONES DE FILTRO -->
+            <div class="wo-filters">
+              <button
+                type="button"
+                class={"wo-filter-btn" <> if @filter == "todas", do: " wo-filter-btn-active", else: ""}
+                phx-click="set_filter"
+                phx-value-filter="todas"
+              >
+                Todas
+              </button>
+
+              <button
+                type="button"
+                class={"wo-filter-btn" <> if @filter == "por_aceptar", do: " wo-filter-btn-active", else: ""}
+                phx-click="set_filter"
+                phx-value-filter="por_aceptar"
+              >
+                Pendientes
+              </button>
+            </div>
+          </div>
         </header>
 
-        <div class="pc-page-card sql-console">
-          <form phx-submit="run_sql">
-            <label class="sql-console-label">
-              Consulta SQL
-            </label>
-            <textarea
-              name="sql_query"
-              class="sql-editor"
-              rows="6"
-            ><%= @sql_query %></textarea>
-
-            <div class="sql-console-actions">
-              <button type="submit" class="sql-run-btn">
-                Ejecutar consulta
-              </button>
-              <span class="sql-console-hint">
-                Se permiten SELECT y UPDATE.
-              </span>
+        <div class="wo-table-card">
+          <%= if filtered == [] do %>
+            <div class="wo-empty">
+              <div class="wo-empty-icon">📭</div>
+              <h2 class="wo-empty-title">Sin órdenes registradas</h2>
+              <p class="wo-empty-text">
+                No hay órdenes para el filtro seleccionado.
+              </p>
             </div>
-          </form>
-
-          <%= if @error do %>
-            <div class="sql-console-error">
-              <%= @error %>
-            </div>
-          <% end %>
-        </div>
-
-        <%= if @columns != [] do %>
-          <div class="pc-page-card sql-result-card">
-            <div class="sql-result-header">
-              <span>Resultados</span>
-              <span class="sql-result-meta">
-                <%= length(@rows) %> filas
-              </span>
-            </div>
-
-            <div class="sql-result-wrapper">
-              <table class="sql-result-table">
+          <% else %>
+            <div class="wo-table-wrapper">
+              <table class="wo-table">
                 <thead>
                   <tr>
-                    <%= for col <- @columns do %>
-                      <th><%= col %></th>
-                    <% end %>
+                    <th>#</th>
+                    <th>Referencia</th>
+                    <th>Descripción</th>
+                    <th>Tipo</th>
+                    <th class="wo-th-center">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <%= for row <- @rows do %>
-                    <tr>
-                      <%= for cell <- row do %>
-                        <td><%= cell %></td>
-                      <% end %>
+                  <%= for {w, idx} <- Enum.with_index(filtered, 1) do %>
+                    <% key = "#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
+
+                    <!-- Fila principal -->
+                    <tr
+                      class={"wo-row" <> if @open_key == key, do: " wo-row-open", else: ""}
+                      phx-click="toggle_detalle"
+                      phx-value-sysudn={w.sysudn}
+                      phx-value-systra={w.systra}
+                      phx-value-serie={w.serie}
+                      phx-value-folio={w.folio}
+                    >
+                      <td class="wo-row-indicator"><%= idx %></td>
+
+                      <td><span class="wo-row-ref"><%= w.referencia %></span></td>
+
+                      <td><span class="wo-row-desc"><%= Map.get(w, :descripcion, "") %></span></td>
+
+                      <td><span class="wo-row-meta-badge"><%= w.tipo %></span></td>
+
+                      <td class="wo-td-center">
+                        <%= if @filter != "todas" do %>
+                          <!-- Aceptar -->
+                          <button
+                            type="button"
+                            class="wo-btn wo-btn-accept"
+                            phx-click="cambiar_estado"
+                            phx-value-ref={w.referencia}
+                            phx-value-estado="1"
+                            phx-bubble="false"
+                          >
+                            Aceptar
+                          </button>
+
+                          <!-- Rechazar -->
+                          <button
+                            type="button"
+                            class="wo-btn wo-btn-reject"
+                            phx-click="cambiar_estado"
+                            phx-value-ref={w.referencia}
+                            phx-value-estado="0"
+                            phx-bubble="false"
+                          >
+                            Rechazar
+                          </button>
+                        <% else %>
+                          <span class="wo-disabled">—</span>
+                        <% end %>
+                      </td>
                     </tr>
+
+                    <!-- Fila de detalles con imágenes -->
+                    <%= if @open_key == key do %>
+                      <tr class="wo-row-detail">
+                        <td colspan="5">
+                          <div class="wo-detail-grid">
+                            <% detalles = Map.get(@detalles, key, []) %>
+                            <% visibles =
+                              Enum.filter(detalles, fn d ->
+                                src = image_src(Map.get(d, :image_url) || Map.get(d, :image_data))
+                                not is_nil(src)
+                              end) %>
+
+                            <%= if visibles == [] do %>
+                              <div class="wo-detail-img wo-detail-img-empty">Sin imágenes</div>
+                            <% else %>
+                              <%= for det <- visibles do %>
+                                <% src =
+                                  image_src(
+                                    Map.get(det, :image_url) ||
+                                      Map.get(det, :image_data)
+                                  ) %>
+
+                                <div class="wo-detail-card">
+                                  <div class="wo-detail-meta">
+                                    <span class="wo-detail-label">
+                                      <%= Map.get(det, :descripcion) ||
+                                          Map.get(det, :concepto) ||
+                                          "Detalle" %>
+                                    </span>
+                                  </div>
+
+                                  <img class="wo-detail-img" src={src} alt="Imagen" />
+                                </div>
+                              <% end %>
+                            <% end %>
+                          </div>
+                        </td>
+                      </tr>
+                    <% end %>
                   <% end %>
                 </tbody>
               </table>
             </div>
-          </div>
-        <% end %>
+          <% end %>
+        </div>
       </section>
     </.platform_shell>
     """
   end
-
-  ## Helpers (igual que antes)
-
-  defp allowed_sql?(sql) do
-    up = sql |> String.trim_leading() |> String.upcase()
-    String.starts_with?(up, "SELECT") or String.starts_with?(up, "UPDATE")
-  end
-
-  defp norm(v) when is_binary(v), do: :unicode.characters_to_binary(v, :latin1, :utf8)
-
-  defp norm({{y, m, d}, {hh, mm, ss, ms}}),
-    do: NaiveDateTime.new!(y, m, d, hh, mm, ss, {ms, 3}) |> NaiveDateTime.to_iso8601()
-
-  defp norm({{y, m, d}, {hh, mm, ss}}),
-    do: NaiveDateTime.new!(y, m, d, hh, mm, ss, 0) |> NaiveDateTime.to_iso8601()
-
-  defp norm({y, m, d}), do: Date.new!(y, m, d) |> Date.to_iso8601()
-  defp norm(%Decimal{} = d), do: Decimal.to_string(d)
-  defp norm(nil), do: ""
-  defp norm(v), do: v
 end

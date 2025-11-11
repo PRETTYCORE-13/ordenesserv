@@ -42,7 +42,7 @@ end
           </div>
         <% end %>
 
-        <form class="pc-login-form" phx-submit="login">
+        <.form class="pc-login-form" action="/ui/login" method="post">
           <div class="pc-field">
             <label for="username">Usuario</label>
             <input
@@ -69,7 +69,7 @@ end
           <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">
             Entrar
           </button>
-        </form>
+        </.form>
       </div>
     </div>
     """

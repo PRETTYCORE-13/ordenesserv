@@ -1,86 +1,83 @@
 defmodule Prettycore.Workorders do
-  import Ecto.Query, only: [from: 2]
+  @moduledoc false
 
   alias Prettycore.Repo
-  alias Prettycore.WorkOrder
-  alias Ecto.Adapters.SQL
 
-  @doc """
-  Lista encabezados desde XEN_WOKORDERENC.
+  ## Encabezados (órdenes)
 
-  Regresa:
-  - referencia
-  - tipo
-  - sysudn, systra, serie, folio (llaves para detalle)
-  - estado (S_MAQEDO)
-  """
   def list_enc do
-    from(w in WorkOrder,
-      select: %{
-        referencia: w.woke_referencia,
-        tipo: w.woktpo_codigo_k,
-        sysudn: w.sysudn_codigo_k,
-        systra: w.systra_codigo_k,
-        serie: w.woke_serie_k,
-        folio: w.woke_folio_k,
-        estado: w.s_maqedo
-      }
-    )
-    |> Repo.all()
-  end
-
-  @doc """
-  Lee detalle desde XEN_WOKORDERDET con SELECT * y trata de detectar el campo de imagen.
-
-  Regresa lista de mapas:
-    [%{image_data: "...base64..."}, ...]
-  """
-  def list_det(sysudn, systra, serie, folio) do
     sql = """
-    SELECT *
-    FROM [dbo].[XEN_WOKORDERDET]
-    WHERE SYSUDN_CODIGO_K = @1
-      AND SYSTRA_CODIGO_K = @2
-      AND WOKE_SERIE_K   = @3
-      AND WOKE_FOLIO_K   = @4
+    SELECT
+      SYSUDN_CODIGO_K,
+      SYSTRA_CODIGO_K,
+      WOKE_SERIE_K,
+      WOKE_FOLIO_K,
+      WOKE_REFERENCIA,
+      WOKTPO_CODIGO_K,
+      S_MAQEDO,
+      WOKE_DESCRIPCION
+    FROM XEN_WOKORDERENC
     """
 
-    case SQL.query(Repo, sql, [sysudn, systra, serie, folio]) do
-      {:ok, %{columns: cols, rows: rows}} ->
-        Enum.map(rows, fn row ->
-          row_map =
-            cols
-            |> Enum.zip(row)
-            |> Enum.into(%{})
+    {:ok, %{columns: cols, rows: rows}} = Repo.query(sql, [])
 
-          img1 =
-            row_map
-            |> Enum.find_value(fn {k, v} ->
-              name = k |> to_string() |> String.upcase()
+    Enum.map(rows, fn row ->
+      row_map = to_map(cols, row)
 
-              if (String.contains?(name, "IMG") or String.contains?(name, "IMAGE")) and
-                   is_binary(v) and v != "" do
-                v
-              else
-                nil
-              end
-            end)
+      %{
+        sysudn:      row_map["SYSUDN_CODIGO_K"],
+        systra:      row_map["SYSTRA_CODIGO_K"],
+        serie:       row_map["WOKE_SERIE_K"],
+        folio:       row_map["WOKE_FOLIO_K"],
+        referencia:  row_map["WOKE_REFERENCIA"],
+        tipo:        row_map["WOKTPO_CODIGO_K"],
+        estado:      row_map["S_MAQEDO"],
+        descripcion: row_map["WOKE_DESCRIPCION"]
+      }
+    end)
+  end
 
-          img =
-            img1 ||
-              Enum.find_value(row_map, fn {_k, v} ->
-                if is_binary(v) and byte_size(v) > 100 do
-                  v
-                else
-                  nil
-                end
-              end)
+  ## Detalle (imágenes)
 
-          %{image_data: img}
-        end)
+  def list_det(sysudn, systra, serie, folio) do
+    sql = """
+    SELECT
+      SYSUDN_CODIGO_K,
+      SYSTRA_CODIGO_K,
+      WOKE_SERIE_K,
+      WOKE_FOLIO_K,
+      CONCEPTO,
+      DESCRIPCION,
+      IMAGE_URL,
+      IMAGE_DATA
+    FROM XEN_WOKORDERDET
+    WHERE SYSUDN_CODIGO_K = @p1
+      AND SYSTRA_CODIGO_K = @p2
+      AND WOKE_SERIE_K    = @p3
+      AND WOKE_FOLIO_K    = @p4
+    """
 
-      {:error, _reason} ->
-        []
-    end
+    params = [sysudn, systra, serie, folio]
+
+    {:ok, %{columns: cols, rows: rows}} = Repo.query(sql, params)
+
+    Enum.map(rows, fn row ->
+      row_map = to_map(cols, row)
+
+      %{
+        concepto:   row_map["CONCEPTO"],
+        descripcion: row_map["DESCRIPCION"],
+        image_url:  row_map["IMAGE_URL"],
+        image_data: row_map["IMAGE_DATA"]
+      }
+    end)
+  end
+
+  ## Helper: lista de columnas + lista de valores -> mapa
+
+  defp to_map(cols, row) do
+    cols
+    |> Enum.zip(row)
+    |> Enum.into(%{})
   end
 end

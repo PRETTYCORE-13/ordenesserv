@@ -21,28 +21,17 @@ scope "/ui", PrettycoreWeb do
   pipe_through :browser
 
   live "/login", LoginLive
+  post "/login", SessionController, :create
+end
+
+scope "/admin", PrettycoreWeb do
+  pipe_through :browser
+
   live "/platform", Inicio
   live "/programacion", Programacion
   live "/programacion/sql", HerramientaSql
   live "/workorder", WorkOrder
 end
-
-scope "/ui", PrettycoreWeb do
-  pipe_through :browser
-  live "/sys_udn", SysUdnLive
-end
-
-  # Interfaz visual tipo Excel
-  scope "/ui", PrettycoreWeb do
-    pipe_through :browser
-    live "/sys_udn", SysUdnLive
-  end
-
-    # Interfaz visual tipo Excel
-  scope "/ui", PrettycoreWeb do
-    pipe_through :browser
-    live "/sys_udn", SysUdnLive
-  end
 
 
   # Health simple en raíz

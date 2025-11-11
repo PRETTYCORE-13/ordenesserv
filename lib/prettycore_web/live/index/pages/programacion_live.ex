@@ -19,7 +19,7 @@ defmodule PrettycoreWeb.Programacion do
   end
 
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/platform")}
+    {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
   end
 
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
@@ -27,11 +27,11 @@ defmodule PrettycoreWeb.Programacion do
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/programacion/sql")}
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/ui/workorder")}
+    {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
   end
 
   # Catch-all
