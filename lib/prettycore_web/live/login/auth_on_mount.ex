@@ -7,7 +7,7 @@ defmodule PrettycoreWeb.AuthOnMount do
   def on_mount(:ensure_authenticated, _params, session, socket) do
     case session["user_id"] do
       nil ->
-        {:halt, redirect(socket, to: "/ui/login")}
+        {:halt, redirect(socket, to: "/")}
       user_id ->
         {:cont, assign(socket, :current_user_id, user_id)}
     end

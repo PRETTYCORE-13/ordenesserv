@@ -25,7 +25,7 @@ defmodule PrettycoreWeb.LoginLive do
           <div class="pc-error"><%= live_flash(@flash, :error) %></div>
         <% end %>
 
-        <form class="pc-login-form" action={~p"/ui/login"} method="post">
+        <form class="pc-login-form" action={~p"/"} method="post">
           <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
 
           <div class="pc-field">

@@ -23,7 +23,7 @@ defmodule PrettycoreWeb.Router do
     live "/", LoginLive
 
     # Controlador que valida usuario y crea sesión
-    post "/login", SessionController, :create
+    post "/", SessionController, :create
 
     # Logout (destruye sesión)
     get "/logout", SessionController, :delete

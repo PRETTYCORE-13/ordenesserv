@@ -19,13 +19,13 @@ defmodule PrettycoreWeb.LoginController do
       {:error, :invalid_credentials} ->
         conn
         |> put_flash(:error, "Usuario o contraseña incorrectos")
-        |> redirect(to: ~p"/ui/login")
+        |> redirect(to: ~p"/")
     end
   end
 
   def delete(conn, _params) do
     conn
     |> configure_session(drop: true)
-    |> redirect(to: ~p"/ui/login")
+    |> redirect(to: ~p"/")
   end
 end

@@ -2,7 +2,7 @@ defmodule PrettycoreWeb.SessionController do
   use PrettycoreWeb, :controller
   alias Prettycore.Auth
 
-  # POST /ui/login
+  # POST /
   def create(conn, %{"username" => user, "password" => pass}) do
     case Auth.authenticate(user, pass) do
       {:ok, %{id: id}} ->
@@ -20,7 +20,7 @@ defmodule PrettycoreWeb.SessionController do
       {:error, :invalid_credentials} ->
         conn
         |> put_flash(:error, "Usuario o contraseña incorrectos")
-        |> redirect(to: ~p"/ui/login")
+        |> redirect(to: ~p"/")
     end
   end
 
@@ -29,6 +29,6 @@ defmodule PrettycoreWeb.SessionController do
     conn
     |> configure_session(drop: true)      # borra TODA la sesión
     |> put_flash(:info, "Sesión cerrada")
-    |> redirect(to: ~p"/ui/login")
+    |> redirect(to: ~p"/")
   end
 end

@@ -112,7 +112,7 @@ defmodule PrettycoreWeb.MenuLayout do
 
           <!-- Cerrar sesión -->
           <.link
-            href={"/ui/logout"}
+            href={"/logout"}
             class="pc-menu-item pc-menu-item-bottom"
             data-confirm="¿Cerrar sesión?"
           >
