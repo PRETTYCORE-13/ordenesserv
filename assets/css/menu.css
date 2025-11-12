@@ -17,15 +17,10 @@
   display: flex;
   flex-direction: column;
   width: 72px; /* cerrada */
-  height: calc(100vh - 32px);
-  margin: 16px 0 16px 16px;
-  padding: 12px 10px;
+    margin: 0px 0 0px 0px;  
+    padding: 12px 10px;
   /* background: linear-gradient(180deg, #111827 0%, #020617 50%, #4c1d95 100%); */
   color: #e5e7eb;
-  border-radius: 999px;
-  box-shadow:
-    0 0 0 1px rgba(148, 163, 184, 0.12),
-    0 18px 45px rgba(15, 23, 42, 0.6);
   transition: width 0.2s ease, border-radius 0.2s ease;
   overflow: visible;
 }
@@ -33,7 +28,7 @@
 /* ABIERTA por clase, ya no por :hover */
 .pc-platform-sidebar-open {
   width: 220px;
-  border-radius: 32px;
+  border-radius: 0;
 }
 
 /* Bloque fijo arriba (logo + toggle) */
@@ -66,7 +61,6 @@
   height: 32px;
   border-radius: 999px;
   object-fit: contain;
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
 }
 
 /* Texto del logo solo visible cuando está abierto */
@@ -254,3 +248,20 @@
   color: #f9fafb;
 }
 
+/* --- BOTÓN CERRAR SESIÓN --- */
+.pc-menu-item-logout {
+  color: #ef4444; /* rojo suave */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 8px;
+  padding-top: 10px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.pc-menu-item-logout:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.pc-menu-item-logout svg {
+  color: #ef4444;
+}

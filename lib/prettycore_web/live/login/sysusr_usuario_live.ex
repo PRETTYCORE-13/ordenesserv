@@ -1,3 +1,4 @@
+# lib/prettycore_web/live/login_live.ex
 defmodule PrettycoreWeb.LoginLive do
   use PrettycoreWeb, :live_view
 
@@ -11,22 +12,6 @@ defmodule PrettycoreWeb.LoginLive do
      |> assign(:error, nil)}
   end
 
-  # Evento cuando envían el formulario
-def handle_event("login", %{"username" => user, "password" => pass}, socket) do
-  case Auth.authenticate(user, pass) do
-    {:ok, _user} ->
-      {:noreply,
-       socket
-       |> assign(:error, nil)
-       |> push_redirect(to: ~p"/ui/platform")}
-
-    {:error, :invalid_credentials} ->
-      {:noreply,
-       socket
-       |> assign(:error, "Usuario o contraseña incorrectos")}
-  end
-end
-
   def render(assigns) do
     ~H"""
     <div class="pc-login-wrap">
@@ -36,40 +21,25 @@ end
           <p>Accede al sistema</p>
         </div>
 
-        <%= if @error do %>
-          <div class="pc-error">
-            <%= @error %>
-          </div>
+        <%= if live_flash(@flash, :error) do %>
+          <div class="pc-error"><%= live_flash(@flash, :error) %></div>
         <% end %>
 
-        <.form class="pc-login-form" action="/ui/login" method="post">
+        <form class="pc-login-form" action={~p"/ui/login"} method="post">
+          <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
+
           <div class="pc-field">
             <label for="username">Usuario</label>
-            <input
-              id="username"
-              name="username"
-              class="pc-input"
-              placeholder="Ingresa tu usuario"
-              value={@username}
-            />
+            <input id="username" name="username" class="pc-input" value={@username} />
           </div>
 
           <div class="pc-field">
             <label for="password">Contraseña</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              class="pc-input"
-              placeholder="Ingresa tu contraseña"
-              value={@password}
-            />
+            <input id="password" name="password" type="password" class="pc-input" value={@password} />
           </div>
 
-          <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">
-            Entrar
-          </button>
-        </.form>
+          <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">Entrar</button>
+        </form>
       </div>
     </div>
     """

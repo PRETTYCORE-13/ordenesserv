@@ -1,7 +1,7 @@
 defmodule PrettycoreWeb.HerramientaSql do
   use PrettycoreWeb, :live_view
 
-  import PrettycoreWeb.PlatformLayout
+  import PrettycoreWeb.MenuLayout
   alias Prettycore.TdsClient
   alias Decimal
 
@@ -107,7 +107,7 @@ defmodule PrettycoreWeb.HerramientaSql do
 
   def render(assigns) do
     ~H"""
-    <.platform_shell
+    <.sidebar
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
       sidebar_open={@sidebar_open}
@@ -183,7 +183,7 @@ defmodule PrettycoreWeb.HerramientaSql do
           </div>
         <% end %>
       </section>
-    </.platform_shell>
+    </.sidebar>
     """
   end
 

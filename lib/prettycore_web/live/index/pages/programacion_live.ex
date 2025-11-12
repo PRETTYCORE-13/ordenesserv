@@ -1,7 +1,7 @@
 defmodule PrettycoreWeb.Programacion do
   use PrettycoreWeb, :live_view
 
-  import PrettycoreWeb.PlatformLayout
+  import PrettycoreWeb.MenuLayout
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -41,7 +41,7 @@ defmodule PrettycoreWeb.Programacion do
 
   def render(assigns) do
     ~H"""
-    <.platform_shell
+    <.sidebar
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
       sidebar_open={@sidebar_open}
@@ -57,7 +57,7 @@ defmodule PrettycoreWeb.Programacion do
           <p>Página base de Programación, en blanco por ahora.</p>
         </div>
       </section>
-    </.platform_shell>
+    </.sidebar>
     """
   end
 end

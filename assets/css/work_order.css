@@ -538,3 +538,405 @@
   align-items: flex-end;
   gap: 8px;
 }
+
+/* Filtros de órdenes (estado) ya los tienes */
+.wo-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* NUEVO: filtros avanzados por columnas */
+.wo-advanced-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.wo-filter-input {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+  min-width: 140px;
+}
+
+.wo-filter-input::placeholder {
+  color: #6b7280;
+}
+
+/* Filtros de órdenes (estado) ya existen */
+.wo-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* Filtros avanzados: selects con valores disponibles */
+.wo-advanced-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.wo-filter-select {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+  min-width: 160px;
+}
+
+.wo-filter-select option {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.wo-advanced-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.wo-filter-select,
+.wo-filter-date {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+  min-width: 160px;
+}
+
+.wo-filter-select option {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.wo-filter-date::-webkit-calendar-picker-indicator {
+  filter: invert(1); /* icono del calendario claro en fondo oscuro */
+}
+
+/* Botón que abre/cierra el panel de filtros avanzados */
+.wo-filters-toggle {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.wo-filters-toggle:hover {
+  background: #111827;
+  border-color: #4b5563;
+}
+
+.wo-filters-toggle-open {
+  background: #000000;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+}
+
+.wo-filters-toggle-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.wo-filters-toggle-text {
+  white-space: nowrap;
+}
+
+.wo-filters-toggle-chevron {
+  font-size: 12px;
+  transition: transform 0.16s ease;
+}
+
+.wo-filters-toggle-chevron-open {
+  transform: rotate(180deg);
+}
+
+/* Panel desplegable de filtros */
+.wo-filters-panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #020617;
+  border: 1px solid #111827;
+}
+
+/* Layout interno de los filtros avanzados */
+.wo-advanced-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wo-filter-select,
+.wo-filter-date {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+  min-width: 160px;
+}
+
+.wo-filter-select option {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.wo-filter-date::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Botón que abre/cierra el panel de filtros avanzados */
+.wo-filters-toggle {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.wo-filters-toggle:hover {
+  background: #111827;
+  border-color: #4b5563;
+}
+
+.wo-filters-toggle-open {
+  background: #000000;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+}
+
+.wo-filters-toggle-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.wo-filters-toggle-text {
+  white-space: nowrap;
+}
+
+.wo-filters-toggle-chevron {
+  font-size: 12px;
+  transition: transform 0.16s ease;
+}
+
+.wo-filters-toggle-chevron-open {
+  transform: rotate(180deg);
+}
+
+/* Panel desplegable de filtros */
+.wo-filters-panel {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #020617;
+  border: 1px solid #111827;
+}
+
+/* Layout interno de los filtros avanzados */
+.wo-advanced-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.wo-filter-select,
+.wo-filter-date {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+  min-width: 160px;
+}
+
+.wo-filter-select option {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.wo-filter-date::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Botón que abre/cierra el menú de filtros (debajo de Total de órdenes) */
+.wo-filters-toggle {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.wo-filters-toggle:hover {
+  background: #111827;
+  border-color: #4b5563;
+}
+
+.wo-filters-toggle-open {
+  background: #000000;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+}
+
+.wo-filters-toggle-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.wo-filters-toggle-text {
+  white-space: nowrap;
+}
+
+/* Drawer lateral (derecha -> izquierda) */
+.wo-filters-drawer {
+  position: fixed;
+  top: 96px;          /* ajusta según tu header */
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  background: #020617;
+  border-left: 1px solid #111827;
+  box-shadow: -18px 0 40px rgba(15, 23, 42, 0.9);
+  padding: 14px 16px;
+  transform: translateX(100%);
+  transition: transform 0.2s ease-out;
+  z-index: 40;
+}
+
+.wo-filters-drawer-open {
+  transform: translateX(0);
+}
+
+.wo-filters-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.wo-filters-drawer-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #e5e7eb;
+}
+
+.wo-filters-drawer-close {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.wo-filters-drawer-close:hover {
+  color: #f9fafb;
+}
+
+/* Cuerpo del drawer: filtros en columna */
+.wo-filters-drawer-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wo-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wo-filter-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+}
+
+/* Inputs reutilizan estilos anteriores */
+.wo-filter-select,
+.wo-filter-date {
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 12px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.wo-filter-select option {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.wo-filter-date::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Dentro del drawer, grupo de botones Todas / Pendientes */
+.wo-filters {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.wo-filter-btn {
+  background: #1f2937;
+  color: #e5e7eb;
+  font-size: 13px;
+  border: 1px solid #374151;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.wo-filter-btn:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+.wo-filter-btn-active {
+  background: #000000;
+  border-color: #6366f1;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}

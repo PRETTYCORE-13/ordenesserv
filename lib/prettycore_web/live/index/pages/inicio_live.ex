@@ -1,7 +1,7 @@
 defmodule PrettycoreWeb.Inicio do
   use PrettycoreWeb, :live_view
 
-  import PrettycoreWeb.PlatformLayout
+  import PrettycoreWeb.MenuLayout
 
   def mount(_params, _session, socket) do
     {:ok,
@@ -47,7 +47,7 @@ defmodule PrettycoreWeb.Inicio do
 
   def render(assigns) do
     ~H"""
-    <.platform_shell
+    <.sidebar
       current_page={@current_page}
       show_programacion_children={@show_programacion_children}
       sidebar_open={@sidebar_open}
@@ -70,7 +70,7 @@ defmodule PrettycoreWeb.Inicio do
           </div>
         </div>
       </section>
-    </.platform_shell>
+    </.sidebar>
     """
   end
 end

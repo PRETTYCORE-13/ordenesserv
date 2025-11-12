@@ -1,7 +1,7 @@
 defmodule PrettycoreWeb.Router do
   use PrettycoreWeb, :router
 
-  # Navegador (para LiveView o vistas HTML)
+  ## Pipelines
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -11,36 +11,45 @@ defmodule PrettycoreWeb.Router do
     plug :put_secure_browser_headers
   end
 
-  # API (solo JSON)
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  # Interfaz Login
-scope "/ui", PrettycoreWeb do
-  pipe_through :browser
+  ## Rutas de login y sesión
+  scope "/ui", PrettycoreWeb do
+    pipe_through :browser
 
-  live "/login", LoginLive
-  post "/login", SessionController, :create
-end
+    # Página de login (LiveView)
+    live "/login", LoginLive
 
-scope "/admin", PrettycoreWeb do
-  pipe_through :browser
+    # Controlador que valida usuario y crea sesión
+    post "/login", SessionController, :create
 
-  live "/platform", Inicio
-  live "/programacion", Programacion
-  live "/programacion/sql", HerramientaSql
-  live "/workorder", WorkOrder
-end
+    # Logout (destruye sesión)
+    get "/logout", SessionController, :delete
+  end
 
+  ## ÁREA PROTEGIDA: requiere sesión
+  live_session :auth,
+    on_mount: [{PrettycoreWeb.AuthOnMount, :ensure_authenticated}] do
 
-  # Health simple en raíz
+    scope "/admin", PrettycoreWeb do
+      pipe_through :browser
+
+      live "/platform", Inicio
+      live "/programacion", Programacion
+      live "/programacion/sql", HerramientaSql
+      live "/workorder", WorkOrder
+    end
+  end
+
+  ## Health simple (sin login)
   scope "/", PrettycoreWeb do
     pipe_through :api
     get "/", HealthController, :index
   end
 
-  # Endpoints JSON
+  ## Endpoints JSON API
   scope "/api", PrettycoreWeb do
     pipe_through :api
 

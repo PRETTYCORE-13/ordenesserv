@@ -15,7 +15,9 @@ defmodule Prettycore.Workorders do
       WOKE_REFERENCIA,
       WOKTPO_CODIGO_K,
       S_MAQEDO,
-      WOKE_DESCRIPCION
+      WOKE_DESCRIPCION,
+      S_FECHA,
+      WOKE_USUARIO
     FROM XEN_WOKORDERENC
     """
 
@@ -32,7 +34,9 @@ defmodule Prettycore.Workorders do
         referencia:  row_map["WOKE_REFERENCIA"],
         tipo:        row_map["WOKTPO_CODIGO_K"],
         estado:      row_map["S_MAQEDO"],
-        descripcion: row_map["WOKE_DESCRIPCION"]
+        descripcion: row_map["WOKE_DESCRIPCION"],
+        fecha:       row_map["S_FECHA"],
+        usuario:     row_map["WOKE_USUARIO"]
       }
     end)
   end
@@ -46,34 +50,36 @@ defmodule Prettycore.Workorders do
       SYSTRA_CODIGO_K,
       WOKE_SERIE_K,
       WOKE_FOLIO_K,
-      CONCEPTO,
-      DESCRIPCION,
-      IMAGE_URL,
-      IMAGE_DATA
+      WOKD_RENGLON_K AS CONCEPTO,
+      WOKD_IMAGEN    AS IMAGE_URL
     FROM XEN_WOKORDERDET
-    WHERE SYSUDN_CODIGO_K = @p1
-      AND SYSTRA_CODIGO_K = @p2
-      AND WOKE_SERIE_K    = @p3
-      AND WOKE_FOLIO_K    = @p4
+    WHERE SYSUDN_CODIGO_K = @1
+      AND SYSTRA_CODIGO_K = @2
+      AND WOKE_SERIE_K    = @3
+      AND WOKE_FOLIO_K    = @4
     """
 
     params = [sysudn, systra, serie, folio]
 
-    {:ok, %{columns: cols, rows: rows}} = Repo.query(sql, params)
+    case Repo.query(sql, params) do
+      {:ok, %{columns: cols, rows: rows}} ->
+        Enum.map(rows, fn row ->
+          row_map = to_map(cols, row)
 
-    Enum.map(rows, fn row ->
-      row_map = to_map(cols, row)
+          %{
+            concepto:    row_map["CONCEPTO"],
+            descripcion: nil,
+            image_url:   row_map["IMAGE_URL"]
+          }
+        end)
 
-      %{
-        concepto:   row_map["CONCEPTO"],
-        descripcion: row_map["DESCRIPCION"],
-        image_url:  row_map["IMAGE_URL"],
-        image_data: row_map["IMAGE_DATA"]
-      }
-    end)
+      {:error, error} ->
+        IO.inspect(error, label: "error list_det")
+        []
+    end
   end
 
-  ## Helper: lista de columnas + lista de valores -> mapa
+  ## Helper
 
   defp to_map(cols, row) do
     cols
