@@ -1,5 +1,5 @@
 defmodule PrettycoreWeb.Inicio do
-  use PrettycoreWeb, :live_view
+  use PrettycoreWeb, :live_view_admin
 
   import PrettycoreWeb.MenuLayout
 
@@ -47,11 +47,6 @@ defmodule PrettycoreWeb.Inicio do
 
   def render(assigns) do
     ~H"""
-    <.sidebar
-      current_page={@current_page}
-      show_programacion_children={@show_programacion_children}
-      sidebar_open={@sidebar_open}
-    >
       <section>
         <header class="pc-page-header">
           <h1>Inicio</h1>
@@ -70,7 +65,6 @@ defmodule PrettycoreWeb.Inicio do
           </div>
         </div>
       </section>
-    </.sidebar>
     """
   end
 end

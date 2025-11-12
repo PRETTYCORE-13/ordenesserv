@@ -1,5 +1,5 @@
 defmodule PrettycoreWeb.HerramientaSql do
-  use PrettycoreWeb, :live_view
+  use PrettycoreWeb, :live_view_admin
 
   import PrettycoreWeb.MenuLayout
   alias Prettycore.TdsClient
@@ -107,11 +107,7 @@ defmodule PrettycoreWeb.HerramientaSql do
 
   def render(assigns) do
     ~H"""
-    <.sidebar
-      current_page={@current_page}
-      show_programacion_children={@show_programacion_children}
-      sidebar_open={@sidebar_open}
-    >
+
       <section>
         <header class="pc-page-header">
           <h1>Programación · Herramienta SQL</h1>
@@ -183,7 +179,6 @@ defmodule PrettycoreWeb.HerramientaSql do
           </div>
         <% end %>
       </section>
-    </.sidebar>
     """
   end
 

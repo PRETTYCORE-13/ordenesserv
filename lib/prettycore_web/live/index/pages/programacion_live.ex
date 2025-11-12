@@ -1,5 +1,5 @@
 defmodule PrettycoreWeb.Programacion do
-  use PrettycoreWeb, :live_view
+  use PrettycoreWeb, :live_view_admin
 
   import PrettycoreWeb.MenuLayout
 
@@ -41,11 +41,7 @@ defmodule PrettycoreWeb.Programacion do
 
   def render(assigns) do
     ~H"""
-    <.sidebar
-      current_page={@current_page}
-      show_programacion_children={@show_programacion_children}
-      sidebar_open={@sidebar_open}
-    >
+
       <section>
         <header class="pc-page-header">
           <h1>Programación</h1>
@@ -57,7 +53,6 @@ defmodule PrettycoreWeb.Programacion do
           <p>Página base de Programación, en blanco por ahora.</p>
         </div>
       </section>
-    </.sidebar>
     """
   end
 end

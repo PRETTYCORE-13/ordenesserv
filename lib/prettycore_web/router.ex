@@ -16,11 +16,11 @@ defmodule PrettycoreWeb.Router do
   end
 
   ## Rutas de login y sesión
-  scope "/ui", PrettycoreWeb do
+  scope "/", PrettycoreWeb do
     pipe_through :browser
 
     # Página de login (LiveView)
-    live "/login", LoginLive
+    live "/", LoginLive
 
     # Controlador que valida usuario y crea sesión
     post "/login", SessionController, :create
