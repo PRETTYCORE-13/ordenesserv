@@ -1,7 +1,7 @@
 defmodule PrettycoreWeb.WorkOrder do
-  use PrettycoreWeb, :live_view_admin
+  use PrettycoreWeb, :live_view
 
-  import PrettycoreWeb.MenuLayout
+  import PrettycoreWeb.PlatformLayout
   alias Prettycore.Workorders
   alias Prettycore.WorkorderApi
 
@@ -141,7 +141,11 @@ defmodule PrettycoreWeb.WorkOrder do
   @spec render(any()) :: Phoenix.LiveView.Rendered.t()
   def render(assigns) do
     ~H"""
-
+    <.platform_shell
+      current_page={@current_page}
+      show_programacion_children={@show_programacion_children}
+      sidebar_open={@sidebar_open}
+    >
       <% base = filter_workorders(@workorders, @filter) %>
 
       <% sysudn_opts =
@@ -492,6 +496,7 @@ defmodule PrettycoreWeb.WorkOrder do
           <% end %>
         </div>
       </section>
+    </.platform_shell>
     """
   end
 end

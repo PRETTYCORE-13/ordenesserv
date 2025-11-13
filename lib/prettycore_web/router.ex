@@ -1,3 +1,4 @@
+# lib/prettycore_web/router.ex
 defmodule PrettycoreWeb.Router do
   use PrettycoreWeb, :router
 
@@ -29,24 +30,23 @@ defmodule PrettycoreWeb.Router do
     get "/logout", SessionController, :delete
   end
 
-  ## ÁREA PROTEGIDA: requiere sesión
-  live_session :auth,
-    on_mount: [{PrettycoreWeb.AuthOnMount, :ensure_authenticated}] do
+## ÁREA PROTEGIDA: requiere sesión
+live_session :auth,
+  on_mount: [{PrettycoreWeb.AuthOnMount, :ensure_authenticated}] do
+  scope "/admin", PrettycoreWeb do
+    pipe_through :browser
 
-    scope "/admin", PrettycoreWeb do
-      pipe_through :browser
-
-      live "/platform", Inicio
-      live "/programacion", Programacion
-      live "/programacion/sql", HerramientaSql
-      live "/workorder", WorkOrder
-    end
+    live "/platform/:email", Inicio
+    live "/programacion/:email", Programacion
+    live "/programacion/sql/:email", HerramientaSql
+    live "/workorder/:email", WorkOrderLive
   end
+end
 
   ## Health simple (sin login)
   scope "/", PrettycoreWeb do
     pipe_through :api
-    get "/", HealthController, :index
+    get "/health", HealthController, :index
   end
 
   ## Endpoints JSON API

@@ -3,12 +3,17 @@ defmodule PrettycoreWeb.Inicio do
 
   import PrettycoreWeb.MenuLayout
 
-  def mount(_params, _session, socket) do
+  # Recibimos el :email desde la ruta /admin/platform/:email
+  def mount(%{"email" => email} = _params, _session, socket) do
+    current_path = "/admin/platform/#{email}"
+
     {:ok,
      socket
      |> assign(:current_page, "inicio")
      |> assign(:sidebar_open, true)
-     |> assign(:show_programacion_children, false)}
+     |> assign(:show_programacion_children, false)
+     |> assign(:current_user_email, email)
+     |> assign(:current_path, current_path)}
   end
 
   ## Navegación y toggle sidebar
@@ -19,23 +24,31 @@ defmodule PrettycoreWeb.Inicio do
   end
 
   # 2) Resto de navegación
+
+  # Ir a Inicio (manteniendo el email en la URL)
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
+    email = socket.assigns.current_user_email
+
     {:noreply,
      socket
      |> assign(:current_page, "inicio")
-     |> assign(:show_programacion_children, false)}
+     |> assign(:show_programacion_children, false)
+     |> push_navigate(to: ~p"/admin/platform/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/workorder/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql/#{email}")}
   end
 
   # 3) Catch-all
@@ -51,6 +64,10 @@ defmodule PrettycoreWeb.Inicio do
         <header class="pc-page-header">
           <h1>Inicio</h1>
           <p>Resumen general de tu espacio PrettyCore.</p>
+          <p class="pc-small-muted">
+            Correo actual: {@current_user_email} <br />
+            URL actual: {@current_path}
+          </p>
         </header>
 
         <div class="pc-page-grid">

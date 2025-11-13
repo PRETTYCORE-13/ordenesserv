@@ -1,21 +1,27 @@
+# lib/prettycore_web/controllers/session_controller.ex
 defmodule PrettycoreWeb.SessionController do
   use PrettycoreWeb, :controller
   alias Prettycore.Auth
 
-  # POST /
   def create(conn, %{"username" => user, "password" => pass}) do
     case Auth.authenticate(user, pass) do
-      {:ok, %{id: id}} ->
-        conn
-        |> put_session(:user_id, id)      # guarda el ID del usuario
-        |> configure_session(renew: true) # rota el session id
-        |> redirect(to: ~p"/admin/platform")
+      {:ok, user_struct} ->
+        # Tomamos id y email de la estructura si existen,
+        # y usamos el username como fallback.
+        user_id =
+          user_struct
+          |> Map.get(:id, user)
 
-      {:ok, _} ->
+        email =
+          user_struct
+          |> Map.get(:email, user)
+
         conn
-        |> put_session(:user_id, user)    # si tu Auth no devuelve id aún
+        |> put_session(:user_id, user_id)
+        |> put_session(:user_email, email)
         |> configure_session(renew: true)
-        |> redirect(to: ~p"/admin/platform")
+        # Redirige a /admin/platform/<email>
+        |> redirect(to: ~p"/admin/platform/#{email}")
 
       {:error, :invalid_credentials} ->
         conn
@@ -24,11 +30,9 @@ defmodule PrettycoreWeb.SessionController do
     end
   end
 
-  # GET /ui/logout
   def delete(conn, _params) do
     conn
-    |> configure_session(drop: true)      # borra TODA la sesión
-    |> put_flash(:info, "Sesión cerrada")
+    |> configure_session(drop: true)
     |> redirect(to: ~p"/")
   end
 end

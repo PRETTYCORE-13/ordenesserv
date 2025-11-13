@@ -3,12 +3,15 @@ defmodule PrettycoreWeb.Programacion do
 
   import PrettycoreWeb.MenuLayout
 
-  def mount(_params, _session, socket) do
+  # RECIBIR EL EMAIL DE LA RUTA /admin/programacion/:email
+  def mount(%{"email" => email} = _params, _session, socket) do
     {:ok,
      socket
      |> assign(:current_page, "programacion")
-     |> assign(:sidebar_open, true)             # estado inicial
-     |> assign(:show_programacion_children, true)}
+     |> assign(:sidebar_open, true)
+     |> assign(:show_programacion_children, true)
+     |> assign(:current_user_email, email)
+     |> assign(:current_path, "/admin/programacion/#{email}")}
   end
 
   ## Navegación + toggle sidebar
@@ -19,19 +22,26 @@ defmodule PrettycoreWeb.Programacion do
   end
 
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/platform/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    {:noreply, socket} # ya estás aquí
+    # ya estás aquí
+    {:noreply,
+     socket
+     |> assign(:current_page, "programacion")
+     |> assign(:show_programacion_children, true)}
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/workorder/#{email}")}
   end
 
   # Catch-all
@@ -41,11 +51,14 @@ defmodule PrettycoreWeb.Programacion do
 
   def render(assigns) do
     ~H"""
-
       <section>
         <header class="pc-page-header">
           <h1>Programación</h1>
           <p>Sección general de programación. Aquí luego metemos más módulos.</p>
+          <p class="pc-small-muted">
+            Correo actual: {@current_user_email} <br />
+            URL actual: {@current_path}
+          </p>
         </header>
 
         <div class="pc-page-card">

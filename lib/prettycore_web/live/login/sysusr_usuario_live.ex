@@ -29,7 +29,7 @@ defmodule PrettycoreWeb.LoginLive do
           <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
 
           <div class="pc-field">
-            <label for="username">Usuario</label>
+            <label for="username">Usuario (correo)</label>
             <input id="username" name="username" class="pc-input" value={@username} />
           </div>
 

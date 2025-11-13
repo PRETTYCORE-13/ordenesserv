@@ -3,20 +3,19 @@ defmodule Prettycore.WorkorderApi do
 
   @url "http://ecore.ath.cx:1406/SP/EN_RESTHELPER/workorderEstado"
 
-  # OJO: pon aquí tu token real o léelo de ENV
-  @token "QGXWeAvvj1p5v1EVOQoeR8HI1VHk25K6UT7A4xPgA81UXHKGBdE1f21spgwZmiE3"
-  # recomendado:
-  # @token System.get_env("WORKORDER_BEARER")
-
   # estado: 1 = aceptar, 0 = rechazar
-  def cambiar_estado(ref, estado) when estado in [0, 1] do
+  # AHORA RECIBE TAMBIÉN EL password DEL SELECT
+  def cambiar_estado(ref, estado, password) when estado in [0, 1] do
     body = %{
       "WOKE_REFERENCIA" => ref,
       "Estado" => Integer.to_string(estado)
+      # Si quieres también mandar el password en el body, lo agregas aquí:
+      # "SYSUSR_PASSWORD" => password
     }
 
     headers = [
-      {"authorization", "Bearer " <> @token},
+      # En lugar de token fijo, mandas el password
+      {"authorization", "Bearer " <> password},
       {"content-type", "application/json"}
     ]
 

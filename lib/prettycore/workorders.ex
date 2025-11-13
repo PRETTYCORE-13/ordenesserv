@@ -1,6 +1,5 @@
 defmodule Prettycore.Workorders do
   @moduledoc false
-
   alias Prettycore.Repo
 
   ## Encabezados (órdenes)
@@ -21,24 +20,32 @@ defmodule Prettycore.Workorders do
     FROM XEN_WOKORDERENC
     """
 
-    {:ok, %{columns: cols, rows: rows}} = Repo.query(sql, [])
+    case Repo.query(sql, []) do
+      {:ok, %{columns: cols, rows: rows}} ->
+        list =
+          Enum.map(rows, fn row ->
+            row_map = to_map(cols, row)
 
-    Enum.map(rows, fn row ->
-      row_map = to_map(cols, row)
+            %{
+              sysudn:      row_map["SYSUDN_CODIGO_K"],
+              systra:      row_map["SYSTRA_CODIGO_K"],
+              serie:       row_map["WOKE_SERIE_K"],
+              folio:       row_map["WOKE_FOLIO_K"],
+              referencia:  row_map["WOKE_REFERENCIA"],
+              tipo:        row_map["WOKTPO_CODIGO_K"],
+              estado:      row_map["S_MAQEDO"],
+              descripcion: row_map["WOKE_DESCRIPCION"],
+              fecha:       row_map["S_FECHA"],
+              usuario:     row_map["WOKE_USUARIO"]
+            }
+          end)
 
-      %{
-        sysudn:      row_map["SYSUDN_CODIGO_K"],
-        systra:      row_map["SYSTRA_CODIGO_K"],
-        serie:       row_map["WOKE_SERIE_K"],
-        folio:       row_map["WOKE_FOLIO_K"],
-        referencia:  row_map["WOKE_REFERENCIA"],
-        tipo:        row_map["WOKTPO_CODIGO_K"],
-        estado:      row_map["S_MAQEDO"],
-        descripcion: row_map["WOKE_DESCRIPCION"],
-        fecha:       row_map["S_FECHA"],
-        usuario:     row_map["WOKE_USUARIO"]
-      }
-    end)
+        {:ok, list}
+
+      {:error, error} ->
+        IO.inspect(error, label: "error list_enc")
+        {:error, error}
+    end
   end
 
   ## Detalle (imágenes)

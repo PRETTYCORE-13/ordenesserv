@@ -5,12 +5,15 @@ defmodule PrettycoreWeb.HerramientaSql do
   alias Prettycore.TdsClient
   alias Decimal
 
-  def mount(_params, _session, socket) do
+  # Ruta: /admin/programacion/sql/:email
+  def mount(%{"email" => email} = _params, _session, socket) do
     {:ok,
      socket
      |> assign(:current_page, "programacion_sql")
      |> assign(:show_programacion_children, true)
      |> assign(:sidebar_open, true)
+     |> assign(:current_user_email, email)
+     |> assign(:current_path, "/admin/programacion/sql/#{email}")
      |> assign(:sql_query, "SELECT * FROM SYS_UDN;")
      |> assign(:columns, [])
      |> assign(:rows, [])
@@ -24,19 +27,22 @@ defmodule PrettycoreWeb.HerramientaSql do
   end
 
   def handle_event("change_page", %{"id" => "inicio"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/platform/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/#{email}")}
   end
 
   def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, socket}
+    {:noreply, socket} # ya estás aquí
   end
 
   def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
+    email = socket.assigns.current_user_email
+    {:noreply, push_navigate(socket, to: ~p"/admin/workorder/#{email}")}
   end
 
   def handle_event("change_page", _params, socket) do
@@ -107,7 +113,6 @@ defmodule PrettycoreWeb.HerramientaSql do
 
   def render(assigns) do
     ~H"""
-
       <section>
         <header class="pc-page-header">
           <h1>Programación · Herramienta SQL</h1>
@@ -115,6 +120,10 @@ defmodule PrettycoreWeb.HerramientaSql do
             Ejecuta consultas SELECT, UPDATE, INSERT, DELETE,
             CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE
             o WITH (CTE) directamente contra tu base SQL Server.
+          </p>
+          <p class="pc-small-muted">
+            Correo actual: {@current_user_email} <br />
+            URL actual: {@current_path}
           </p>
         </header>
 
@@ -206,7 +215,6 @@ defmodule PrettycoreWeb.HerramientaSql do
   end
 
   defp drop_leading_semicolons(str), do: do_drop_semis(str)
-
   defp do_drop_semis(<<";", rest::binary>>), do: do_drop_semis(rest)
   defp do_drop_semis(str), do: str
 
