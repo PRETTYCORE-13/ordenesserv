@@ -4,19 +4,17 @@ defmodule PrettycoreWeb.WorkOrderLive do
   import PrettycoreWeb.MenuLayout
   alias Prettycore.Workorders
   alias Prettycore.WorkorderApi
-
-  # NUEVO: para el SELECT con Ecto
   alias Prettycore.Repo
   alias Prettycore.Auth.User
   import Ecto.Query, only: [from: 2]
 
   ## MOUNT
-
-  def mount(%{"email" => email} = _params, _session, socket) do
+  @impl true
+  def mount(_params, session, socket) do
     {workorders, db_error} =
       case Workorders.list_enc() do
         {:ok, list}    -> {list, false}
-        {:error, _err} -> {[],  true}
+        {:error, _err} -> {[], true}
       end
 
     {:ok,
@@ -35,41 +33,51 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:usuario_filter, "")
      |> assign(:filters_open, false)
      |> assign(:page, 1)
-     |> assign(:current_user_email, email)
-     |> assign(:current_path, "/admin/workorder/#{email}")}
+     |> assign(:current_user_email, session)
+     |> assign(:current_path, "/admin/workorder")}
   end
 
-  ## Navegación / toggle sidebar
+  def handle_params(unsigned_params, uri, socket) do
+IO.inspect(params: unsigned_params)
+{:noreply, socket}
 
-  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
-    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
   end
 
-  def handle_event("change_page", %{"id" => "inicio"}, socket) do
+
+  # ------------------------------------------------------------------
+  # 🎯 MODELO 2: NAV CENTRALIZADA
+  # ------------------------------------------------------------------
+  @impl true
+  def handle_event("change_page", %{"id" => id}, socket) do
     email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/platform/#{email}")}
+
+    case id do
+      "toggle_sidebar" ->
+        {:noreply, update(socket, :sidebar_open, &(not &1))}
+
+      "inicio" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
+
+      "programacion" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
+
+      "programacion_sql" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
+
+      "workorder" ->
+        {:noreply, socket}  # ya estás aquí
+
+      "config" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/configuracion")}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
-  def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/#{email}")}
-  end
-
-  def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql/#{email}")}
-  end
-
-  def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    # ya estás aquí; si quieres puedes quedarte en la misma página
-    {:noreply, socket}
-  end
-
-  def handle_event("change_page", _params, socket) do
-    {:noreply, socket}
-  end
-
-  # Paginación: siguiente / anterior
+  # ------------------------------------------------------------------
+  # PAGINACIÓN
+  # ------------------------------------------------------------------
   def handle_event("goto_page", %{"dir" => "prev"}, socket) do
     {:noreply, update(socket, :page, fn p -> max(p - 1, 1) end)}
   end
@@ -78,16 +86,13 @@ defmodule PrettycoreWeb.WorkOrderLive do
     {:noreply, update(socket, :page, fn p -> p + 1 end)}
   end
 
-  ## Cambiar estado (API Aceptar / Rechazar)
-  ## AQUÍ ES DONDE SE HACE SIEMPRE EL SELECT EXTRA ANTES DE LLAMAR AL API
-
+  # ------------------------------------------------------------------
+  # CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
+  # ------------------------------------------------------------------
   def handle_event("cambiar_estado", %{"ref" => ref, "estado" => estado_str}, socket) do
     estado = String.to_integer(estado_str)
-
-    # 1) Sacar el código del usuario actual (ajusta si tu clave no es el email)
     sysusr_codigo = socket.assigns.current_user_email
 
-    # 2) Hacer el SELECT SYSUSR_PASSWORD FROM SYS_USUARIO WHERE SYSUSR_CODIGO_K = @SYSUSR_CODIGO_K
     password_query =
       from u in User,
         where: u.sysusr_codigo_k == ^sysusr_codigo,
@@ -99,13 +104,12 @@ defmodule PrettycoreWeb.WorkOrderLive do
         {:noreply, socket}
 
       password ->
-        # 3) Llamar al API con el password obtenido
         case WorkorderApi.cambiar_estado(ref, estado, password) do
           {:ok, _body} ->
             {workorders, db_error} =
               case Workorders.list_enc() do
-                {:ok, list}    -> {list, false}
-                {:error, _err} -> {socket.assigns.workorders, true}
+                {:ok, list} -> {list, false}
+                {:error, _} -> {socket.assigns.workorders, true}
               end
 
             {:noreply,
@@ -120,31 +124,41 @@ defmodule PrettycoreWeb.WorkOrderLive do
     end
   end
 
-  ## Filtro básico (Todas / Pendientes)
-
+  # ------------------------------------------------------------------
+  # FILTROS BÁSICOS (Todas / Pendientes)
+  # ------------------------------------------------------------------
   def handle_event("set_filter", %{"filter" => filter}, socket) do
-    {:noreply, assign(socket, :filter, filter)}
+    {:noreply,
+     socket
+     |> assign(:filter, filter)
+     |> assign(:open_key, nil)
+     |> assign(:detalles, %{})}
   end
 
-  ## Toggle drawer de filtros
-
+  # ------------------------------------------------------------------
+  # Drawer de filtros
+  # ------------------------------------------------------------------
   def handle_event("toggle_filters", _params, socket) do
     {:noreply, update(socket, :filters_open, fn open -> not open end)}
   end
 
-  ## Filtros avanzados (UDN, rango de fechas, usuario)
-
+  # ------------------------------------------------------------------
+  # FILTROS AVANZADOS
+  # ------------------------------------------------------------------
   def handle_event("set_filters", params, socket) do
     {:noreply,
      socket
      |> assign(:sysudn_filter, Map.get(params, "sysudn", ""))
      |> assign(:fecha_desde, Map.get(params, "fecha_desde", ""))
      |> assign(:fecha_hasta, Map.get(params, "fecha_hasta", ""))
-     |> assign(:usuario_filter, Map.get(params, "usuario", ""))}
+     |> assign(:usuario_filter, Map.get(params, "usuario", ""))
+     |> assign(:open_key, nil)
+     |> assign(:detalles, %{})}
   end
 
-  ## Abrir / cerrar detalle
-
+  # ------------------------------------------------------------------
+  # ABRIR / CERRAR DETALLES
+  # ------------------------------------------------------------------
   def handle_event(
         "toggle_detalle",
         %{"sysudn" => sysudn, "systra" => systra, "serie" => serie, "folio" => folio},
@@ -153,17 +167,11 @@ defmodule PrettycoreWeb.WorkOrderLive do
     key = "#{sysudn}|#{systra}|#{serie}|#{folio}"
 
     detalles_cache = socket.assigns.detalles
-
     detalles =
       Map.get(detalles_cache, key) ||
         Workorders.list_det(sysudn, systra, serie, folio)
 
-    open_key =
-      if socket.assigns.open_key == key do
-        nil
-      else
-        key
-      end
+    open_key = if socket.assigns.open_key == key, do: nil, else: key
 
     {:noreply,
      socket
@@ -171,23 +179,26 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:open_key, open_key)}
   end
 
-  ## Helpers
-
+  # ------------------------------------------------------------------
+  # HELPERS
+  # ------------------------------------------------------------------
   defp image_src(nil), do: nil
-
   defp image_src(url) when is_binary(url) do
     trimmed = String.trim(url)
     if trimmed == "", do: nil, else: trimmed
   end
 
   defp filter_workorders(workorders, "todas"), do: workorders
-
-  defp filter_workorders(workorders, "por_aceptar") do
-    Enum.filter(workorders, &(&1.estado == 100))
-  end
-
+  defp filter_workorders(workorders, "por_aceptar"), do: Enum.filter(workorders, &(&1.estado == 100))
   defp filter_workorders(workorders, _), do: workorders
 
-  ## Render
+  defp estado_label(100), do: "Pendiente"
+  defp estado_label(500), do: "Atendida"
+  defp estado_label(600), do: "Cancelado"
+  defp estado_label(_),   do: "Desconocido"
 
+  defp estado_class(100), do: "wo-state wo-state-pendiente"
+  defp estado_class(500), do: "wo-state wo-state-atendida"
+  defp estado_class(600), do: "wo-state wo-state-cancelado"
+  defp estado_class(_),   do: "wo-state"
 end

@@ -6,51 +6,56 @@ defmodule PrettycoreWeb.HerramientaSql do
   alias Decimal
 
   # Ruta: /admin/programacion/sql/:email
-  def mount(%{"email" => email} = _params, _session, socket) do
+  @impl true
+  def mount(_params, session, socket) do
     {:ok,
      socket
      |> assign(:current_page, "programacion_sql")
      |> assign(:show_programacion_children, true)
      |> assign(:sidebar_open, true)
-     |> assign(:current_user_email, email)
-     |> assign(:current_path, "/admin/programacion/sql/#{email}")
+     |> assign(:current_user_email, session)
+     |> assign(:current_path, "/admin/programacion/sql")
      |> assign(:sql_query, "SELECT * FROM SYS_UDN;")
      |> assign(:columns, [])
      |> assign(:rows, [])
      |> assign(:error, nil)}
   end
 
-  ## Navegación / toggle sidebar
-
-  def handle_event("change_page", %{"id" => "toggle_sidebar"}, socket) do
-    {:noreply, update(socket, :sidebar_open, fn open -> not open end)}
-  end
-
-  def handle_event("change_page", %{"id" => "inicio"}, socket) do
+  # -----------------------------------------------------
+  # NAV CENTRALIZADA (MODELO 2)
+  # -----------------------------------------------------
+  @impl true
+  def handle_event("change_page", %{"id" => id}, socket) do
     email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/platform/#{email}")}
+
+    case id do
+      "toggle_sidebar" ->
+        {:noreply, update(socket, :sidebar_open, &(not &1))}
+
+      "inicio" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/platform")}
+
+      "programacion" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
+
+      "programacion_sql" ->
+        {:noreply, socket} # ya estás aquí
+
+      "workorder" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
+
+      "config" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/configuracion")}
+
+      _ ->
+        {:noreply, socket}
+    end
   end
 
-  def handle_event("change_page", %{"id" => "programacion"}, socket) do
-    email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/programacion/#{email}")}
-  end
-
-  def handle_event("change_page", %{"id" => "programacion_sql"}, socket) do
-    {:noreply, socket} # ya estás aquí
-  end
-
-  def handle_event("change_page", %{"id" => "workorder"}, socket) do
-    email = socket.assigns.current_user_email
-    {:noreply, push_navigate(socket, to: ~p"/admin/workorder/#{email}")}
-  end
-
-  def handle_event("change_page", _params, socket) do
-    {:noreply, socket}
-  end
-
-  ## Ejecutar SQL
-
+  # -----------------------------------------------------
+  # EJECUCIÓN DE SQL
+  # -----------------------------------------------------
+  @impl true
   def handle_event("run_sql", %{"sql_query" => query}, socket) do
     sql =
       query
@@ -63,11 +68,9 @@ defmodule PrettycoreWeb.HerramientaSql do
 
       not allowed_sql?(sql) ->
         {:noreply,
-         assign(
-           socket,
-           :error,
+         assign(socket, :error,
            "Solo se permiten SELECT, UPDATE, INSERT, DELETE, " <>
-             "CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE o WITH (CTE)."
+           "CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE o WITH (CTE)."
          )}
 
       true ->
@@ -82,35 +85,37 @@ defmodule PrettycoreWeb.HerramientaSql do
                 end)
 
               {:noreply,
-               socket
-               |> assign(:sql_query, query)
-               |> assign(:error, nil)
-               |> assign(:columns, columns)
-               |> assign(:rows, rows_norm)}
+                socket
+                |> assign(:sql_query, query)
+                |> assign(:error, nil)
+                |> assign(:columns, columns)
+                |> assign(:rows, rows_norm)}
             else
               {:noreply,
-               socket
-               |> assign(:sql_query, query)
-               |> assign(:error, nil)
-               |> assign(:columns, ["Resultado"])
-               |> assign(:rows, [[
-                 "Comando ejecutado con éxito (#{res.num_rows || 0} filas afectadas)"
-               ]])}
+                socket
+                |> assign(:sql_query, query)
+                |> assign(:error, nil)
+                |> assign(:columns, ["Resultado"])
+                |> assign(:rows, [[
+                  "Comando ejecutado con éxito (#{res.num_rows || 0} filas afectadas)"
+                ]])}
             end
 
           {:error, reason} ->
             {:noreply,
-             socket
-             |> assign(:sql_query, query)
-             |> assign(:error, "Error al ejecutar: #{inspect(reason)}")
-             |> assign(:columns, [])
-             |> assign(:rows, [])}
+              socket
+              |> assign(:sql_query, query)
+              |> assign(:error, "Error al ejecutar: #{inspect(reason)}")
+              |> assign(:columns, [])
+              |> assign(:rows, [])}
         end
     end
   end
 
-  ## Render
-
+  # -----------------------------------------------------
+  # RENDER
+  # -----------------------------------------------------
+  @impl true
   def render(assigns) do
     ~H"""
       <section>
@@ -121,6 +126,7 @@ defmodule PrettycoreWeb.HerramientaSql do
             CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE
             o WITH (CTE) directamente contra tu base SQL Server.
           </p>
+
           <p class="pc-small-muted">
             Correo actual: {@current_user_email} <br />
             URL actual: {@current_path}
@@ -132,6 +138,7 @@ defmodule PrettycoreWeb.HerramientaSql do
             <label class="sql-console-label">
               Consulta SQL
             </label>
+
             <textarea
               name="sql_query"
               class="sql-editor"
@@ -144,7 +151,8 @@ defmodule PrettycoreWeb.HerramientaSql do
               </button>
               <span class="sql-console-hint">
                 Se permiten SELECT, UPDATE, INSERT, DELETE,
-                CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE y WITH (CTE).
+                CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW,
+                ALTER TABLE y WITH (CTE).
               </span>
             </div>
           </form>
@@ -174,6 +182,7 @@ defmodule PrettycoreWeb.HerramientaSql do
                     <% end %>
                   </tr>
                 </thead>
+
                 <tbody>
                   <%= for row <- @rows do %>
                     <tr>
@@ -191,8 +200,7 @@ defmodule PrettycoreWeb.HerramientaSql do
     """
   end
 
-  ## Helpers
-
+  ## Helpers de validación SQL
   defp allowed_sql?(sql) do
     up =
       sql
@@ -218,6 +226,7 @@ defmodule PrettycoreWeb.HerramientaSql do
   defp do_drop_semis(<<";", rest::binary>>), do: do_drop_semis(rest)
   defp do_drop_semis(str), do: str
 
+  ## Normalización SQL
   defp norm(v) when is_binary(v),
     do: :unicode.characters_to_binary(v, :latin1, :utf8)
 

@@ -265,3 +265,157 @@
 .pc-menu-item-logout svg {
   color: #ef4444;
 }
+
+/* BLOQUE SUPERIOR: Logos + toggle */
+.pc-platform-sidebar-top-row {
+  display: flex;
+  flex-direction: row;          /* fila cuando está abierto */
+  align-items: center;
+  justify-content: center;      /* todo centrado */
+  gap: 10px;
+  width: 100%;
+  padding: 6px 0;
+}
+
+/* Cuando el sidebar está CERRADO → cambia a columna */
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-platform-sidebar-top-row {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Cada elemento (logos / toggle) igual tamaño y centrados */
+.pc-platform-sidebar-top-row .mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tamaño del botón toggle */
+.pc-menu-toggle.mini {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.04); /* cercado visual limpio */
+}
+
+/* Asegura que logos y boton sean círculos iguales */
+.pc-platform-sidebar-top-row .mini img,
+.pc-menu-toggle.mini {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+/* Alineación perfecta: centrados y separados */
+.pc-platform-sidebar-top-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;        /* centra vertical */
+  justify-content: center;    /* centra horizontal */
+  gap: 12px;                  /* SEPARA los círculos */
+  width: 100%;
+  padding: 8px 0;
+}
+
+/* Sidebar cerrado → columna centrada */
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-platform-sidebar-top-row {
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ajuste visual del botón */
+.pc-menu-toggle.mini {
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pc-user-display {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+  opacity: 0.85;
+}
+
+/* Cuando sidebar está cerrado → oculta solo el texto (opcional) */
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-user-display {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* --- BLOQUE DE USUARIO --- */
+.pc-user-block {
+  display: flex;
+  align-items: center;
+  margin: 10px 0 8px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+/* Círculo con inicial */
+.pc-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: #3b82f6; /* azul */
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Información del usuario */
+.pc-user-info {
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+/* Solo cuando el sidebar esté ABIERTO */
+.pc-platform-sidebar-open .pc-user-info {
+  margin-left: 10px;
+}
+
+/* Cuando el sidebar esté CERRADO → sin margen */
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-user-info {
+  margin-left: 0;
+}
+
+
+.pc-user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.pc-user-role {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* --- Sidebar cerrado: solo letra, oculta texto --- */
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-user-info {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.pc-platform-sidebar:not(.pc-platform-sidebar-open) .pc-user-block {
+  justify-content: center;
+  padding: 0;
+}
+

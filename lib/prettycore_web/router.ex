@@ -36,10 +36,12 @@ live_session :auth,
   scope "/admin", PrettycoreWeb do
     pipe_through :browser
 
-    live "/platform/:email", Inicio
-    live "/programacion/:email", Programacion
-    live "/programacion/sql/:email", HerramientaSql
-    live "/workorder/:email", WorkOrderLive
+    live "/platform", Inicio
+    live "/programacion", Programacion
+    live "/programacion/sql", HerramientaSql
+    live "/workorder", WorkOrderLive
+    live "/configuracion", ConfiguracionLive
+
   end
 end
 

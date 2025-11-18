@@ -986,3 +986,31 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
   font-weight: 500;
   color: #333;
 }
+
+.wo-state { 
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.wo-state-pendiente {
+  background: #fef3c7; 
+  color: #92400e;
+}
+
+.wo-state-atendida {
+  background: #d1fae5; 
+  color: #065f46;
+}
+
+.wo-state-cancelado {
+  background: #fee2e2; 
+  color: #991b1b;
+}
+
+button[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

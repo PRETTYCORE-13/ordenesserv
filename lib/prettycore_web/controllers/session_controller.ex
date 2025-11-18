@@ -21,7 +21,7 @@ defmodule PrettycoreWeb.SessionController do
         |> put_session(:user_email, email)
         |> configure_session(renew: true)
         # Redirige a /admin/platform/<email>
-        |> redirect(to: ~p"/admin/platform/#{email}")
+        |> redirect(to: ~p"/admin/platform")
 
       {:error, :invalid_credentials} ->
         conn
