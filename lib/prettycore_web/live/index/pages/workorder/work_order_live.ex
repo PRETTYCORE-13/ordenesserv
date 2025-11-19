@@ -11,11 +11,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
   ## MOUNT
   @impl true
   def mount(_params, session, socket) do
-    {workorders, db_error} =
-      case Workorders.list_enc() do
-        {:ok, list}    -> {list, false}
-        {:error, _err} -> {[], true}
-      end
+    workorders=Prettycore.Workorders.list_enc()
 
     {:ok,
      socket
@@ -23,7 +19,6 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:show_programacion_children, false)
      |> assign(:sidebar_open, true)
      |> assign(:workorders, workorders)
-     |> assign(:db_error, db_error)
      |> assign(:open_key, nil)
      |> assign(:detalles, %{})
      |> assign(:filter, "por_aceptar")

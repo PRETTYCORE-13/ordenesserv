@@ -95,12 +95,7 @@
 
                               <section class="wo-page">
                                 <!-- Banner superior cuando hay problemas de BD -->
-                                <%= if @db_error do %>
-                                  <div class="wo-error-banner">
-                                    Estamos teniendo problemas para conectarnos a la base de datos.
-                                    Es posible que la información no se muestre correctamente.
-                                  </div>
-                                  <% end %>
+
 
                                     <header class="wo-header">
                                       <div class="wo-hero-main">
@@ -219,17 +214,6 @@
                                     </div>
 
                                     <div class="wo-table-card">
-                                      <%= if @db_error do %>
-                                        <!-- Error de conexión a BD -->
-                                        <div class="wo-empty">
-                                          <div class="wo-empty-icon">⚠️</div>
-                                          <h2 class="wo-empty-title">Problemas de conexión</h2>
-                                          <p class="wo-empty-text">
-                                            No podemos cargar las órdenes porque la base de datos no responde.
-                                            Intenta nuevamente más tarde.
-                                          </p>
-                                        </div>
-                                        <% else %>
                                           <%= if filtered==[] do %>
                                             <!-- Lista vacía normal -->
                                             <div class="wo-empty">
@@ -272,7 +256,7 @@
 
                                                           <td>
                                                             <span class="wo-row-meta-badge">
-                                                              <%= w.tipo %>
+                                                              <%= w.tipo.descripcion %>
                                                             </span>
                                                           </td>
 
@@ -365,6 +349,5 @@
                                                 </button>
                                               </div>
                                               <% end %>
-                                                <% end %>
                                     </div>
                               </section>

@@ -1,10 +1,18 @@
 defmodule Prettycore.Workorders do
   @moduledoc false
   alias Prettycore.Repo
-
+  alias Prettycore.Workorders.WorkorderEnc
+  import Ecto.Query
   ## Encabezados (órdenes)
 
   def list_enc do
+    ##   Repo.all(WorkorderEnc)
+    WorkorderEnc
+     |> preload([:tipo])
+    |> Repo.all()
+  end
+
+  def list_enc2 do
     sql = """
     SELECT
       SYSUDN_CODIGO_K,
@@ -27,16 +35,16 @@ defmodule Prettycore.Workorders do
             row_map = to_map(cols, row)
 
             %{
-              sysudn:      row_map["SYSUDN_CODIGO_K"],
-              systra:      row_map["SYSTRA_CODIGO_K"],
-              serie:       row_map["WOKE_SERIE_K"],
-              folio:       row_map["WOKE_FOLIO_K"],
-              referencia:  row_map["WOKE_REFERENCIA"],
-              tipo:        row_map["WOKTPO_CODIGO_K"],
-              estado:      row_map["S_MAQEDO"],
+              sysudn: row_map["SYSUDN_CODIGO_K"],
+              systra: row_map["SYSTRA_CODIGO_K"],
+              serie: row_map["WOKE_SERIE_K"],
+              folio: row_map["WOKE_FOLIO_K"],
+              referencia: row_map["WOKE_REFERENCIA"],
+              tipo: row_map["WOKTPO_CODIGO_K"],
+              estado: row_map["S_MAQEDO"],
               descripcion: row_map["WOKE_DESCRIPCION"],
-              fecha:       row_map["S_FECHA"],
-              usuario:     row_map["WOKE_USUARIO"]
+              fecha: row_map["S_FECHA"],
+              usuario: row_map["WOKE_USUARIO"]
             }
           end)
 
@@ -74,9 +82,9 @@ defmodule Prettycore.Workorders do
           row_map = to_map(cols, row)
 
           %{
-            concepto:    row_map["CONCEPTO"],
+            concepto: row_map["CONCEPTO"],
             descripcion: nil,
-            image_url:   row_map["IMAGE_URL"]
+            image_url: row_map["IMAGE_URL"]
           }
         end)
 
