@@ -154,26 +154,25 @@
                                         </button>
                                       </div>
 
-                                      <form class="wo-filters-drawer-body" phx-change="set_filters">
+                                      <.form phx-submit="set_filter" class="wo-filters-drawer-body" phx-change="set_filter">
                                         <!-- ESTADO: Todas / Pendientes -->
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Estado</label>
                                           <div class="wo-filters">
-                                            <button type="button" class={"wo-filter-btn" <> if @filter == "todas", do: "
+                                            <.button  name="estado" value="todas" class={"wo-filter-btn" <> if @filter == "todas", do: "
                                               wo-filter-btn-active", else: ""}
-                                              phx-click="set_filter"
                                               phx-value-filter="todas"
                                               >
                                               Todas
-                                            </button>
+                                            </.button>
 
-                                            <button type="button" class={"wo-filter-btn" <> if @filter == "por_aceptar",
+                                            <.button name="estado" value="por_aceptar" class={"wo-filter-btn" <> if @filter == "por_aceptar",
                                               do: " wo-filter-btn-active", else: ""}
-                                              phx-click="set_filter"
-                                              phx-value-filter="por_aceptar"
                                               >
                                               Pendientes
-                                            </button>
+                                            </.button>
+                                                
+
                                           </div>
                                         </div>
 
@@ -216,7 +215,7 @@
                                               <% end %>
                                           </select>
                                         </div>
-                                      </form>
+                                      </.form>
                                     </div>
 
                                     <div class="wo-table-card">

@@ -13,7 +13,7 @@ defmodule PrettycoreWeb.HerramientaSql do
      |> assign(:current_page, "programacion_sql")
      |> assign(:show_programacion_children, true)
      |> assign(:sidebar_open, true)
-     |> assign(:current_user_email, session)
+     |> assign(:current_user_email, session["user_email"])
      |> assign(:current_path, "/admin/programacion/sql")
      |> assign(:sql_query, "SELECT * FROM SYS_UDN;")
      |> assign(:columns, [])

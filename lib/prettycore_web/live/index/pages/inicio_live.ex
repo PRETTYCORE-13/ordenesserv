@@ -12,7 +12,7 @@ defmodule PrettycoreWeb.Inicio do
      |> assign(:current_page, "inicio")
      |> assign(:sidebar_open, true)
      |> assign(:show_programacion_children, false)
-     |> assign(:current_user_email, session)
+     |> assign(:current_user_email, session["user_email"])
      |> assign(:current_path, current_path)}
   end
 

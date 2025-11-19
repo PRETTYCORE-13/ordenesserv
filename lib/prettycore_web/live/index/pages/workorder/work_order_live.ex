@@ -33,13 +33,23 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:usuario_filter, "")
      |> assign(:filters_open, false)
      |> assign(:page, 1)
-     |> assign(:current_user_email, session)
      |> assign(:current_path, "/admin/workorder")}
   end
 
-  def handle_params(unsigned_params, uri, socket) do
-IO.inspect(params: unsigned_params)
+  def handle_params(params, uri, socket) do
+IO.inspect(params: params)
 {:noreply, socket}
+
+    {:noreply,
+     socket
+     |> assign(:sysudn_filter, Map.get(params, "sysudn", ""))
+     |> assign(:fecha_desde, Map.get(params, "fecha_desde", ""))
+     |> assign(:fecha_hasta, Map.get(params, "fecha_hasta", ""))
+     |> assign(:usuario_filter, Map.get(params, "usuario", ""))
+     |> assign(:filter, Map.get(params, "estado"))
+     |> assign(:open_key, nil)
+     |> assign(:detalles, %{})}
+
 
   end
 
@@ -127,13 +137,7 @@ IO.inspect(params: unsigned_params)
   # ------------------------------------------------------------------
   # FILTROS BÁSICOS (Todas / Pendientes)
   # ------------------------------------------------------------------
-  def handle_event("set_filter", %{"filter" => filter}, socket) do
-    {:noreply,
-     socket
-     |> assign(:filter, filter)
-     |> assign(:open_key, nil)
-     |> assign(:detalles, %{})}
-  end
+
 
   # ------------------------------------------------------------------
   # Drawer de filtros
@@ -145,15 +149,17 @@ IO.inspect(params: unsigned_params)
   # ------------------------------------------------------------------
   # FILTROS AVANZADOS
   # ------------------------------------------------------------------
-  def handle_event("set_filters", params, socket) do
-    {:noreply,
-     socket
-     |> assign(:sysudn_filter, Map.get(params, "sysudn", ""))
-     |> assign(:fecha_desde, Map.get(params, "fecha_desde", ""))
-     |> assign(:fecha_hasta, Map.get(params, "fecha_hasta", ""))
-     |> assign(:usuario_filter, Map.get(params, "usuario", ""))
-     |> assign(:open_key, nil)
-     |> assign(:detalles, %{})}
+  def handle_event("set_filter", params, socket) do
+    # Encapsulamos los parámetros
+  clean_params =
+    params
+    |> Enum.reject(fn {_k, v} -> v in [nil, ""] end)
+    |> Enum.into(%{})
+
+  query = Plug.Conn.Query.encode(clean_params)
+
+  {:noreply,
+   push_patch(socket, to: "/admin/workorder?#{query}")}
   end
 
   # ------------------------------------------------------------------
