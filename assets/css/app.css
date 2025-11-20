@@ -4,7 +4,11 @@
 @custom-variant phx-click-loading (.phx-click-loading&, .phx-click-loading &);
 @custom-variant phx-submit-loading (.phx-submit-loading&, .phx-submit-loading &);
 @custom-variant phx-change-loading (.phx-change-loading&, .phx-change-loading &);
-[data-phx-session], [data-phx-teleported-src] { display: contents }
+
+[data-phx-session],
+[data-phx-teleported-src] {
+  display: contents
+}
 
 @import "./login.css";
 @import "./index.css";
@@ -26,7 +30,7 @@
   --pc-hover: #2b2b3a;
   --pc-radius: 12px;
   --pc-transition: all 0.25s ease;
-  --pc-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  --pc-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* === Container === */
@@ -57,6 +61,7 @@
   color: var(--pc-text);
   transition: var(--pc-transition);
 }
+
 .pc-input:focus {
   outline: none;
   border-color: var(--pc-accent);
@@ -74,10 +79,12 @@
   cursor: pointer;
   transition: var(--pc-transition);
 }
+
 .pc-btn:hover {
   background: var(--pc-accent-light);
   transform: translateY(-1px);
 }
+
 .pc-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -107,7 +114,8 @@
   z-index: 10;
 }
 
-.pc-table th, .pc-table td {
+.pc-table th,
+.pc-table td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--pc-border);
   text-align: left;
@@ -125,6 +133,7 @@
   gap: 0.25rem;
   transition: var(--pc-transition);
 }
+
 .pc-table th button:hover {
   color: var(--pc-accent-light);
 }
@@ -132,6 +141,7 @@
 .pc-table tbody tr:nth-child(even) {
   background: var(--pc-card);
 }
+
 .pc-table tbody tr:hover {
   background: var(--pc-hover);
 }
@@ -155,10 +165,12 @@
   cursor: pointer;
   transition: var(--pc-transition);
 }
+
 .pc-pager button:hover:not(:disabled) {
   background: var(--pc-accent);
   color: white;
 }
+
 .pc-pager button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -169,17 +181,18 @@
   .pc-table {
     font-size: 0.8rem;
   }
-  .pc-table th, .pc-table td {
+
+  .pc-table th,
+  .pc-table td {
     padding: 0.5rem;
   }
+
   .pc-toolbar {
     flex-direction: column;
     align-items: stretch;
   }
+
   .pc-btn {
     width: 100%;
   }
 }
-
-
-

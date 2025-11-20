@@ -17,7 +17,6 @@ defmodule Prettycore.WorkordersTest do
 
         # Verify it's a WorkorderEnc struct
         assert %WorkorderEnc{} = first_workorder
-        assert nil == first_workorder
 
         # Verify it has the expected fields
         assert Map.has_key?(first_workorder, :sysudn)
