@@ -18,16 +18,16 @@ defmodule PrettycoreWeb.LoginLive do
       <div class="pc-login-card">
         <div class="pc-login-header">
           <h1>Iniciar sesión</h1>
+
           <p>Accede al sistema</p>
         </div>
 
         <%= if live_flash(@flash, :error) do %>
-          <div class="pc-error"><%= live_flash(@flash, :error) %></div>
+          <div class="pc-error">{live_flash(@flash, :error)}</div>
         <% end %>
 
         <form class="pc-login-form" action={~p"/"} method="post">
           <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-
           <div class="pc-field">
             <label for="username">Usuario (correo)</label>
             <input id="username" name="username" class="pc-input" value={@username} />
@@ -37,8 +37,10 @@ defmodule PrettycoreWeb.LoginLive do
             <label for="password">Contraseña</label>
             <input id="password" name="password" type="password" class="pc-input" value={@password} />
           </div>
-
-          <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">Entrar</button>
+           <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">Entrar</button>
+          <div class="pc-login-footer">
+            <.link navigate={~p"/password-reset"} class="pc-link">¿Olvidaste tu contraseña?</.link>
+          </div>
         </form>
       </div>
     </div>

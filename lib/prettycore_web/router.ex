@@ -23,6 +23,9 @@ defmodule PrettycoreWeb.Router do
     # Página de login (LiveView)
     live "/", LoginLive
 
+    # Nueva ruta para cambio de contraseña (UI)
+    live "/password-reset", PasswordResetLive
+
     # Controlador que valida usuario y crea sesión
     post "/", SessionController, :create
 

@@ -130,7 +130,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
   end
 
   # ------------------------------------------------------------------
-  # CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
+# CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
   # ------------------------------------------------------------------
   def handle_event("cambiar_estado", %{"ref" => ref, "estado" => estado_str}, socket) do
     estado = String.to_integer(estado_str)
