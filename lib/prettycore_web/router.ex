@@ -32,7 +32,7 @@ defmodule PrettycoreWeb.Router do
 
   ## ÁREA PROTEGIDA: requiere sesión
   live_session :auth,
-    on_mount: [] do
+    on_mount: [{PrettycoreWeb.AuthOnMount, :ensure_authenticated}] do
     scope "/admin", PrettycoreWeb do
       pipe_through :browser
 
