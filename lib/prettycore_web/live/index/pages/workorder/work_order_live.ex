@@ -11,7 +11,26 @@ defmodule PrettycoreWeb.WorkOrderLive do
   ## MOUNT
   @impl true
   def mount(_params, session, socket) do
-    workorders=Prettycore.Workorders.list_enc()
+    # Initialize with default filters (por_aceptar)
+    filters = %{estado: "por_aceptar"}
+    workorders = Workorders.list_enc_filtered(filters)
+
+    # Get all workorders once for filter options
+    all_workorders = Workorders.list_enc()
+
+    sysudn_opts =
+      all_workorders
+      |> Enum.map(& &1.sysudn)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    usuario_opts =
+      all_workorders
+      |> Enum.map(&Map.get(&1, :usuario))
+      |> Enum.reject(&(&1 in [nil, ""]))
+      |> Enum.uniq()
+      |> Enum.sort()
 
     {:ok,
      socket
@@ -19,6 +38,8 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:show_programacion_children, false)
      |> assign(:sidebar_open, true)
      |> assign(:workorders, workorders)
+     |> assign(:sysudn_opts, sysudn_opts)
+     |> assign(:usuario_opts, usuario_opts)
      |> assign(:open_key, nil)
      |> assign(:detalles, %{})
      |> assign(:filter, "por_aceptar")
@@ -31,21 +52,38 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:current_path, "/admin/workorder")}
   end
 
-  def handle_params(params, uri, socket) do
-IO.inspect(params: params)
-{:noreply, socket}
+  @impl true
+  def handle_params(params, _uri, socket) do
+    # Extract filter values from URL params
+    sysudn = Map.get(params, "sysudn", "")
+    fecha_desde = Map.get(params, "fecha_desde", "")
+    fecha_hasta = Map.get(params, "fecha_hasta", "")
+    usuario = Map.get(params, "usuario", "")
+    estado = Map.get(params, "estado", "por_aceptar")
+
+    # Build filters map for the query
+    filters = %{
+      estado: estado,
+      sysudn: sysudn,
+      usuario: usuario,
+      fecha_desde: fecha_desde,
+      fecha_hasta: fecha_hasta
+    }
+
+    # Load workorders with filters applied at database level
+    workorders = Workorders.list_enc_filtered(filters)
 
     {:noreply,
      socket
-     |> assign(:sysudn_filter, Map.get(params, "sysudn", ""))
-     |> assign(:fecha_desde, Map.get(params, "fecha_desde", ""))
-     |> assign(:fecha_hasta, Map.get(params, "fecha_hasta", ""))
-     |> assign(:usuario_filter, Map.get(params, "usuario", ""))
-     |> assign(:filter, Map.get(params, "estado"))
+     |> assign(:workorders, workorders)
+     |> assign(:sysudn_filter, sysudn)
+     |> assign(:fecha_desde, fecha_desde)
+     |> assign(:fecha_hasta, fecha_hasta)
+     |> assign(:usuario_filter, usuario)
+     |> assign(:filter, estado)
      |> assign(:open_key, nil)
-     |> assign(:detalles, %{})}
-
-
+     |> assign(:detalles, %{})
+     |> assign(:page, 1)}
   end
 
 
@@ -111,16 +149,20 @@ IO.inspect(params: params)
       password ->
         case WorkorderApi.cambiar_estado(ref, estado, password) do
           {:ok, _body} ->
-            {workorders, db_error} =
-              case Workorders.list_enc() do
-                {:ok, list} -> {list, false}
-                {:error, _} -> {socket.assigns.workorders, true}
-              end
+            # Reload workorders with current filters
+            filters = %{
+              estado: socket.assigns.filter,
+              sysudn: socket.assigns.sysudn_filter,
+              usuario: socket.assigns.usuario_filter,
+              fecha_desde: socket.assigns.fecha_desde,
+              fecha_hasta: socket.assigns.fecha_hasta
+            }
+
+            workorders = Workorders.list_enc_filtered(filters)
 
             {:noreply,
              socket
-             |> assign(:workorders, workorders)
-             |> assign(:db_error, db_error)}
+             |> assign(:workorders, workorders)}
 
           {:error, reason} ->
             IO.inspect(reason, label: "error cambiar_estado")
@@ -188,10 +230,6 @@ IO.inspect(params: params)
     trimmed = String.trim(url)
     if trimmed == "", do: nil, else: trimmed
   end
-
-  defp filter_workorders(workorders, "todas"), do: workorders
-  defp filter_workorders(workorders, "por_aceptar"), do: Enum.filter(workorders, &(&1.estado == 100))
-  defp filter_workorders(workorders, _), do: workorders
 
   defp estado_label(100), do: "Pendiente"
   defp estado_label(500), do: "Atendida"

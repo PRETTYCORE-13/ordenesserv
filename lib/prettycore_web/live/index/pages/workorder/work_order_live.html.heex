@@ -1,97 +1,15 @@
-<% base=filter_workorders(@workorders, @filter) %>
-
-  <% sysudn_opts=@workorders |> Enum.map(& &1.sysudn)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq()
-    %>
-
-    <% usuario_opts=@workorders |> Enum.map(&Map.get(&1, :usuario))
-      |> Enum.reject(&(&1 in [nil, ""]))
-      |> Enum.uniq()
-      %>
-
-      <% fecha_desde_date=case @fecha_desde do "" -> nil
-        s ->
-        case Date.from_iso8601(s) do
-        {:ok, d} -> d
-        _ -> nil
-        end
-        end
-        %>
-
-        <% fecha_hasta_date=case @fecha_hasta do "" -> nil
-          s ->
-          case Date.from_iso8601(s) do
-          {:ok, d} -> d
-          _ -> nil
-          end
-          end
-          %>
-
-          <% sysudn_filter=@sysudn_filter %>
-            <% usuario_filter=@usuario_filter %>
-
-              <% filtered=Enum.filter(base, fn w ->
-                # UDN
-                sysudn_ok =
-                sysudn_filter == "" or w.sysudn == sysudn_filter
-
-                # Usuario
-                usuario_val = (Map.get(w, :usuario, "") || "") |> to_string()
-                usuario_ok =
-                usuario_filter == "" or usuario_val == usuario_filter
-
-                # Fecha -> Date
-                fecha =
-                case Map.get(w, :fecha) do
-                %NaiveDateTime{} = nd -> NaiveDateTime.to_date(nd)
-                %DateTime{} = dt -> DateTime.to_date(dt)
-                %Date{} = d -> d
-                s when is_binary(s) ->
-                s
-                |> String.slice(0, 10)
-                |> Date.from_iso8601()
-                |> case do
-                {:ok, d} -> d
-                _ -> nil
-                end
-
-                _ -> nil
-                end
-
-                fecha_ok =
-                cond do
-                is_nil(fecha_desde_date) and is_nil(fecha_hasta_date) ->
-                true
-
-                is_nil(fecha) ->
-                false
-
-                true ->
-                after_start =
-                is_nil(fecha_desde_date) or
-                Date.compare(fecha, fecha_desde_date) in [:eq, :gt]
-
-                before_end =
-                is_nil(fecha_hasta_date) or
-                Date.compare(fecha, fecha_hasta_date) in [:eq, :lt]
-
-                after_start and before_end
-                end
-
-                sysudn_ok and usuario_ok and fecha_ok
-                end)
-                %>
-
-                <% page_size=20 %>
-                  <% total=length(filtered) %>
-                    <% total_pages=if total==0, do: 1, else: div(total + page_size - 1, page_size) %>
-                      <% page=if @page < 1, do: 1, else: @page %>
-                        <% page=if page> total_pages, do: total_pages, else: page %>
-                          <% start_index=(page - 1) * page_size %>
-                            <% page_entries=filtered |> Enum.drop(start_index)
-                              |> Enum.take(page_size)
-                              %>
+<% # Workorders are now filtered at database level via Ecto queries %>
+<% # Pagination logic %>
+<% page_size = 20 %>
+<% total = length(@workorders) %>
+<% total_pages = if total == 0, do: 1, else: div(total + page_size - 1, page_size) %>
+<% page = if @page < 1, do: 1, else: @page %>
+<% page = if page > total_pages, do: total_pages, else: page %>
+<% start_index = (page - 1) * page_size %>
+<% page_entries = @workorders
+  |> Enum.drop(start_index)
+  |> Enum.take(page_size)
+%>
 
                               <section class="wo-page">
                                 <!-- Banner superior cuando hay problemas de BD -->
@@ -113,7 +31,7 @@
                                           <div class="wo-stat-card">
                                             <span class="wo-stat-label">Total de órdenes</span>
                                             <span class="wo-stat-value">
-                                              <%= length(filtered) %>
+                                              <%= length(@workorders) %>
                                             </span>
                                           </div>
                                         </div>
@@ -177,7 +95,7 @@
                                             <option value="" selected={@sysudn_filter=="" }>
                                               Todas las UDN
                                             </option>
-                                            <%= for opt <- sysudn_opts do %>
+                                            <%= for opt <- @sysudn_opts do %>
                                               <option value={opt} selected={@sysudn_filter==opt}>
                                                 <%= opt %>
                                               </option>
@@ -203,7 +121,7 @@
                                             <option value="" selected={@usuario_filter=="" }>
                                               Todos los usuarios
                                             </option>
-                                            <%= for opt <- usuario_opts do %>
+                                            <%= for opt <- @usuario_opts do %>
                                               <option value={opt} selected={@usuario_filter==opt}>
                                                 <%= opt %>
                                               </option>
@@ -214,7 +132,7 @@
                                     </div>
 
                                     <div class="wo-table-card">
-                                          <%= if filtered==[] do %>
+                                          <%= if @workorders==[] do %>
                                             <!-- Lista vacía normal -->
                                             <div class="wo-empty">
                                               <div class="wo-empty-icon">📭</div>
