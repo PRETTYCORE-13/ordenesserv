@@ -2,13 +2,12 @@ defmodule Prettycore.Workorders do
   @moduledoc false
   alias Prettycore.Repo
   alias Prettycore.Workorders.WorkorderEnc
-  import Ecto.Query
+  import Ecto.Query, warn: false
   ## Encabezados (órdenes)
 
   def list_enc do
-    ##   Repo.all(WorkorderEnc)
     WorkorderEnc
-#     |> preload([:tipo])
+    |> preload([:tipo])
     |> Repo.all()
   end
 

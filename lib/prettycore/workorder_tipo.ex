@@ -8,7 +8,7 @@ defmodule Prettycore.Workorders.WorkorderTipo do
     field :descripcion, :string, source: :"WOKTPO_DESCRIPCION"
 
     has_many :encabezados, Prettycore.Workorders.WorkorderEnc,
-      foreign_key: :"WOKTPO_CODIGO_K",
+      foreign_key: :tipo_id,
       references: :id
   end
 end

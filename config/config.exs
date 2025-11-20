@@ -20,6 +20,7 @@ config :prettycore, Prettycore.Repo,
   idle_timeout: 5_000
 
 config :prettycore,
+  ecto_repos: [Prettycore.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint

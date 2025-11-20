@@ -1,5 +1,20 @@
 import Config
 
+# Configure the database for testing
+# Note: Using integration tests with the production database
+# SQL Sandbox is not fully supported with SQL Server (TDS)
+config :prettycore, Prettycore.Repo,
+  hostname: "ecore.ath.cx",
+  port: 1433,
+  username: "sa",
+  password: "N0vacore",
+  database: "ECORE_PRD_10",
+  pool_size: 2,
+  encrypt: false,
+  trust_server_certificate: true,
+  timeout: 15_000,
+  idle_timeout: 5_000
+
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
 config :prettycore, PrettycoreWeb.Endpoint,

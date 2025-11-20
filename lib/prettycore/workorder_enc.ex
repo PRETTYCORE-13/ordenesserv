@@ -12,8 +12,11 @@ defmodule Prettycore.Workorders.WorkorderEnc do
     field :folio,      :integer, source: :"WOKE_FOLIO_K"
     field :referencia, :string,  source: :"WOKE_REFERENCIA"
 
+    # Foreign key field must be defined when using define_field: false
+    field :tipo_id, :string, source: :"WOKTPO_CODIGO_K"
+
     belongs_to :tipo, WorkorderTipo,
-      foreign_key: :"WOKTPO_CODIGO_K",
+      foreign_key: :tipo_id,
       references: :id,
       define_field: false
 
