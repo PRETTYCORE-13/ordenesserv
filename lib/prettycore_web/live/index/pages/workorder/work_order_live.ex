@@ -37,6 +37,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:current_page, "workorder")
      |> assign(:show_programacion_children, false)
      |> assign(:sidebar_open, true)
+     |> assign(:current_user_email, session["user_email"])
      |> assign(:workorders, workorders)
      |> assign(:sysudn_opts, sysudn_opts)
      |> assign(:usuario_opts, usuario_opts)
