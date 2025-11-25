@@ -950,33 +950,110 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 /* Contenedor principal de la paginación */
 .wo-pagination {
   margin-top: 24px;
-  padding: 12px 0;
+  padding: 16px 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  border-top: 1px solid #e5e7eb;
+}
 
-  border-top: 1px solid #eee;
+/* Estilo para los enlaces de navegación (nav) generados por Flop.Phoenix */
+.wo-pagination nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estilo para todos los enlaces de paginación */
+.wo-pagination a,
+.wo-pagination span {
+  min-width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+/* Hover para enlaces activos */
+.wo-pagination a:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+/* Página actual/activa */
+.wo-pagination .pagination-current,
+.wo-pagination span[aria-current="page"] {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: default;
+}
+
+/* Enlaces deshabilitados (Previous/Next cuando no están disponibles) */
+.wo-pagination span:not([aria-current]) {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Estilos específicos para botones Anterior/Siguiente */
+.wo-pagination a[rel="prev"],
+.wo-pagination a[rel="next"],
+.wo-pagination span[rel="prev"],
+.wo-pagination span[rel="next"] {
+  padding: 0 16px;
+  font-weight: 600;
+}
+
+/* Ellipsis (puntos suspensivos) */
+.wo-pagination .pagination-ellipsis {
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: default;
+  min-width: 30px;
 }
 
 /* Botones de página */
 .wo-page-btn {
   background: #ffffff;
-  border: 1px solid #ccc;
-  padding: 6px 16px;
-  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: all 0.2s ease-in-out;
 }
 
 .wo-page-btn:hover:not(:disabled) {
-  background: #f2f2f2;
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .wo-page-btn:disabled {
-  color: #999;
-  background: #f7f7f7;
+  color: #9ca3af;
+  background: #f9fafb;
+  border-color: #e5e7eb;
   cursor: not-allowed;
 }
 
@@ -984,7 +1061,8 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 .wo-page-info {
   font-size: 14px;
   font-weight: 500;
-  color: #333;
+  color: #374151;
+  margin: 0 8px;
 }
 
 .wo-state { 

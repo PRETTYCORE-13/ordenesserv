@@ -5,6 +5,14 @@ defmodule Prettycore.Workorders.WorkorderEnc do
   @schema_prefix "dbo"
   @primary_key false
 
+  @derive {
+    Flop.Schema,
+    filterable: [:sysudn, :estado, :usuario, :fecha],
+    sortable: [:fecha, :sysudn, :estado],
+    default_limit: 20,
+    max_limit: 100
+  }
+
   schema "XEN_WOKORDERENC" do
     field :sysudn,     :string,  source: :"SYSUDN_CODIGO_K"
     field :systra,     :string,  source: :"SYSTRA_CODIGO_K"

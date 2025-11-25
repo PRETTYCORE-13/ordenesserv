@@ -1,15 +1,5 @@
-<% # Workorders are now filtered at database level via Ecto queries %>
-<% # Pagination logic %>
-<% page_size = 20 %>
-<% total = length(@workorders) %>
-<% total_pages = if total == 0, do: 1, else: div(total + page_size - 1, page_size) %>
-<% page = if @page < 1, do: 1, else: @page %>
-<% page = if page > total_pages, do: total_pages, else: page %>
-<% start_index = (page - 1) * page_size %>
-<% page_entries = @workorders
-  |> Enum.drop(start_index)
-  |> Enum.take(page_size)
-%>
+<% # Workorders are now paginated at database level via Flop %>
+<% params = @params || %{} %>
 
                               <section class="wo-page">
                                 <!-- Banner superior cuando hay problemas de BD -->
@@ -31,7 +21,7 @@
                                           <div class="wo-stat-card">
                                             <span class="wo-stat-label">Total de órdenes</span>
                                             <span class="wo-stat-value">
-                                              <%= length(@workorders) %>
+                                              <%= @meta.total_count %>
                                             </span>
                                           </div>
                                         </div>
@@ -72,14 +62,14 @@
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Estado</label>
                                           <div class="wo-filters">
-                                            <.button  name="estado" value="todas" class={"wo-filter-btn" <> if @filter == "todas", do: "
+                                            <.button  name="estado" value="todas" class={"wo-filter-btn" <> if params["estado"] == "todas", do: "
                                               wo-filter-btn-active", else: ""}
                                               phx-value-filter="todas"
                                               >
                                               Todas
                                             </.button>
 
-                                            <.button name="estado" value="por_aceptar" class={"wo-filter-btn" <> if @filter == "por_aceptar",
+                                            <.button name="estado" value="por_aceptar" class={"wo-filter-btn" <> if params["estado"] == "por_aceptar",
                                               do: " wo-filter-btn-active", else: ""}
                                               >
                                               Pendientes
@@ -92,11 +82,11 @@
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">UDN</label>
                                           <select name="sysudn" class="wo-filter-select">
-                                            <option value="" selected={@sysudn_filter=="" }>
+                                            <option value="" selected={params["sysudn"]=="" || is_nil(params["sysudn"]) }>
                                               Todas las UDN
                                             </option>
                                             <%= for opt <- @sysudn_opts do %>
-                                              <option value={opt} selected={@sysudn_filter==opt}>
+                                              <option value={opt} selected={params["sysudn"]==opt}>
                                                 <%= opt %>
                                               </option>
                                               <% end %>
@@ -106,23 +96,23 @@
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Fecha desde</label>
                                           <input type="date" name="fecha_desde" class="wo-filter-date"
-                                            value={@fecha_desde} />
+                                            value={params["fecha_desde"] || ""} />
                                         </div>
 
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Fecha hasta</label>
                                           <input type="date" name="fecha_hasta" class="wo-filter-date"
-                                            value={@fecha_hasta} />
+                                            value={params["fecha_hasta"] || ""} />
                                         </div>
 
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Usuario</label>
                                           <select name="usuario" class="wo-filter-select">
-                                            <option value="" selected={@usuario_filter=="" }>
+                                            <option value="" selected={params["usuario"]=="" || is_nil(params["usuario"]) }>
                                               Todos los usuarios
                                             </option>
                                             <%= for opt <- @usuario_opts do %>
-                                              <option value={opt} selected={@usuario_filter==opt}>
+                                              <option value={opt} selected={params["usuario"]==opt}>
                                                 <%= opt %>
                                               </option>
                                               <% end %>
@@ -155,7 +145,7 @@
                                                     </tr>
                                                   </thead>
                                                   <tbody>
-                                                    <%= for w <- page_entries do %>
+                                                    <%= for w <- @workorders do %>
                                                       <% key="#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
 
                                                         <!-- Fila principal -->
@@ -188,7 +178,7 @@
                                                           <!-- Acciones -->
                                                           <td class="wo-td-center">
 
-                                                            <% botones_desactivados?=@filter=="todas" and w.estado !=100
+                                                            <% botones_desactivados?=params["estado"]=="todas" and w.estado !=100
                                                               %>
 
                                                               <button type="button" class="wo-btn wo-btn-accept"
@@ -249,22 +239,19 @@
                                                 </table>
                                               </div>
 
-                                              <!-- Controles de paginación -->
+                                              <!-- Controles de paginación con Flop Phoenix -->
                                               <div class="wo-pagination">
-                                                <button type="button" class="wo-page-btn" phx-click="goto_page"
-                                                  phx-value-dir="prev" disabled={page <=1}>
-                                                  Anterior
-                                                </button>
-
-                                                <span class="wo-page-info">
-                                                  Página <%= page %> de <%= total_pages %>
-                                                </span>
-
-                                                <button type="button" class="wo-page-btn" phx-click="goto_page"
-                                                  phx-value-dir="next" disabled={page>= total_pages}
-                                                  >
-                                                  Siguiente
-                                                </button>
+                                                <Flop.Phoenix.pagination
+                                                  meta={@meta}
+                                                  path={fn params -> build_pagination_path(params, @params) end}
+                                                >
+                                                  <:previous attrs={[aria: [label: "Ir a la página anterior"]]}>
+                                                    Anterior
+                                                  </:previous>
+                                                  <:next attrs={[aria: [label: "Ir a la página siguiente"]]}>
+                                                    Siguiente
+                                                  </:next>
+                                                </Flop.Phoenix.pagination>
                                               </div>
                                               <% end %>
                                     </div>

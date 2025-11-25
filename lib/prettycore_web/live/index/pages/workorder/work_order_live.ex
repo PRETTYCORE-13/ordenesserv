@@ -1,7 +1,6 @@
 defmodule PrettycoreWeb.WorkOrderLive do
   use PrettycoreWeb, :live_view_admin
 
-  import PrettycoreWeb.MenuLayout
   alias Prettycore.Workorders
   alias Prettycore.WorkorderApi
   alias Prettycore.Repo
@@ -11,10 +10,6 @@ defmodule PrettycoreWeb.WorkOrderLive do
   ## MOUNT
   @impl true
   def mount(_params, session, socket) do
-    # Initialize with default filters (por_aceptar)
-    filters = %{estado: "por_aceptar"}
-    workorders = Workorders.list_enc_filtered(filters)
-
     # Get all workorders once for filter options
     all_workorders = Workorders.list_enc()
 
@@ -38,53 +33,44 @@ defmodule PrettycoreWeb.WorkOrderLive do
      |> assign(:show_programacion_children, false)
      |> assign(:sidebar_open, true)
      |> assign(:current_user_email, session["user_email"])
-     |> assign(:workorders, workorders)
      |> assign(:sysudn_opts, sysudn_opts)
      |> assign(:usuario_opts, usuario_opts)
      |> assign(:open_key, nil)
      |> assign(:detalles, %{})
-     |> assign(:filter, "por_aceptar")
-     |> assign(:sysudn_filter, "")
-     |> assign(:fecha_desde, "")
-     |> assign(:fecha_hasta, "")
-     |> assign(:usuario_filter, "")
      |> assign(:filters_open, false)
-     |> assign(:page, 1)
      |> assign(:current_path, "/admin/workorder")}
   end
 
   @impl true
   def handle_params(params, _uri, socket) do
-    # Extract filter values from URL params
-    sysudn = Map.get(params, "sysudn", "")
-    fecha_desde = Map.get(params, "fecha_desde", "")
-    fecha_hasta = Map.get(params, "fecha_hasta", "")
-    usuario = Map.get(params, "usuario", "")
-    estado = Map.get(params, "estado", "por_aceptar")
+    # Set default estado if not provided
+    params =
+      params
+      |> Map.put_new("estado", "por_aceptar")
+      |> Map.put_new("page", "1")
+      |> Map.put_new("page_size", "10")
 
-    # Build filters map for the query
-    filters = %{
-      estado: estado,
-      sysudn: sysudn,
-      usuario: usuario,
-      fecha_desde: fecha_desde,
-      fecha_hasta: fecha_hasta
-    }
+    # Use Flop to handle pagination and filtering
+    case Workorders.list_enc_with_flop(params) do
+      {:ok, {workorders, meta}} ->
+        {:noreply,
+         socket
+         |> assign(:workorders, workorders)
+         |> assign(:meta, meta)
+         |> assign(:params, params)
+         |> assign(:open_key, nil)
+         |> assign(:detalles, %{})}
 
-    # Load workorders with filters applied at database level
-    workorders = Workorders.list_enc_filtered(filters)
-
-    {:noreply,
-     socket
-     |> assign(:workorders, workorders)
-     |> assign(:sysudn_filter, sysudn)
-     |> assign(:fecha_desde, fecha_desde)
-     |> assign(:fecha_hasta, fecha_hasta)
-     |> assign(:usuario_filter, usuario)
-     |> assign(:filter, estado)
-     |> assign(:open_key, nil)
-     |> assign(:detalles, %{})
-     |> assign(:page, 1)}
+      {:error, meta} ->
+        # If validation fails, use default params and show empty results
+        {:noreply,
+         socket
+         |> assign(:workorders, [])
+         |> assign(:meta, meta)
+         |> assign(:params, params)
+         |> assign(:open_key, nil)
+         |> assign(:detalles, %{})}
+    end
   end
 
 
@@ -93,8 +79,6 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # ------------------------------------------------------------------
   @impl true
   def handle_event("change_page", %{"id" => id}, socket) do
-    email = socket.assigns.current_user_email
-
     case id do
       "toggle_sidebar" ->
         {:noreply, update(socket, :sidebar_open, &(not &1))}
@@ -120,15 +104,8 @@ defmodule PrettycoreWeb.WorkOrderLive do
   end
 
   # ------------------------------------------------------------------
-  # PAGINACIÓN
+  # PAGINACIÓN - Ahora manejado por Flop Phoenix
   # ------------------------------------------------------------------
-  def handle_event("goto_page", %{"dir" => "prev"}, socket) do
-    {:noreply, update(socket, :page, fn p -> max(p - 1, 1) end)}
-  end
-
-  def handle_event("goto_page", %{"dir" => "next"}, socket) do
-    {:noreply, update(socket, :page, fn p -> p + 1 end)}
-  end
 
   # ------------------------------------------------------------------
 # CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
@@ -150,20 +127,17 @@ defmodule PrettycoreWeb.WorkOrderLive do
       password ->
         case WorkorderApi.cambiar_estado(ref, estado, password) do
           {:ok, _body} ->
-            # Reload workorders with current filters
-            filters = %{
-              estado: socket.assigns.filter,
-              sysudn: socket.assigns.sysudn_filter,
-              usuario: socket.assigns.usuario_filter,
-              fecha_desde: socket.assigns.fecha_desde,
-              fecha_hasta: socket.assigns.fecha_hasta
-            }
+            # Reload workorders with current params
+            case Workorders.list_enc_with_flop(socket.assigns.params) do
+              {:ok, {workorders, meta}} ->
+                {:noreply,
+                 socket
+                 |> assign(:workorders, workorders)
+                 |> assign(:meta, meta)}
 
-            workorders = Workorders.list_enc_filtered(filters)
-
-            {:noreply,
-             socket
-             |> assign(:workorders, workorders)}
+              {:error, _} ->
+                {:noreply, socket}
+            end
 
           {:error, reason} ->
             IO.inspect(reason, label: "error cambiar_estado")
@@ -188,16 +162,23 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # FILTROS AVANZADOS
   # ------------------------------------------------------------------
   def handle_event("set_filter", params, socket) do
-    # Encapsulamos los parámetros
-  clean_params =
-    params
-    |> Enum.reject(fn {_k, v} -> v in [nil, ""] end)
-    |> Enum.into(%{})
+    # Clean empty params and reset to page 1 when filters change
+    clean_params =
+      params
+      |> Enum.reject(fn {_k, v} -> v in [nil, ""] end)
+      |> Enum.into(%{})
+      |> Enum.map(fn {k, v} ->
+        # Si el valor es una lista, tomar el primer elemento
+        {k, if(is_list(v), do: List.first(v), else: v)}
+      end)
+      |> Enum.into(%{})
+      |> Map.put("page", "1")
+      |> Map.put("page_size", "10")
 
-  query = Plug.Conn.Query.encode(clean_params)
+    query = URI.encode_query(clean_params)
 
-  {:noreply,
-   push_patch(socket, to: "/admin/workorder?#{query}")}
+    {:noreply,
+     push_patch(socket, to: "/admin/workorder?#{query}")}
   end
 
   # ------------------------------------------------------------------
@@ -241,4 +222,29 @@ defmodule PrettycoreWeb.WorkOrderLive do
   defp estado_class(500), do: "wo-state wo-state-atendida"
   defp estado_class(600), do: "wo-state wo-state-cancelado"
   defp estado_class(_),   do: "wo-state"
+
+  # Build path for pagination preserving all filter params
+  # This function is called by Flop.Phoenix.pagination with new page params
+  def build_pagination_path(new_params, current_params) do
+    # Convert new_params to a map if it's a keyword list
+    new_params = Enum.into(new_params, %{})
+
+    # Extract page and page_size from new_params (can be atoms or strings)
+    page = new_params[:page] || new_params["page"] || 1
+    page_size = new_params[:page_size] || new_params["page_size"] || 10
+
+    # Merge current filters with new pagination params
+    query_params =
+      current_params
+      |> Map.drop(["page", "page_size", "order_by", "order_directions"])
+      |> Map.merge(%{
+        "page" => to_string(page),
+        "page_size" => to_string(page_size)
+      })
+
+    # Build the query string
+    query_string = URI.encode_query(query_params)
+
+    "/admin/workorder?" <> query_string
+  end
 end

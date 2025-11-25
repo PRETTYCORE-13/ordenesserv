@@ -3,6 +3,7 @@ defmodule Prettycore.Workorders do
   alias Prettycore.Repo
   alias Prettycore.Workorders.WorkorderEnc
   import Ecto.Query, warn: false
+
   ## Encabezados (órdenes)
 
   def list_enc do
@@ -37,6 +38,42 @@ defmodule Prettycore.Workorders do
     |> apply_fecha_hasta_filter(filters[:fecha_hasta])
     |> preload([:tipo])
     |> Repo.all()
+  end
+
+  @spec list_enc_with_flop() :: {:error, Flop.Meta.t()} | {:ok, {list(), Flop.Meta.t()}}
+  @doc """
+  Lists workorder headers with Flop for pagination, filtering and sorting.
+
+  ## Parameters
+    * `flop_params` - Flop parameters including pagination, filters and sorting
+
+  ## Examples
+      iex> list_enc_with_flop(%{page: 1, page_size: 20})
+      {:ok, {[%WorkorderEnc{}, ...], %Flop.Meta{}}}
+  """
+  def list_enc_with_flop(flop_params \\ %{}) do
+    # Add default order_by if not provided (required by SQL Server with OFFSET)
+    flop_params =
+      if Map.has_key?(flop_params, "order_by") || Map.has_key?(flop_params, :order_by) do
+        flop_params
+      else
+        # Use string keys to match the rest of the params
+        Map.put(flop_params, "order_by", ["fecha"])
+        |> Map.put("order_directions", ["desc"])
+      end
+
+    WorkorderEnc
+    |> preload([:tipo])
+    |> apply_custom_filters(flop_params)
+    |> Flop.validate_and_run(flop_params, for: WorkorderEnc)
+  end
+
+  # Apply custom filters that aren't handled by Flop's standard filters
+  defp apply_custom_filters(query, params) do
+    query
+    |> apply_estado_filter(params["estado"] || params[:estado])
+    |> apply_fecha_desde_filter(params["fecha_desde"] || params[:fecha_desde])
+    |> apply_fecha_hasta_filter(params["fecha_hasta"] || params[:fecha_hasta])
   end
 
   # Filter by estado
@@ -110,49 +147,7 @@ defmodule Prettycore.Workorders do
   end
   defp parse_date(_), do: nil
 
-  def list_enc2 do
-    sql = """
-    SELECT
-      SYSUDN_CODIGO_K,
-      SYSTRA_CODIGO_K,
-      WOKE_SERIE_K,
-      WOKE_FOLIO_K,
-      WOKE_REFERENCIA,
-      WOKTPO_CODIGO_K,
-      S_MAQEDO,
-      WOKE_DESCRIPCION,
-      S_FECHA,
-      WOKE_USUARIO
-    FROM XEN_WOKORDERENC
-    """
 
-    case Repo.query(sql, []) do
-      {:ok, %{columns: cols, rows: rows}} ->
-        list =
-          Enum.map(rows, fn row ->
-            row_map = to_map(cols, row)
-
-            %{
-              sysudn: row_map["SYSUDN_CODIGO_K"],
-              systra: row_map["SYSTRA_CODIGO_K"],
-              serie: row_map["WOKE_SERIE_K"],
-              folio: row_map["WOKE_FOLIO_K"],
-              referencia: row_map["WOKE_REFERENCIA"],
-              tipo: row_map["WOKTPO_CODIGO_K"],
-              estado: row_map["S_MAQEDO"],
-              descripcion: row_map["WOKE_DESCRIPCION"],
-              fecha: row_map["S_FECHA"],
-              usuario: row_map["WOKE_USUARIO"]
-            }
-          end)
-
-        {:ok, list}
-
-      {:error, error} ->
-        IO.inspect(error, label: "error list_enc")
-        {:error, error}
-    end
-  end
 
   ## Detalle (imágenes)
 
