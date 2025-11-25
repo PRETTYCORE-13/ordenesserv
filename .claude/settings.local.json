@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mix deps.get:*)",
       "Bash(mix compile:*)",
-      "Bash(mix test:*)"
+      "Bash(mix test:*)",
+      "Bash(mix assets.deploy:*)"
     ],
     "deny": [],
     "ask": []

@@ -43,6 +43,7 @@ defmodule PrettycoreWeb.Router do
       live "/programacion", Programacion
       live "/programacion/sql", HerramientaSql
       live "/workorder", WorkOrderLive
+      live "/clientes", Clientes
       live "/configuracion", ConfiguracionLive
     end
   end

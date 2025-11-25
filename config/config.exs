@@ -16,8 +16,11 @@ config :prettycore, Prettycore.Repo,
   pool_size: 10,
   encrypt: false,
   trust_server_certificate: true,
-  timeout: 15_000,
-  idle_timeout: 5_000
+  timeout: 60_000,           # 60 segundos para queries complejas
+  connect_timeout: 30_000,   # 30 segundos para conectar
+  idle_timeout: 300_000,     # 5 minutos antes de cerrar conexiones idle
+  queue_target: 5_000,       # Tiempo objetivo en cola
+  queue_interval: 1_000
 
 config :prettycore,
   ecto_repos: [Prettycore.Repo],
@@ -41,7 +44,25 @@ config :prettycore, PrettycoreWeb.Endpoint,
 #
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
-config :prettycore, Prettycore.Mailer, adapter: Swoosh.Adapters.SMTP
+# Configures the mailer
+#
+# SMTP Configuration for Gmail con opciones TLS mejoradas
+config :prettycore, Prettycore.Mailer,
+  adapter: Swoosh.Adapters.SMTP,
+  relay: "smtp.gmail.com",
+  username: "servicios.ennovacore@gmail.com",
+  password: System.get_env("SMTP_PASSWORD") || "tazooiiaqvtfobtu",
+  ssl: false,
+  tls: :always,
+  tls_options: [
+    verify: :verify_none,
+    versions: [:"tlsv1.2", :"tlsv1.3"],
+    cacerts: :public_key.cacerts_get()
+  ],
+  auth: :always,
+  port: 587,
+  retries: 3,
+  timeout: 10_000
 
 # Configure esbuild (the version is required)
 config :esbuild,

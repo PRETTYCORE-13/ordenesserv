@@ -95,6 +95,10 @@ defmodule PrettycoreWeb.WorkOrderLive do
       "workorder" ->
         {:noreply, socket}  # ya estás aquí
 
+      "clientes" ->
+        {:noreply, push_navigate(socket, to: ~p"/admin/clientes")}
+
+
       "config" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/configuracion")}
 
@@ -246,5 +250,28 @@ defmodule PrettycoreWeb.WorkOrderLive do
     query_string = URI.encode_query(query_params)
 
     "/admin/workorder?" <> query_string
+  end
+
+  # Calcula las páginas visibles para la paginación dinámica
+  # Muestra un máximo de `max_visible` páginas, desplazándose cuando sea necesario
+  def get_visible_pages(current_page, total_pages, max_visible) do
+    cond do
+      # Si hay menos páginas que el máximo visible, mostrar todas
+      total_pages <= max_visible ->
+        1..total_pages |> Enum.to_list()
+
+      # Si estamos en las primeras páginas
+      current_page <= div(max_visible, 2) + 1 ->
+        1..max_visible |> Enum.to_list()
+
+      # Si estamos en las últimas páginas
+      current_page >= total_pages - div(max_visible, 2) ->
+        (total_pages - max_visible + 1)..total_pages |> Enum.to_list()
+
+      # Si estamos en el medio, centrar la página actual
+      true ->
+        start_page = current_page - div(max_visible, 2)
+        start_page..(start_page + max_visible - 1) |> Enum.to_list()
+    end
   end
 end

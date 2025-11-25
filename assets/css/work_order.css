@@ -954,22 +954,78 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   border-top: 1px solid #e5e7eb;
+  position: relative;
 }
 
-/* Estilo para los enlaces de navegación (nav) generados por Flop.Phoenix */
+/* Estilo para el nav de Flop.Phoenix */
 .wo-pagination nav {
+  display: contents; /* Permite que los botones anterior/siguiente se posicionen libremente */
+}
+
+/* Botones Anterior/Siguiente - posicionados en los extremos */
+.wo-pagination-btn {
+  min-width: 100px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.wo-pagination-btn:hover {
+  background: #000000;
+  border-color: #000000;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Botones deshabilitados */
+.wo-pagination-disabled {
+  min-width: 100px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.wo-pagination-disabled:hover {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Contenedor de números de página - centrado */
+.wo-pagination-numbers {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-/* Estilo para todos los enlaces de paginación */
-.wo-pagination a,
-.wo-pagination span {
-  min-width: 40px;
-  height: 40px;
+/* Números de página individuales */
+.wo-pagination-number {
+  min-width: 42px;
+  height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -977,7 +1033,7 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
   background: #ffffff;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   color: #374151;
   text-decoration: none;
@@ -985,52 +1041,29 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
   cursor: pointer;
 }
 
-/* Hover para enlaces activos */
-.wo-pagination a:hover {
+.wo-pagination-number:hover {
   background: #000000;
   border-color: #000000;
   color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Página actual/activa */
-.wo-pagination .pagination-current,
-.wo-pagination span[aria-current="page"] {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: #ffffff;
-  font-weight: 600;
+/* Página actual - destacada con color */
+.wo-pagination-current {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+  font-weight: 700;
   cursor: default;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Enlaces deshabilitados (Previous/Next cuando no están disponibles) */
-.wo-pagination span:not([aria-current]) {
-  background: #f9fafb;
-  border-color: #e5e7eb;
-  color: #9ca3af;
-  cursor: not-allowed;
+.wo-pagination-current:hover {
+  transform: none;
 }
 
-/* Estilos específicos para botones Anterior/Siguiente */
-.wo-pagination a[rel="prev"],
-.wo-pagination a[rel="next"],
-.wo-pagination span[rel="prev"],
-.wo-pagination span[rel="next"] {
-  padding: 0 16px;
-  font-weight: 600;
-}
-
-/* Ellipsis (puntos suspensivos) */
-.wo-pagination .pagination-ellipsis {
-  border: none;
-  background: transparent;
-  color: #6b7280;
-  cursor: default;
-  min-width: 30px;
-}
-
-/* Botones de página */
+/* Botones de página (legacy - por si acaso) */
 .wo-page-btn {
   background: #ffffff;
   border: 1px solid #d1d5db;
@@ -1043,11 +1076,11 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-page-btn:hover:not(:disabled) {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: #000000;
+  border-color: #000000;
   color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .wo-page-btn:disabled {
@@ -1091,4 +1124,8 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 button[disabled] {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+ol, ul, menu {
+  display: flex;
 }

@@ -241,17 +241,47 @@
 
                                               <!-- Controles de paginación con Flop Phoenix -->
                                               <div class="wo-pagination">
-                                                <Flop.Phoenix.pagination
-                                                  meta={@meta}
-                                                  path={fn params -> build_pagination_path(params, @params) end}
-                                                >
-                                                  <:previous attrs={[aria: [label: "Ir a la página anterior"]]}>
+                                                <!-- Botón Anterior -->
+                                                <%= if @meta.has_previous_page? do %>
+                                                  <a
+                                                    href={build_pagination_path(%{"page" => @meta.previous_page}, @params)}
+                                                    class="wo-pagination-btn wo-pagination-prev"
+                                                    aria-label="Ir a la página anterior"
+                                                  >
                                                     Anterior
-                                                  </:previous>
-                                                  <:next attrs={[aria: [label: "Ir a la página siguiente"]]}>
+                                                  </a>
+                                                <% else %>
+                                                  <span class="wo-pagination-btn wo-pagination-disabled">Anterior</span>
+                                                <% end %>
+
+                                                <!-- Números de página personalizados (máximo 3 visibles) -->
+                                                <div class="wo-pagination-numbers">
+                                                  <%= for page <- get_visible_pages(@meta.current_page, @meta.total_pages, 3) do %>
+                                                    <%= if page == @meta.current_page do %>
+                                                      <span class="wo-pagination-number wo-pagination-current"><%= page %></span>
+                                                    <% else %>
+                                                      <a
+                                                        href={build_pagination_path(%{"page" => page}, @params)}
+                                                        class="wo-pagination-number"
+                                                      >
+                                                        <%= page %>
+                                                      </a>
+                                                    <% end %>
+                                                  <% end %>
+                                                </div>
+
+                                                <!-- Botón Siguiente -->
+                                                <%= if @meta.has_next_page? do %>
+                                                  <a
+                                                    href={build_pagination_path(%{"page" => @meta.next_page}, @params)}
+                                                    class="wo-pagination-btn wo-pagination-next"
+                                                    aria-label="Ir a la página siguiente"
+                                                  >
                                                     Siguiente
-                                                  </:next>
-                                                </Flop.Phoenix.pagination>
+                                                  </a>
+                                                <% else %>
+                                                  <span class="wo-pagination-btn wo-pagination-disabled">Siguiente</span>
+                                                <% end %>
                                               </div>
                                               <% end %>
                                     </div>
