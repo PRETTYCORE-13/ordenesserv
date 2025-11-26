@@ -9,10 +9,12 @@
                                       <div class="wo-hero-main">
                                         <div class="wo-hero-icon">🛠️</div>
                                         <div>
-                                          <h1 class="wo-title">Órdenes de trabajo</h1>
-                                          <p class="wo-subtitle">
-                                            Visualiza tus órdenes y las imágenes asociadas.
-                                          </p>
+                                          <.header>
+                                            Órdenes de trabajo
+                                            <:subtitle>
+                                              Visualiza tus órdenes y las imágenes asociadas.
+                                            </:subtitle>
+                                          </.header>
                                         </div>
                                       </div>
 
@@ -27,10 +29,11 @@
                                         </div>
 
                                         <!-- Botón debajo del total para abrir el menú lateral -->
-                                        <button type="button" class={"wo-filters-toggle" <> if @filters_open, do: "
-                                          wo-filters-toggle-open", else: ""}
+                                        <.button
+                                          type="button"
+                                          class={"wo-filters-toggle" <> if @filters_open, do: " wo-filters-toggle-open", else: ""}
                                           phx-click="toggle_filters"
-                                          >
+                                        >
                                           <span class="wo-filters-toggle-icon">
                                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                               <path fill="currentColor"
@@ -40,7 +43,7 @@
                                           <span class="wo-filters-toggle-text">
                                             Filtros
                                           </span>
-                                        </button>
+                                        </.button>
                                       </div>
                                     </header>
 
@@ -51,13 +54,16 @@
                                       >
                                       <div class="wo-filters-drawer-header">
                                         <span class="wo-filters-drawer-title">Filtros</span>
-                                        <button type="button" class="wo-filters-drawer-close"
-                                          phx-click="toggle_filters">
+                                        <.button
+                                          type="button"
+                                          class="wo-filters-drawer-close"
+                                          phx-click="toggle_filters"
+                                        >
                                           ✕
-                                        </button>
+                                        </.button>
                                       </div>
 
-                                      <.form phx-submit="set_filter" class="wo-filters-drawer-body" phx-change="set_filter">
+                                      <.form :let={_f} for={%{}} as={:filters} phx-submit="set_filter" class="wo-filters-drawer-body" phx-change="set_filter">
                                         <!-- ESTADO: Todas / Pendientes -->
                                         <div class="wo-filter-field">
                                           <label class="wo-filter-label">Estado</label>
@@ -80,43 +86,45 @@
                                         </div>
 
                                         <div class="wo-filter-field">
-                                          <label class="wo-filter-label">UDN</label>
-                                          <select name="sysudn" class="wo-filter-select">
-                                            <option value="" selected={params["sysudn"]=="" || is_nil(params["sysudn"]) }>
-                                              Todas las UDN
-                                            </option>
-                                            <%= for opt <- @sysudn_opts do %>
-                                              <option value={opt} selected={params["sysudn"]==opt}>
-                                                <%= opt %>
-                                              </option>
-                                              <% end %>
-                                          </select>
+                                          <.input
+                                            type="select"
+                                            name="sysudn"
+                                            label="UDN"
+                                            value={params["sysudn"]}
+                                            options={[{"Todas las UDN", ""}] ++ Enum.map(@sysudn_opts, &{&1, &1})}
+                                            class="wo-filter-select"
+                                          />
                                         </div>
 
                                         <div class="wo-filter-field">
-                                          <label class="wo-filter-label">Fecha desde</label>
-                                          <input type="date" name="fecha_desde" class="wo-filter-date"
-                                            value={params["fecha_desde"] || ""} />
+                                          <.input
+                                            type="date"
+                                            name="fecha_desde"
+                                            label="Fecha desde"
+                                            value={params["fecha_desde"] || ""}
+                                            class="wo-filter-date"
+                                          />
                                         </div>
 
                                         <div class="wo-filter-field">
-                                          <label class="wo-filter-label">Fecha hasta</label>
-                                          <input type="date" name="fecha_hasta" class="wo-filter-date"
-                                            value={params["fecha_hasta"] || ""} />
+                                          <.input
+                                            type="date"
+                                            name="fecha_hasta"
+                                            label="Fecha hasta"
+                                            value={params["fecha_hasta"] || ""}
+                                            class="wo-filter-date"
+                                          />
                                         </div>
 
                                         <div class="wo-filter-field">
-                                          <label class="wo-filter-label">Usuario</label>
-                                          <select name="usuario" class="wo-filter-select">
-                                            <option value="" selected={params["usuario"]=="" || is_nil(params["usuario"]) }>
-                                              Todos los usuarios
-                                            </option>
-                                            <%= for opt <- @usuario_opts do %>
-                                              <option value={opt} selected={params["usuario"]==opt}>
-                                                <%= opt %>
-                                              </option>
-                                              <% end %>
-                                          </select>
+                                          <.input
+                                            type="select"
+                                            name="usuario"
+                                            label="Usuario"
+                                            value={params["usuario"]}
+                                            options={[{"Todos los usuarios", ""}] ++ Enum.map(@usuario_opts, &{&1, &1})}
+                                            class="wo-filter-select"
+                                          />
                                         </div>
                                       </.form>
                                     </div>
@@ -178,20 +186,30 @@
                                                           <!-- Acciones -->
                                                           <td class="wo-td-center">
 
-                                                            <% botones_desactivados?=params["estado"]=="todas" and w.estado !=100
+                                                            <% botones_desactivados? = params["estado"]=="todas" and w.estado !=100
                                                               %>
 
-                                                              <button type="button" class="wo-btn wo-btn-accept"
-                                                                phx-click="cambiar_estado" phx-value-ref={w.referencia}
-                                                                phx-value-estado="1" disabled={botones_desactivados?}>
+                                                              <.button
+                                                                type="button"
+                                                                class="wo-btn wo-btn-accept"
+                                                                phx-click="cambiar_estado"
+                                                                phx-value-ref={w.referencia}
+                                                                phx-value-estado="1"
+                                                                disabled={botones_desactivados?}
+                                                              >
                                                                 Aceptar
-                                                              </button>
+                                                              </.button>
 
-                                                              <button type="button" class="wo-btn wo-btn-reject"
-                                                                phx-click="cambiar_estado" phx-value-ref={w.referencia}
-                                                                phx-value-estado="0" disabled={botones_desactivados?}>
+                                                              <.button
+                                                                type="button"
+                                                                class="wo-btn wo-btn-reject"
+                                                                phx-click="cambiar_estado"
+                                                                phx-value-ref={w.referencia}
+                                                                phx-value-estado="0"
+                                                                disabled={botones_desactivados?}
+                                                              >
                                                                 Rechazar
-                                                              </button>
+                                                              </.button>
 
                                                           </td>
 

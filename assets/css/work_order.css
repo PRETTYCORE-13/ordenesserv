@@ -477,19 +477,20 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-btn {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
   cursor: pointer;
   margin: 0 4px;
+  border: none;
 }
 .wo-btn-accept {
-  background-color: #22c55e;
-  color: white;
+  background-color: #22c55e !important;
+  color: white !important;
 }
 .wo-btn-reject {
-  background-color: #ef4444;
-  color: white;
+  background-color: #ef4444 !important;
+  color: white !important;
 }
 .wo-btn:hover {
   opacity: 0.85;
@@ -605,13 +606,26 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 
 .wo-filter-select,
 .wo-filter-date {
-  background: #020617;
-  color: #e5e7eb;
-  font-size: 12px;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 4px 8px;
+  background: #020617 !important;
+  color: #e5e7eb !important;
+  font-size: 12px !important;
+  border: 1px solid #374151 !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
   min-width: 160px;
+}
+
+/* Override core_components fieldset styling for filter fields */
+.wo-filter-field .fieldset {
+  margin-bottom: 0;
+}
+
+.wo-filter-field .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 4px;
 }
 
 .wo-filter-select option {
@@ -640,14 +654,14 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-filters-toggle:hover {
-  background: #111827;
-  border-color: #4b5563;
+  background: #111827 !important;
+  border-color: #4b5563 !important;
 }
 
 .wo-filters-toggle-open {
-  background: #000000;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  background: #000000 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5) !important;
 }
 
 .wo-filters-toggle-icon svg {
@@ -686,13 +700,26 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 
 .wo-filter-select,
 .wo-filter-date {
-  background: #020617;
-  color: #e5e7eb;
-  font-size: 12px;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 4px 8px;
+  background: #020617 !important;
+  color: #e5e7eb !important;
+  font-size: 12px !important;
+  border: 1px solid #374151 !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
   min-width: 160px;
+}
+
+/* Override core_components fieldset styling for filter fields */
+.wo-filter-field .fieldset {
+  margin-bottom: 0;
+}
+
+.wo-filter-field .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 4px;
 }
 
 .wo-filter-select option {
@@ -721,14 +748,14 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-filters-toggle:hover {
-  background: #111827;
-  border-color: #4b5563;
+  background: #111827 !important;
+  border-color: #4b5563 !important;
 }
 
 .wo-filters-toggle-open {
-  background: #000000;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  background: #000000 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5) !important;
 }
 
 .wo-filters-toggle-icon svg {
@@ -767,13 +794,26 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 
 .wo-filter-select,
 .wo-filter-date {
-  background: #020617;
-  color: #e5e7eb;
-  font-size: 12px;
-  border: 1px solid #374151;
-  border-radius: 8px;
-  padding: 4px 8px;
+  background: #020617 !important;
+  color: #e5e7eb !important;
+  font-size: 12px !important;
+  border: 1px solid #374151 !important;
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
   min-width: 160px;
+}
+
+/* Override core_components fieldset styling for filter fields */
+.wo-filter-field .fieldset {
+  margin-bottom: 0;
+}
+
+.wo-filter-field .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 4px;
 }
 
 .wo-filter-select option {
@@ -787,29 +827,29 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 
 /* Botón que abre/cierra el menú de filtros (debajo de Total de órdenes) */
 .wo-filters-toggle {
-  margin-top: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid #374151;
-  background: #020617;
-  color: #e5e7eb;
-  font-size: 12px;
+  margin-top: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid #374151 !important;
+  background: #020617 !important;
+  color: #e5e7eb !important;
+  font-size: 12px !important;
   cursor: pointer;
   transition: all 0.16s ease;
 }
 
 .wo-filters-toggle:hover {
-  background: #111827;
-  border-color: #4b5563;
+  background: #111827 !important;
+  border-color: #4b5563 !important;
 }
 
 .wo-filters-toggle-open {
-  background: #000000;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+  background: #000000 !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5) !important;
 }
 
 .wo-filters-toggle-icon svg {
@@ -856,16 +896,16 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-filters-drawer-close {
-  border: none;
-  background: transparent;
-  color: #9ca3af;
-  font-size: 16px;
+  border: none !important;
+  background: transparent !important;
+  color: #9ca3af !important;
+  font-size: 16px !important;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 4px !important;
 }
 
 .wo-filters-drawer-close:hover {
-  color: #f9fafb;
+  color: #f9fafb !important;
 }
 
 /* Cuerpo del drawer: filtros en columna */
@@ -916,26 +956,26 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-filter-btn {
-  background: #1f2937;
-  color: #e5e7eb;
-  font-size: 13px;
-  border: 1px solid #374151;
-  border-radius: 999px;
-  padding: 6px 12px;
+  background: #1f2937 !important;
+  color: #e5e7eb !important;
+  font-size: 13px !important;
+  border: 1px solid #374151 !important;
+  border-radius: 999px !important;
+  padding: 6px 12px !important;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .wo-filter-btn:hover {
-  background: #4b5563;
-  border-color: #6b7280;
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
 }
 
 .wo-filter-btn-active {
-  background: #000000;
-  border-color: #6366f1;
-  color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+  background: #000000 !important;
+  border-color: #6366f1 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25) !important;
 }
 
 .wo-error-banner {
