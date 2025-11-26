@@ -996,18 +996,18 @@ background: radial-gradient(circle at 0% 0%, #69467d, #020617 65%);  box-shadow:
 }
 
 .wo-filters-close {
-  border: none;
-  background: transparent;
-  color: #9ca3af;
+  border: none !important;
+  background: transparent !important;
+  color: #9ca3af !important;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 4px !important;
+  border-radius: 4px !important;
   transition: all 0.2s ease;
 }
 
 .wo-filters-close:hover {
-  background: #1f2937;
-  color: #f9fafb;
+  background: #1f2937 !important;
+  color: #f9fafb !important;
 }
 
 .wo-filters-close svg {

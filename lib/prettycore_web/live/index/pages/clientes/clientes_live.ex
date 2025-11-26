@@ -178,15 +178,17 @@ defmodule PrettycoreWeb.Clientes do
   @impl true
   def render(assigns) do
     ~H"""
-    <section class="wo-container">
+    <section class="wo-page">
       <header class="wo-header">
         <div class="wo-hero-main">
           <div class="wo-hero-icon">👥</div>
           <div>
-            <h1 class="wo-title">Clientes</h1>
-            <p class="wo-subtitle">
-              Visualiza y gestiona tus clientes activos.
-            </p>
+            <.header>
+              Clientes
+              <:subtitle>
+                Visualiza y gestiona tus clientes activos.
+              </:subtitle>
+            </.header>
           </div>
         </div>
 
@@ -201,7 +203,7 @@ defmodule PrettycoreWeb.Clientes do
           </div>
 
           <!-- Botón para abrir el menú lateral de columnas -->
-          <button
+          <.button
             type="button"
             class={"wo-filters-toggle" <> if @filters_open, do: " wo-filters-toggle-open", else: ""}
             phx-click="toggle_filters"
@@ -217,7 +219,7 @@ defmodule PrettycoreWeb.Clientes do
             <span class="wo-filters-toggle-text">
               Columnas
             </span>
-          </button>
+          </.button>
         </div>
       </header>
 
@@ -225,14 +227,14 @@ defmodule PrettycoreWeb.Clientes do
       <div class={"wo-filters-drawer" <> if @filters_open, do: " wo-filters-drawer-open", else: ""}>
         <div class="wo-filters-header">
           <h2 class="wo-filters-title">Columnas visibles</h2>
-          <button type="button" class="wo-filters-close" phx-click="toggle_filters">
+          <.button type="button" class="wo-filters-close" phx-click="toggle_filters">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="currentColor"
                 d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6Z"
               />
             </svg>
-          </button>
+          </.button>
         </div>
 
         <div class="wo-filters-content">
@@ -393,7 +395,7 @@ defmodule PrettycoreWeb.Clientes do
       <% end %>
 
       <!-- Tabla de clientes -->
-      <div class="wo-table-container">
+      <div class="wo-table-card"><div class="wo-table-wrapper">
         <table class="wo-table">
           <thead>
             <tr>
@@ -488,11 +490,10 @@ defmodule PrettycoreWeb.Clientes do
             <% end %>
           </tbody>
         </table>
-      </div>
+      </div></div>
 
       <!-- Paginación personalizada (igual que workorder) -->
       <%= if Map.get(@meta, :total_pages, 0) > 1 do %>
-        <div class="wo-pagination-container">
           <div class="wo-pagination">
             <!-- Botón Anterior -->
             <%= if Map.get(@meta, :has_previous_page?, false) do %>
@@ -536,7 +537,6 @@ defmodule PrettycoreWeb.Clientes do
               <span class="wo-pagination-btn wo-pagination-disabled">Siguiente</span>
             <% end %>
           </div>
-        </div>
       <% end %>
     </section>
     """
