@@ -91,49 +91,52 @@ defmodule PrettycoreWeb.PasswordResetLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="pc-login-wrap">
-      <div class="pc-login-card">
-        <div class="pc-login-header">
-          <h1>Cambio de Contraseña</h1>
-          
-          <p>Recupera el acceso a tu cuenta</p>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 via-slate-900 to-slate-950 p-4">
+      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+        <div class="text-center mb-8">
+          <h1 class="text-2xl font-bold text-gray-900 mb-2">Cambio de Contraseña</h1>
+          <p class="text-sm text-gray-500">Recupera el acceso a tu cuenta</p>
         </div>
-        
+
         <%= if @message do %>
-          <div class="pc-success">{@message}</div>
+          <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+            {@message}
+          </div>
         <% end %>
-        
+
         <%= if @error do %>
-          <div class="pc-error">{@error}</div>
+          <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+            {@error}
+          </div>
         <% end %>
-        
+
         <%= if @step == :request do %>
-          <form id="request-form" phx-submit="request_code" class="pc-login-form">
-            <div class="pc-field">
-              <label for="username">Usuario</label>
+          <form id="request-form" phx-submit="request_code" class="space-y-6">
+            <div class="space-y-2">
+              <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
               <input
                 id="username"
                 name="username"
                 type="text"
                 required
-                class="pc-input"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
               />
             </div>
-            
+
             <button
               type="submit"
               disabled={@loading}
-              class="pc-btn pc-btn-primary pc-btn-full"
+              class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {if @loading, do: "Enviando...", else: "Enviar código"}
             </button>
           </form>
         <% end %>
-        
+
         <%= if @step == :verify do %>
-          <form id="verify-form" phx-submit="verify_code" class="pc-login-form">
-            <div class="pc-field">
-              <label for="code">Código de verificación</label>
+          <form id="verify-form" phx-submit="verify_code" class="space-y-6">
+            <div class="space-y-2">
+              <label for="code" class="block text-sm font-medium text-gray-700">Código de verificación</label>
               <input
                 id="code"
                 name="code"
@@ -141,59 +144,59 @@ defmodule PrettycoreWeb.PasswordResetLive do
                 value={@code}
                 maxlength="6"
                 required
-                class="pc-input pc-input-code"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-center text-2xl font-mono tracking-widest focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
                 placeholder="123456"
               />
-              <p class="pc-field-hint">Revisa tu correo (usuario: {@username})</p>
+              <p class="text-xs text-gray-500 mt-1">Revisa tu correo (usuario: {@username})</p>
             </div>
-            
-            <div class="pc-field">
-              <label for="new_password">Nueva contraseña</label>
+
+            <div class="space-y-2">
+              <label for="new_password" class="block text-sm font-medium text-gray-700">Nueva contraseña</label>
               <input
                 id="new_password"
                 name="new_password"
                 type="password"
                 minlength="8"
                 required
-                class="pc-input"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
               />
             </div>
-            
-            <div class="pc-field">
-              <label for="confirm_password">Confirmar contraseña</label>
+
+            <div class="space-y-2">
+              <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
               <input
                 id="confirm_password"
                 name="confirm_password"
                 type="password"
                 minlength="8"
                 required
-                class="pc-input"
+                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all outline-none"
               />
             </div>
-            
-            <div class="pc-btn-group">
+
+            <div class="flex flex-col gap-3">
               <button
                 type="submit"
                 disabled={@loading}
-                class="pc-btn pc-btn-primary"
+                class="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {if @loading, do: "Verificando...", else: "Cambiar contraseña"}
               </button>
               <button
                 type="button"
                 phx-click="back_to_request"
-                class="pc-btn pc-btn-secondary"
+                class="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all"
               >
                 Nuevo código
               </button>
             </div>
           </form>
         <% end %>
-        
+
         <%= if @step == :success do %>
-          <div class="pc-success-state">
-            <div class="pc-success-icon">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="text-center space-y-6">
+            <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -202,11 +205,17 @@ defmodule PrettycoreWeb.PasswordResetLive do
                 />
               </svg>
             </div>
-            
-            <h2>¡Contraseña actualizada!</h2>
-            
-            <p>Ya puedes iniciar sesión con tu nueva contraseña.</p>
-             <.link navigate={~p"/"} class="pc-btn pc-btn-primary pc-btn-full">Ir a Login</.link>
+
+            <h2 class="text-xl font-semibold text-gray-900">¡Contraseña actualizada!</h2>
+
+            <p class="text-sm text-gray-600">Ya puedes iniciar sesión con tu nueva contraseña.</p>
+
+            <a
+              href={~p"/"}
+              class="inline-block w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg"
+            >
+              Ir a Login
+            </a>
           </div>
         <% end %>
       </div>
