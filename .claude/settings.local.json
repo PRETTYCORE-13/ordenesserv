@@ -4,7 +4,11 @@
       "Bash(mix deps.get:*)",
       "Bash(mix compile:*)",
       "Bash(mix test:*)",
-      "Bash(mix assets.deploy:*)"
+      "Bash(mix assets.deploy:*)",
+      "Bash(cat:*)",
+      "Bash(mix assets.build:*)",
+      "Bash(mix tailwind:*)",
+      "Bash(mix tailwind.install:*)"
     ],
     "deny": [],
     "ask": []
