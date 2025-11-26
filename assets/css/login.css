@@ -33,17 +33,37 @@
 }
 
 .pc-login-header h1 {
-  margin: 0;
-  font-size: 1.6rem;
-  font-weight: 600;
-  color: #f9fafb;
-  letter-spacing: 0.03em;
+  margin: 0 !important;
+  font-size: 1.6rem !important;
+  font-weight: 600 !important;
+  color: #f9fafb !important;
+  letter-spacing: 0.03em !important;
+  padding-bottom: 0 !important;
 }
 
 .pc-login-header p {
-  margin-top: 0.35rem;
-  font-size: 0.9rem;
-  color: #9ca3af;
+  margin-top: 0.35rem !important;
+  font-size: 0.9rem !important;
+  color: #9ca3af !important;
+}
+
+/* Override core_components header styling */
+.pc-login-header header {
+  padding-bottom: 0 !important;
+}
+
+.pc-login-header header h1 {
+  margin: 0 !important;
+  font-size: 1.6rem !important;
+  font-weight: 600 !important;
+  color: #f9fafb !important;
+  letter-spacing: 0.03em !important;
+}
+
+.pc-login-header header p {
+  margin-top: 0.35rem !important;
+  font-size: 0.9rem !important;
+  color: #9ca3af !important;
 }
 
 /* === FORMULARIO === */
@@ -68,16 +88,28 @@
   color: #e5e7eb;
 }
 
+/* Override core_components fieldset styling */
+.pc-login-form .fieldset {
+  margin-bottom: 1rem !important;
+}
+
+.pc-login-form .label {
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
+  color: #e5e7eb !important;
+  margin-bottom: 0.25rem !important;
+}
+
 /* Inputs genéricos del sistema */
 
 .pc-input {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.55rem;
-  border: 1px solid #27272f;
-  background: #050510;
-  color: #f9fafb;
-  font-size: 0.9rem;
+  width: 100% !important;
+  padding: 0.6rem 0.8rem !important;
+  border-radius: 0.55rem !important;
+  border: 1px solid #27272f !important;
+  background: #050510 !important;
+  color: #f9fafb !important;
+  font-size: 0.9rem !important;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease,
@@ -86,31 +118,31 @@
 }
 
 .pc-input::placeholder {
-  color: #6b7280;
+  color: #6b7280 !important;
 }
 
 .pc-input:focus {
-  outline: none;
-  border-color: #a855f7;
+  outline: none !important;
+  border-color: #a855f7 !important;
   box-shadow:
     0 0 0 1px rgba(168, 85, 247, 0.55),
-    0 0 22px rgba(88, 28, 135, 0.65);
-  background: #07071a;
-  transform: translateY(-1px);
+    0 0 22px rgba(88, 28, 135, 0.65) !important;
+  background: #07071a !important;
+  transform: translateY(-1px) !important;
 }
 
 /* === BOTONES === */
 
 .pc-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 0.6rem;
-  border: 1px solid transparent;
-  font-size: 0.9rem;
-  font-weight: 500;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.4rem !important;
+  padding: 0.55rem 1.1rem !important;
+  border-radius: 0.6rem !important;
+  border: 1px solid transparent !important;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
   cursor: pointer;
   user-select: none;
   transition:
@@ -124,44 +156,44 @@
 /* Botón principal morado */
 
 .pc-btn-primary {
-  background: radial-gradient(circle at top left, #a855f7 0, #7c3aed 45%, #4c1d95 100%);
-  color: #f9fafb;
-  border-color: rgba(168, 85, 247, 0.7);
+  background: radial-gradient(circle at top left, #a855f7 0, #7c3aed 45%, #4c1d95 100%) !important;
+  color: #f9fafb !important;
+  border-color: rgba(168, 85, 247, 0.7) !important;
   box-shadow:
     0 10px 25px rgba(124, 58, 237, 0.55),
-    0 0 18px rgba(168, 85, 247, 0.5);
+    0 0 18px rgba(168, 85, 247, 0.5) !important;
 }
 
 .pc-btn-primary:hover {
   filter: brightness(1.08);
-  transform: translateY(-1px);
+  transform: translateY(-1px) !important;
   box-shadow:
     0 14px 32px rgba(124, 58, 237, 0.75),
-    0 0 24px rgba(168, 85, 247, 0.7);
+    0 0 24px rgba(168, 85, 247, 0.7) !important;
 }
 
 .pc-btn-primary:active {
-  transform: translateY(0);
+  transform: translateY(0) !important;
   box-shadow:
     0 8px 20px rgba(124, 58, 237, 0.6),
-    0 0 16px rgba(168, 85, 247, 0.6);
+    0 0 16px rgba(168, 85, 247, 0.6) !important;
 }
 
 /* Botón ancho completo en login */
 
 .pc-btn-full {
-  width: 100%;
-  margin-top: 0.4rem;
+  width: 100% !important;
+  margin-top: 0.4rem !important;
 }
 
 /* Deshabilitado genérico */
 
 .pc-btn[disabled],
 .pc-btn.pc-btn-disabled {
-  opacity: 0.6;
-  cursor: default;
-  box-shadow: none;
-  transform: none;
+  opacity: 0.6 !important;
+  cursor: default !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 /* === LINKS === */
@@ -200,6 +232,26 @@
   width: 14px;
   height: 14px;
   accent-color: #a855f7;
+}
+
+/* === ERROR MESSAGE === */
+
+.pc-error {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.5rem;
+  color: #fca5a5;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* === LOGIN FOOTER === */
+
+.pc-login-footer {
+  margin-top: 1rem;
+  text-align: center;
 }
 
 /* === RESPONSIVE === */

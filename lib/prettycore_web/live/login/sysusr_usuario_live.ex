@@ -2,8 +2,6 @@
 defmodule PrettycoreWeb.LoginLive do
   use PrettycoreWeb, :live_view
 
-  alias Prettycore.Auth
-
   def mount(_params, _session, socket) do
     {:ok,
      socket
@@ -17,27 +15,43 @@ defmodule PrettycoreWeb.LoginLive do
     <div class="pc-login-wrap">
       <div class="pc-login-card">
         <div class="pc-login-header">
-          <h1>Iniciar sesión</h1>
-
-          <p>Accede al sistema</p>
+          <.header>
+            Iniciar sesión
+            <:subtitle>
+              Accede al sistema
+            </:subtitle>
+          </.header>
         </div>
 
-        <%= if live_flash(@flash, :error) do %>
-          <div class="pc-error">{live_flash(@flash, :error)}</div>
+        <%= if Phoenix.Flash.get(@flash, :error) do %>
+          <div class="pc-error">{Phoenix.Flash.get(@flash, :error)}</div>
         <% end %>
 
         <form class="pc-login-form" action={~p"/"} method="post">
           <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-          <div class="pc-field">
-            <label for="username">Usuario (correo)</label>
-            <input id="username" name="username" class="pc-input" value={@username} />
-          </div>
 
-          <div class="pc-field">
-            <label for="password">Contraseña</label>
-            <input id="password" name="password" type="password" class="pc-input" value={@password} />
-          </div>
-           <button type="submit" class="pc-btn pc-btn-primary pc-btn-full">Entrar</button>
+          <.input
+            type="text"
+            id="username"
+            name="username"
+            label="Usuario (correo)"
+            value={@username}
+            class="pc-input"
+          />
+
+          <.input
+            type="password"
+            id="password"
+            name="password"
+            label="Contraseña"
+            value={@password}
+            class="pc-input"
+          />
+
+          <.button type="submit" class="pc-btn pc-btn-primary pc-btn-full">
+            Entrar
+          </.button>
+
           <div class="pc-login-footer">
             <.link navigate={~p"/password-reset"} class="pc-link">¿Olvidaste tu contraseña?</.link>
           </div>
