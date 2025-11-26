@@ -4,6 +4,12 @@ defmodule Prettycore.Clientes.Cliente do
   """
   use Ecto.Schema
 
+  @derive {
+    Flop.Schema,
+    filterable: [:ctecli_codigo_k, :ctecli_razonsocial, :ctecli_dencomercia, :ctecli_rfc],
+    sortable: [:ctecli_codigo_k, :ctecli_razonsocial, :ctecli_dencomercia]
+  }
+
   @primary_key {:ctecli_codigo_k, :string, autogenerate: false}
   @timestamps_opts [type: :naive_datetime]
 

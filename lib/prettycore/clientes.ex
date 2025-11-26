@@ -219,4 +219,55 @@ defmodule Prettycore.Clientes do
     |> Repo.all()
     |> Enum.map(&fix_map_encoding/1)
   end
+
+  @doc """
+  Lista clientes con paginación usando Flop
+  """
+  def list_clientes_with_flop(params \\ %{}) do
+    sysudn_codigo_k = "100"
+    vtarut_codigo_k_ini = "001"
+    vtarut_codigo_k_fin = "999"
+
+    base_query =
+      from c in Cliente,
+        left_join: d in Direccion,
+          on: c.ctecli_codigo_k == d.ctecli_codigo_k,
+        left_join: ruta in Ruta,
+          on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
+        left_join: edo in Estado,
+          on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
+        where: c.s_maqedo == 10,
+        where:
+          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
+          (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
+          (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
+        where: ruta.sysudn_codigo_k == ^sysudn_codigo_k,
+        distinct: true,
+        order_by: [asc: c.ctecli_codigo_k],
+        select: %{
+          codigo: c.ctecli_codigo_k,
+          razon_social: c.ctecli_razonsocial,
+          nombre_comercial: c.ctecli_dencomercia,
+          rfc: c.ctecli_rfc,
+          telefono: d.ctedir_telefono,
+          estado: edo.mapedo_descripcion,
+          colonia: d.ctedir_colonia,
+          calle: d.ctedir_calle,
+          preventa: d.vtarut_codigo_k_pre,
+          entrega: d.vtarut_codigo_k_ent,
+          autoventa: d.vtarut_codigo_k_aut
+        }
+
+    # Configurar Flop con 20 registros por página
+    flop_params = Map.merge(%{"page_size" => "20"}, params)
+
+    case Flop.validate_and_run(base_query, flop_params, for: Cliente) do
+      {:ok, {clientes, meta}} ->
+        clientes_fixed = Enum.map(clientes, &fix_map_encoding/1)
+        {:ok, {clientes_fixed, meta}}
+
+      {:error, meta} ->
+        {:error, meta}
+    end
+  end
 end
