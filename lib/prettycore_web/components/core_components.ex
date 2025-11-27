@@ -334,34 +334,50 @@ defmodule PrettycoreWeb.CoreComponents do
       end
 
     ~H"""
-    <table class="table table-zebra">
-      <thead>
-        <tr>
-          <th :for={col <- @col}>{col[:label]}</th>
-          <th :if={@action != []}>
-            <span class="sr-only">{gettext("Actions")}</span>
-          </th>
-        </tr>
-      </thead>
-      <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
-        <tr :for={row <- @rows} id={@row_id && @row_id.(row)}>
-          <td
-            :for={col <- @col}
-            phx-click={@row_click && @row_click.(row)}
-            class={@row_click && "hover:cursor-pointer"}
-          >
-            {render_slot(col, @row_item.(row))}
-          </td>
-          <td :if={@action != []} class="w-0 font-semibold">
-            <div class="flex gap-4">
-              <%= for action <- @action do %>
-                {render_slot(action, @row_item.(row))}
-              <% end %>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse min-w-[800px]">
+          <thead>
+            <tr class="bg-gradient-to-r from-slate-900 to-purple-950 border-b border-slate-700">
+              <th
+                :for={col <- @col}
+                class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide"
+              >
+                {col[:label]}
+              </th>
+              <th :if={@action != []} class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                <span class="sr-only">{gettext("Actions")}</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
+            <tr
+              :for={row <- @rows}
+              id={@row_id && @row_id.(row)}
+              class="border-b border-gray-100 hover:bg-purple-50 transition-colors"
+            >
+              <td
+                :for={col <- @col}
+                phx-click={@row_click && @row_click.(row)}
+                class={[
+                  "px-4 py-3 text-sm text-gray-700",
+                  @row_click && "hover:cursor-pointer"
+                ]}
+              >
+                {render_slot(col, @row_item.(row))}
+              </td>
+              <td :if={@action != []} class="px-4 py-3 text-sm">
+                <div class="flex gap-4">
+                  <%= for action <- @action do %>
+                    {render_slot(action, @row_item.(row))}
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     """
   end
 
