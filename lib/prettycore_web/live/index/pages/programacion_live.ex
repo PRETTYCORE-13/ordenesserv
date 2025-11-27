@@ -41,7 +41,7 @@ defmodule PrettycoreWeb.Programacion do
       "workorder" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
 
-              "clientes" ->
+      "clientes" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/clientes")}
 
       "config" ->
@@ -58,22 +58,23 @@ defmodule PrettycoreWeb.Programacion do
   @impl true
   def render(assigns) do
     ~H"""
-      <section>
-        <header class="pc-page-header">
-          <h1>Programación</h1>
-          <p>Sección general de programación. Aquí luego metemos más módulos.</p>
+    <section>
+      <header class="pc-page-header">
+        <h1>Programación</h1>
 
-          <p class="pc-small-muted">
-            Correo actual: {@current_user_email} <br />
-            URL actual: {@current_path}
-          </p>
-        </header>
+        <p>Sección general de programación. Aquí luego metemos más módulos.</p>
 
-        <div class="pc-page-card">
-          <h2>Programación</h2>
-          <p>Página base de Programación, en blanco por ahora.</p>
-        </div>
-      </section>
+        <p class="pc-small-muted">
+          Correo actual: {@current_user_email} <br /> URL actual: {@current_path}
+        </p>
+      </header>
+
+      <div class="pc-page-card">
+        <h2>Programación</h2>
+
+        <p>Página base de Programación, en blanco por ahora.</p>
+      </div>
+    </section>
     """
   end
 end

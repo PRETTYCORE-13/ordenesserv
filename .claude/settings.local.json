@@ -8,7 +8,11 @@
       "Bash(cat:*)",
       "Bash(mix assets.build:*)",
       "Bash(mix tailwind:*)",
-      "Bash(mix tailwind.install:*)"
+      "Bash(mix tailwind.install:*)",
+      "Bash(del \"c:\\Users\\HP\\Desktop\\ELIXIR\\prettycore\\assets\\css\\program.css\")",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []

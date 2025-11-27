@@ -95,6 +95,7 @@ defmodule PrettycoreWeb.PasswordResetLive do
       <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
         <div class="text-center mb-8">
           <h1 class="text-2xl font-bold text-gray-900 mb-2">Cambio de Contraseña</h1>
+
           <p class="text-sm text-gray-500">Recupera el acceso a tu cuenta</p>
         </div>
 
@@ -136,7 +137,9 @@ defmodule PrettycoreWeb.PasswordResetLive do
         <%= if @step == :verify do %>
           <form id="verify-form" phx-submit="verify_code" class="space-y-6">
             <div class="space-y-2">
-              <label for="code" class="block text-sm font-medium text-gray-700">Código de verificación</label>
+              <label for="code" class="block text-sm font-medium text-gray-700">
+                Código de verificación
+              </label>
               <input
                 id="code"
                 name="code"
@@ -151,7 +154,9 @@ defmodule PrettycoreWeb.PasswordResetLive do
             </div>
 
             <div class="space-y-2">
-              <label for="new_password" class="block text-sm font-medium text-gray-700">Nueva contraseña</label>
+              <label for="new_password" class="block text-sm font-medium text-gray-700">
+                Nueva contraseña
+              </label>
               <input
                 id="new_password"
                 name="new_password"
@@ -163,7 +168,9 @@ defmodule PrettycoreWeb.PasswordResetLive do
             </div>
 
             <div class="space-y-2">
-              <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmar contraseña</label>
+              <label for="confirm_password" class="block text-sm font-medium text-gray-700">
+                Confirmar contraseña
+              </label>
               <input
                 id="confirm_password"
                 name="confirm_password"
@@ -196,7 +203,12 @@ defmodule PrettycoreWeb.PasswordResetLive do
         <%= if @step == :success do %>
           <div class="text-center space-y-6">
             <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                class="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"

@@ -73,7 +73,6 @@ defmodule PrettycoreWeb.WorkOrderLive do
     end
   end
 
-
   # ------------------------------------------------------------------
   # 🎯 MODELO 2: NAV CENTRALIZADA
   # ------------------------------------------------------------------
@@ -93,11 +92,11 @@ defmodule PrettycoreWeb.WorkOrderLive do
         {:noreply, push_navigate(socket, to: ~p"/admin/programacion/sql")}
 
       "workorder" ->
-        {:noreply, socket}  # ya estás aquí
+        # ya estás aquí
+        {:noreply, socket}
 
       "clientes" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/clientes")}
-
 
       "config" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/configuracion")}
@@ -112,16 +111,17 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # ------------------------------------------------------------------
 
   # ------------------------------------------------------------------
-# CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
+  # CAMBIAR ESTADO (ACEPTAR / RECHAZAR)
   # ------------------------------------------------------------------
   def handle_event("cambiar_estado", %{"ref" => ref, "estado" => estado_str}, socket) do
     estado = String.to_integer(estado_str)
     sysusr_codigo = socket.assigns.current_user_email
 
     password_query =
-      from u in User,
+      from(u in User,
         where: u.sysusr_codigo_k == ^sysusr_codigo,
         select: u.sysusr_password
+      )
 
     case Repo.one(password_query) do
       nil ->
@@ -154,7 +154,6 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # FILTROS BÁSICOS (Todas / Pendientes)
   # ------------------------------------------------------------------
 
-
   # ------------------------------------------------------------------
   # Drawer de filtros
   # ------------------------------------------------------------------
@@ -181,8 +180,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
 
     query = URI.encode_query(clean_params)
 
-    {:noreply,
-     push_patch(socket, to: "/admin/workorder?#{query}")}
+    {:noreply, push_patch(socket, to: "/admin/workorder?#{query}")}
   end
 
   # ------------------------------------------------------------------
@@ -196,6 +194,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
     key = "#{sysudn}|#{systra}|#{serie}|#{folio}"
 
     detalles_cache = socket.assigns.detalles
+
     detalles =
       Map.get(detalles_cache, key) ||
         Workorders.list_det(sysudn, systra, serie, folio)
@@ -212,6 +211,7 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # HELPERS
   # ------------------------------------------------------------------
   defp image_src(nil), do: nil
+
   defp image_src(url) when is_binary(url) do
     trimmed = String.trim(url)
     if trimmed == "", do: nil, else: trimmed
@@ -220,12 +220,12 @@ defmodule PrettycoreWeb.WorkOrderLive do
   defp estado_label(100), do: "Pendiente"
   defp estado_label(500), do: "Atendida"
   defp estado_label(600), do: "Cancelado"
-  defp estado_label(_),   do: "Desconocido"
+  defp estado_label(_), do: "Desconocido"
 
   defp estado_class(100), do: "wo-state wo-state-pendiente"
   defp estado_class(500), do: "wo-state wo-state-atendida"
   defp estado_class(600), do: "wo-state wo-state-cancelado"
-  defp estado_class(_),   do: "wo-state"
+  defp estado_class(_), do: "wo-state"
 
   # Build path for pagination preserving all filter params
   # This function is called by Flop.Phoenix.pagination with new page params

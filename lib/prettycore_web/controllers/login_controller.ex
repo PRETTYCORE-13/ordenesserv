@@ -6,13 +6,16 @@ defmodule PrettycoreWeb.LoginController do
     case Auth.authenticate(user, pass) do
       {:ok, %{id: id}} ->
         conn
-        |> put_session(:user_id, id)        # guarda ID real
-        |> configure_session(renew: true)   # rotar session id
+        # guarda ID real
+        |> put_session(:user_id, id)
+        # rotar session id
+        |> configure_session(renew: true)
         |> redirect(to: ~p"/ui/platform")
 
       {:ok, _} ->
         conn
-        |> put_session(:user_id, user)      # fallback si no tienes id
+        # fallback si no tienes id
+        |> put_session(:user_id, user)
         |> configure_session(renew: true)
         |> redirect(to: ~p"/ui/platform")
 

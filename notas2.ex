@@ -146,48 +146,35 @@ defmodule PrettycoreWeb.WorkOrder do
       show_programacion_children={@show_programacion_children}
       sidebar_open={@sidebar_open}
     >
-      <% base = filter_workorders(@workorders, @filter) %>
-
-      <% sysudn_opts =
+      <% base = filter_workorders(@workorders, @filter) %> <% sysudn_opts =
         @workorders
         |> Enum.map(& &1.sysudn)
         |> Enum.reject(&is_nil/1)
-        |> Enum.uniq()
-      %>
-
-      <% usuario_opts =
+        |> Enum.uniq() %> <% usuario_opts =
         @workorders
         |> Enum.map(&Map.get(&1, :usuario))
         |> Enum.reject(&(&1 in [nil, ""]))
-        |> Enum.uniq()
-      %>
-
-      <% fecha_desde_date =
+        |> Enum.uniq() %> <% fecha_desde_date =
         case @fecha_desde do
-          "" -> nil
-          s  ->
+          "" ->
+            nil
+
+          s ->
             case Date.from_iso8601(s) do
               {:ok, d} -> d
               _ -> nil
             end
-        end
-      %>
-
-      <% fecha_hasta_date =
+        end %> <% fecha_hasta_date =
         case @fecha_hasta do
-          "" -> nil
-          s  ->
+          "" ->
+            nil
+
+          s ->
             case Date.from_iso8601(s) do
               {:ok, d} -> d
               _ -> nil
             end
-        end
-      %>
-
-      <% sysudn_filter  = @sysudn_filter %>
-      <% usuario_filter = @usuario_filter %>
-
-      <% filtered =
+        end %> <% sysudn_filter = @sysudn_filter %> <% usuario_filter = @usuario_filter %> <% filtered =
         Enum.filter(base, fn w ->
           # UDN
           sysudn_ok =
@@ -195,16 +182,23 @@ defmodule PrettycoreWeb.WorkOrder do
 
           # Usuario
           usuario_val = (Map.get(w, :usuario, "") || "") |> to_string()
+
           usuario_ok =
             usuario_filter == "" or usuario_val == usuario_filter
 
           # Fecha -> Date
           fecha =
             case Map.get(w, :fecha) do
-              %NaiveDateTime{} = nd -> NaiveDateTime.to_date(nd)
-              %DateTime{} = dt      -> DateTime.to_date(dt)
-              %Date{} = d           -> d
-              s when is_binary(s)   ->
+              %NaiveDateTime{} = nd ->
+                NaiveDateTime.to_date(nd)
+
+              %DateTime{} = dt ->
+                DateTime.to_date(dt)
+
+              %Date{} = d ->
+                d
+
+              s when is_binary(s) ->
                 s
                 |> String.slice(0, 10)
                 |> Date.from_iso8601()
@@ -213,7 +207,8 @@ defmodule PrettycoreWeb.WorkOrder do
                   _ -> nil
                 end
 
-              _ -> nil
+              _ ->
+                nil
             end
 
           fecha_ok =
@@ -237,18 +232,16 @@ defmodule PrettycoreWeb.WorkOrder do
             end
 
           sysudn_ok and usuario_ok and fecha_ok
-        end)
-      %>
-
+        end) %>
       <section class="wo-page">
         <header class="wo-header">
           <div class="wo-hero-main">
             <div class="wo-hero-icon">🛠️</div>
+
             <div>
               <h1 class="wo-title">Órdenes de trabajo</h1>
-              <p class="wo-subtitle">
-                Visualiza tus órdenes y las imágenes asociadas.
-              </p>
+
+              <p class="wo-subtitle">Visualiza tus órdenes y las imágenes asociadas.</p>
             </div>
           </div>
 
@@ -256,10 +249,9 @@ defmodule PrettycoreWeb.WorkOrder do
             <div class="wo-stats">
               <div class="wo-stat-card">
                 <span class="wo-stat-label">Total de órdenes</span>
-                <span class="wo-stat-value"><%= length(filtered) %></span>
+                <span class="wo-stat-value">{length(filtered)}</span>
               </div>
             </div>
-
             <!-- Botón debajo del total para abrir el menú lateral -->
             <button
               type="button"
@@ -274,20 +266,15 @@ defmodule PrettycoreWeb.WorkOrder do
                   />
                 </svg>
               </span>
-              <span class="wo-filters-toggle-text">
-                Filtros
-              </span>
+               <span class="wo-filters-toggle-text">Filtros</span>
             </button>
           </div>
         </header>
-
         <!-- Drawer lateral de filtros -->
-        <div
-          class={
+        <div class={
             "wo-filters-drawer" <>
               if @filters_open, do: " wo-filters-drawer-open", else: ""
-          }
-        >
+          }>
           <div class="wo-filters-drawer-header">
             <span class="wo-filters-drawer-title">Filtros</span>
             <button
@@ -312,7 +299,6 @@ defmodule PrettycoreWeb.WorkOrder do
                 >
                   Todas
                 </button>
-
                 <button
                   type="button"
                   class={"wo-filter-btn" <> if @filter == "por_aceptar", do: " wo-filter-btn-active", else: ""}
@@ -327,13 +313,10 @@ defmodule PrettycoreWeb.WorkOrder do
             <div class="wo-filter-field">
               <label class="wo-filter-label">UDN</label>
               <select name="sysudn" class="wo-filter-select">
-                <option value="" selected={@sysudn_filter == ""}>
-                  Todas las UDN
-                </option>
+                <option value="" selected={@sysudn_filter == ""}>Todas las UDN</option>
+
                 <%= for opt <- sysudn_opts do %>
-                  <option value={opt} selected={@sysudn_filter == opt}>
-                    <%= opt %>
-                  </option>
+                  <option value={opt} selected={@sysudn_filter == opt}>{opt}</option>
                 <% end %>
               </select>
             </div>
@@ -361,13 +344,10 @@ defmodule PrettycoreWeb.WorkOrder do
             <div class="wo-filter-field">
               <label class="wo-filter-label">Usuario</label>
               <select name="usuario" class="wo-filter-select">
-                <option value="" selected={@usuario_filter == ""}>
-                  Todos los usuarios
-                </option>
+                <option value="" selected={@usuario_filter == ""}>Todos los usuarios</option>
+
                 <%= for opt <- usuario_opts do %>
-                  <option value={opt} selected={@usuario_filter == opt}>
-                    <%= opt %>
-                  </option>
+                  <option value={opt} selected={@usuario_filter == opt}>{opt}</option>
                 <% end %>
               </select>
             </div>
@@ -378,10 +358,10 @@ defmodule PrettycoreWeb.WorkOrder do
           <%= if filtered == [] do %>
             <div class="wo-empty">
               <div class="wo-empty-icon">📭</div>
+
               <h2 class="wo-empty-title">Sin órdenes registradas</h2>
-              <p class="wo-empty-text">
-                No hay órdenes para el filtro seleccionado.
-              </p>
+
+              <p class="wo-empty-text">No hay órdenes para el filtro seleccionado.</p>
             </div>
           <% else %>
             <div class="wo-table-wrapper">
@@ -389,15 +369,18 @@ defmodule PrettycoreWeb.WorkOrder do
                 <thead>
                   <tr>
                     <th>Identificador</th>
+
                     <th>Descripción</th>
+
                     <th>Tipo</th>
+
                     <th class="wo-th-center">Acciones</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   <%= for w <- filtered do %>
                     <% key = "#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
-
                     <!-- Fila principal -->
                     <tr
                       class={"wo-row" <> if @open_key == key, do: " wo-row-open", else: ""}
@@ -407,17 +390,11 @@ defmodule PrettycoreWeb.WorkOrder do
                       phx-value-serie={w.serie}
                       phx-value-folio={w.folio}
                     >
-                      <td>
-                        <%= "#{w.sysudn} #{w.serie} #{w.folio}" %>
-                      </td>
+                      <td>{"#{w.sysudn} #{w.serie} #{w.folio}"}</td>
 
-                      <td>
-                        <%= Map.get(w, :descripcion, "") %>
-                      </td>
+                      <td>{Map.get(w, :descripcion, "")}</td>
 
-                      <td>
-                        <span class="wo-row-meta-badge"><%= w.tipo %></span>
-                      </td>
+                      <td><span class="wo-row-meta-badge">{w.tipo}</span></td>
 
                       <td class="wo-td-center">
                         <%= if @filter != "todas" do %>
@@ -431,7 +408,6 @@ defmodule PrettycoreWeb.WorkOrder do
                           >
                             Aceptar
                           </button>
-
                           <button
                             type="button"
                             class="wo-btn wo-btn-reject"
@@ -447,33 +423,27 @@ defmodule PrettycoreWeb.WorkOrder do
                         <% end %>
                       </td>
                     </tr>
-
                     <!-- Fila de detalles -->
                     <%= if @open_key == key do %>
                       <tr class="wo-row-detail">
                         <td colspan="4">
                           <div class="wo-detail-grid">
-                            <% detalles = Map.get(@detalles, key, []) %>
-                            <% visibles =
+                            <% detalles = Map.get(@detalles, key, []) %> <% visibles =
                               Enum.filter(detalles, fn d ->
                                 src = image_src(Map.get(d, :image_url))
                                 not is_nil(src)
                               end) %>
-
                             <%= if visibles == [] do %>
-                              <div class="wo-detail-img wo-detail-img-empty">
-                                Sin imágenes
-                              </div>
+                              <div class="wo-detail-img wo-detail-img-empty">Sin imágenes</div>
                             <% else %>
                               <%= for det <- visibles do %>
                                 <% src = image_src(Map.get(det, :image_url)) %>
-
                                 <div class="wo-detail-card">
                                   <div class="wo-detail-meta">
                                     <span class="wo-detail-label">
-                                      <%= Map.get(det, :descripcion) ||
-                                          Map.get(det, :concepto) ||
-                                          "Detalle" %>
+                                      {Map.get(det, :descripcion) ||
+                                        Map.get(det, :concepto) ||
+                                        "Detalle"}
                                     </span>
                                   </div>
 

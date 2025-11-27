@@ -23,7 +23,6 @@ defmodule Prettycore.Auth do
               |> Enum.at(1)
               |> String.trim()
 
-
             if Plug.Crypto.secure_compare(actual_password, password) do
               {:ok, user}
             else

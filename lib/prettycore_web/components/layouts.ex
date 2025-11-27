@@ -1,5 +1,6 @@
 defmodule PrettycoreWeb.Layouts do
   import PrettycoreWeb.MenuLayout
+
   @moduledoc """
   This module holds layouts and related functionality
   used by your application.

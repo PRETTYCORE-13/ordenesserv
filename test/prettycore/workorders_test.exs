@@ -209,10 +209,11 @@ defmodule Prettycore.WorkordersTest do
       fecha_desde = "2025-01-01"
       fecha_hasta = "2025-12-31"
 
-      result = Workorders.list_enc_filtered(%{
-        fecha_desde: fecha_desde,
-        fecha_hasta: fecha_hasta
-      })
+      result =
+        Workorders.list_enc_filtered(%{
+          fecha_desde: fecha_desde,
+          fecha_hasta: fecha_hasta
+        })
 
       assert is_list(result)
 
@@ -237,10 +238,11 @@ defmodule Prettycore.WorkordersTest do
       if length(all_workorders) > 0 do
         sample = List.first(all_workorders)
 
-        result = Workorders.list_enc_filtered(%{
-          estado: sample.estado,
-          sysudn: sample.sysudn
-        })
+        result =
+          Workorders.list_enc_filtered(%{
+            estado: sample.estado,
+            sysudn: sample.sysudn
+          })
 
         assert is_list(result)
 
@@ -254,11 +256,12 @@ defmodule Prettycore.WorkordersTest do
     end
 
     test "ignores empty string filters" do
-      result_with_empty = Workorders.list_enc_filtered(%{
-        estado: "",
-        sysudn: "",
-        usuario: ""
-      })
+      result_with_empty =
+        Workorders.list_enc_filtered(%{
+          estado: "",
+          sysudn: "",
+          usuario: ""
+        })
 
       result_no_filter = Workorders.list_enc_filtered()
 
@@ -268,11 +271,12 @@ defmodule Prettycore.WorkordersTest do
     end
 
     test "ignores nil filters" do
-      result_with_nil = Workorders.list_enc_filtered(%{
-        estado: nil,
-        sysudn: nil,
-        usuario: nil
-      })
+      result_with_nil =
+        Workorders.list_enc_filtered(%{
+          estado: nil,
+          sysudn: nil,
+          usuario: nil
+        })
 
       result_no_filter = Workorders.list_enc_filtered()
 
@@ -282,10 +286,11 @@ defmodule Prettycore.WorkordersTest do
     end
 
     test "handles invalid date formats gracefully" do
-      result = Workorders.list_enc_filtered(%{
-        fecha_desde: "invalid-date",
-        fecha_hasta: "not-a-date"
-      })
+      result =
+        Workorders.list_enc_filtered(%{
+          fecha_desde: "invalid-date",
+          fecha_hasta: "not-a-date"
+        })
 
       # Should not crash, just ignore invalid dates
       assert is_list(result)
