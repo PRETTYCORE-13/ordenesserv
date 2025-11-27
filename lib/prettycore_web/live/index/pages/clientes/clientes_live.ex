@@ -31,17 +31,22 @@ defmodule PrettycoreWeb.Clientes do
 
     # Columnas visibles desde params o por defecto todas visibles
     default_visible_columns = %{
-      "codigo" => true,
-      "razon_social" => true,
-      "nombre_comercial" => true,
-      "rfc" => true,
-      "telefono" => true,
-      "estado" => true,
-      "colonia" => true,
-      "calle" => true,
+      "udn" => true,
       "preventa" => true,
       "entrega" => true,
-      "autoventa" => true
+      "autoventa" => true,
+      "ctedir_codigo_k" => true,
+      "rfc" => true,
+      "codigo" => true,
+      "razon_social" => true,
+      "diascredito" => true,
+      "limite_credito" => true,
+      "paquete_codigo" => true,
+      "frecuencia_codigo" => true,
+      "email_receptor" => true,
+      "forma_pago" => true,
+      "metodo_pago" => true,
+      "estatus" => true
     }
 
     visible_columns = Map.merge(default_visible_columns, visible_columns_params)
@@ -256,136 +261,100 @@ defmodule PrettycoreWeb.Clientes do
               <span class="flex-1 text-[15px] font-semibold text-indigo-200">Seleccionar todas</span>
             </label>
 
-            <!-- Checkbox para Código -->
+            <!-- Checkbox para UDN -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["codigo"]}
-                phx-click="toggle_column"
-                phx-value-column="codigo"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Código</span>
-            </label>
-
-            <!-- Checkbox para Razón Social -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["razon_social"]}
-                phx-click="toggle_column"
-                phx-value-column="razon_social"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Razón Social</span>
-            </label>
-
-            <!-- Checkbox para Nombre Comercial -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["nombre_comercial"]}
-                phx-click="toggle_column"
-                phx-value-column="nombre_comercial"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Nombre Comercial</span>
-            </label>
-
-            <!-- Checkbox para RFC -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["rfc"]}
-                phx-click="toggle_column"
-                phx-value-column="rfc"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">RFC</span>
-            </label>
-
-            <!-- Checkbox para Teléfono -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["telefono"]}
-                phx-click="toggle_column"
-                phx-value-column="telefono"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Teléfono</span>
-            </label>
-
-            <!-- Checkbox para Estado -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["estado"]}
-                phx-click="toggle_column"
-                phx-value-column="estado"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Estado</span>
-            </label>
-
-            <!-- Checkbox para Colonia -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["colonia"]}
-                phx-click="toggle_column"
-                phx-value-column="colonia"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Colonia</span>
-            </label>
-
-            <!-- Checkbox para Calle -->
-            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["calle"]}
-                phx-click="toggle_column"
-                phx-value-column="calle"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Calle</span>
+              <input type="checkbox" checked={@visible_columns["udn"]} phx-click="toggle_column" phx-value-column="udn" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">UDN</span>
             </label>
 
             <!-- Checkbox para Preventa -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["preventa"]}
-                phx-click="toggle_column"
-                phx-value-column="preventa"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
+              <input type="checkbox" checked={@visible_columns["preventa"]} phx-click="toggle_column" phx-value-column="preventa" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
               <span class="flex-1 text-[15px] text-slate-300">Preventa</span>
             </label>
 
             <!-- Checkbox para Entrega -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["entrega"]}
-                phx-click="toggle_column"
-                phx-value-column="entrega"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
+              <input type="checkbox" checked={@visible_columns["entrega"]} phx-click="toggle_column" phx-value-column="entrega" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
               <span class="flex-1 text-[15px] text-slate-300">Entrega</span>
             </label>
 
             <!-- Checkbox para Autoventa -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
-              <input
-                type="checkbox"
-                checked={@visible_columns["autoventa"]}
-                phx-click="toggle_column"
-                phx-value-column="autoventa"
-                class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
+              <input type="checkbox" checked={@visible_columns["autoventa"]} phx-click="toggle_column" phx-value-column="autoventa" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
               <span class="flex-1 text-[15px] text-slate-300">Autoventa</span>
+            </label>
+
+            <!-- Checkbox para Código Dirección -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["ctedir_codigo_k"]} phx-click="toggle_column" phx-value-column="ctedir_codigo_k" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Código Dirección</span>
+            </label>
+
+            <!-- Checkbox para RFC -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["rfc"]} phx-click="toggle_column" phx-value-column="rfc" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">RFC</span>
+            </label>
+
+            <!-- Checkbox para Código -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["codigo"]} phx-click="toggle_column" phx-value-column="codigo" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Código Cliente</span>
+            </label>
+
+            <!-- Checkbox para Razón Social -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["razon_social"]} phx-click="toggle_column" phx-value-column="razon_social" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Razón Social</span>
+            </label>
+
+            <!-- Checkbox para Días Crédito -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["diascredito"]} phx-click="toggle_column" phx-value-column="diascredito" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Días Crédito</span>
+            </label>
+
+            <!-- Checkbox para Límite Crédito -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["limite_credito"]} phx-click="toggle_column" phx-value-column="limite_credito" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Límite Crédito</span>
+            </label>
+
+            <!-- Checkbox para Lista Precios -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["paquete_codigo"]} phx-click="toggle_column" phx-value-column="paquete_codigo" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Lista Precios</span>
+            </label>
+
+            <!-- Checkbox para Frecuencia -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["frecuencia_codigo"]} phx-click="toggle_column" phx-value-column="frecuencia_codigo" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Frecuencia</span>
+            </label>
+
+            <!-- Checkbox para Email Receptor -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["email_receptor"]} phx-click="toggle_column" phx-value-column="email_receptor" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Email Receptor</span>
+            </label>
+
+            <!-- Checkbox para Forma Pago -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["forma_pago"]} phx-click="toggle_column" phx-value-column="forma_pago" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Forma Pago</span>
+            </label>
+
+            <!-- Checkbox para Método Pago -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["metodo_pago"]} phx-click="toggle_column" phx-value-column="metodo_pago" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Método Pago</span>
+            </label>
+
+            <!-- Checkbox para Estatus -->
+            <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
+              <input type="checkbox" checked={@visible_columns["estatus"]} phx-click="toggle_column" phx-value-column="estatus" class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2" />
+              <span class="flex-1 text-[15px] text-slate-300">Estatus</span>
             </label>
           </div>
         </div>
@@ -398,96 +367,168 @@ defmodule PrettycoreWeb.Clientes do
         </div>
       <% end %>
 
-      <!-- Tabla de clientes -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <!-- Tabla de clientes estilo dashboard -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-200/80 overflow-hidden backdrop-blur-sm">
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse min-w-[800px]">
+          <table class="w-full min-w-max">
             <thead>
-              <tr class="bg-gradient-to-r from-slate-900 to-purple-950 border-b border-slate-700">
-                <%= if @visible_columns["codigo"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Código</th>
-                <% end %>
-                <%= if @visible_columns["razon_social"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Razón Social</th>
-                <% end %>
-                <%= if @visible_columns["nombre_comercial"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Nombre Comercial</th>
-                <% end %>
-                <%= if @visible_columns["rfc"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">RFC</th>
-                <% end %>
-                <%= if @visible_columns["telefono"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Teléfono</th>
-                <% end %>
-                <%= if @visible_columns["estado"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Estado</th>
-                <% end %>
-                <%= if @visible_columns["colonia"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Colonia</th>
-                <% end %>
-                <%= if @visible_columns["calle"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Calle</th>
+              <tr class="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900">
+                <%= if @visible_columns["udn"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">UDN</th>
                 <% end %>
                 <%= if @visible_columns["preventa"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Preventa</th>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Preventa</th>
                 <% end %>
                 <%= if @visible_columns["entrega"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Entrega</th>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Entrega</th>
                 <% end %>
                 <%= if @visible_columns["autoventa"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Autoventa</th>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Autoventa</th>
+                <% end %>
+                <%= if @visible_columns["ctedir_codigo_k"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Cód. Dirección</th>
+                <% end %>
+                <%= if @visible_columns["rfc"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">RFC</th>
+                <% end %>
+                <%= if @visible_columns["codigo"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Código Cliente</th>
+                <% end %>
+                <%= if @visible_columns["razon_social"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Razón Social</th>
+                <% end %>
+                <%= if @visible_columns["diascredito"] do %>
+                  <th class="px-6 py-4 text-center text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Días Crédito</th>
+                <% end %>
+                <%= if @visible_columns["limite_credito"] do %>
+                  <th class="px-6 py-4 text-right text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Límite Crédito</th>
+                <% end %>
+                <%= if @visible_columns["paquete_codigo"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Lista Precios</th>
+                <% end %>
+                <%= if @visible_columns["frecuencia_codigo"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Frecuencia</th>
+                <% end %>
+                <%= if @visible_columns["email_receptor"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Email Receptor</th>
+                <% end %>
+                <%= if @visible_columns["forma_pago"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Forma Pago</th>
+                <% end %>
+                <%= if @visible_columns["metodo_pago"] do %>
+                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Método Pago</th>
+                <% end %>
+                <%= if @visible_columns["estatus"] do %>
+                  <th class="px-6 py-4 text-center text-[11px] font-bold text-purple-200 uppercase tracking-wider">Estatus</th>
                 <% end %>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-gray-100">
               <%= if @loading do %>
                 <tr>
-                  <td colspan="11" class="text-center py-10 text-gray-500 text-sm">
-                    Cargando clientes...
+                  <td colspan="16" class="text-center py-16 text-gray-500 text-sm">
+                    <div class="flex flex-col items-center gap-3">
+                      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+                      <span class="font-medium">Cargando clientes...</span>
+                    </div>
                   </td>
                 </tr>
               <% else %>
                 <%= if Enum.empty?(@clientes) do %>
                   <tr>
-                    <td colspan="11" class="text-center py-10 text-gray-500 text-sm">
-                      No se encontraron clientes con los filtros seleccionados
+                    <td colspan="16" class="text-center py-16 text-gray-500 text-sm">
+                      <div class="flex flex-col items-center gap-2">
+                        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <span class="font-medium text-gray-600">No se encontraron clientes</span>
+                        <span class="text-xs text-gray-400">Intenta ajustar los filtros de búsqueda</span>
+                      </div>
                     </td>
                   </tr>
                 <% else %>
                   <%= for cliente <- @clientes do %>
-                    <tr class="border-b border-gray-100 hover:bg-purple-50 transition-colors">
-                      <%= if @visible_columns["codigo"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.codigo %></td>
-                      <% end %>
-                      <%= if @visible_columns["razon_social"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.razon_social %></td>
-                      <% end %>
-                      <%= if @visible_columns["nombre_comercial"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.nombre_comercial %></td>
-                      <% end %>
-                      <%= if @visible_columns["rfc"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.rfc %></td>
-                      <% end %>
-                      <%= if @visible_columns["telefono"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.telefono %></td>
-                      <% end %>
-                      <%= if @visible_columns["estado"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.estado %></td>
-                      <% end %>
-                      <%= if @visible_columns["colonia"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.colonia %></td>
-                      <% end %>
-                      <%= if @visible_columns["calle"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.calle %></td>
+                    <tr class="group hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent transition-all duration-200 cursor-pointer border-l-4 border-transparent hover:border-purple-500">
+                      <%= if @visible_columns["udn"] do %>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100/50">
+                          <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                            <%= cliente.udn %>
+                          </div>
+                        </td>
                       <% end %>
                       <%= if @visible_columns["preventa"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.preventa %></td>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
+                          <span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-medium text-xs"><%= cliente.preventa %></span>
+                        </td>
                       <% end %>
                       <%= if @visible_columns["entrega"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.entrega %></td>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
+                          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-xs"><%= cliente.entrega %></span>
+                        </td>
                       <% end %>
                       <%= if @visible_columns["autoventa"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.autoventa %></td>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
+                          <span class="px-2.5 py-1 bg-orange-50 text-orange-700 rounded-lg font-medium text-xs"><%= cliente.autoventa %></span>
+                        </td>
+                      <% end %>
+                      <%= if @visible_columns["ctedir_codigo_k"] do %>
+                        <td class="px-6 py-4 text-sm font-mono text-gray-600 border-r border-gray-100/50"><%= cliente.ctedir_codigo_k %></td>
+                      <% end %>
+                      <%= if @visible_columns["rfc"] do %>
+                        <td class="px-6 py-4 text-sm font-mono text-gray-900 border-r border-gray-100/50 uppercase"><%= cliente.rfc %></td>
+                      <% end %>
+                      <%= if @visible_columns["codigo"] do %>
+                        <td class="px-6 py-4 text-sm font-semibold text-purple-900 border-r border-gray-100/50"><%= cliente.codigo %></td>
+                      <% end %>
+                      <%= if @visible_columns["razon_social"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100/50 max-w-xs truncate" title={cliente.razon_social}><%= cliente.razon_social %></td>
+                      <% end %>
+                      <%= if @visible_columns["diascredito"] do %>
+                        <td class="px-6 py-4 text-sm text-center border-r border-gray-100/50">
+                          <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs">
+                            <%= cliente.diascredito %>
+                          </span>
+                        </td>
+                      <% end %>
+                      <%= if @visible_columns["limite_credito"] do %>
+                        <td class="px-6 py-4 text-sm text-right font-semibold text-gray-900 border-r border-gray-100/50">
+                          <span class="text-emerald-600">$<%= if cliente.limite_credito, do: :erlang.float_to_binary(Decimal.to_float(cliente.limite_credito), decimals: 2), else: "0.00" %></span>
+                        </td>
+                      <% end %>
+                      <%= if @visible_columns["paquete_codigo"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
+                          <span class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg font-medium text-xs"><%= cliente.paquete_codigo %></span>
+                        </td>
+                      <% end %>
+                      <%= if @visible_columns["frecuencia_codigo"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.frecuencia_codigo %></td>
+                      <% end %>
+                      <%= if @visible_columns["email_receptor"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-600 border-r border-gray-100/50 max-w-xs truncate" title={cliente.email_receptor}>
+                          <%= if cliente.email_receptor do %>
+                            <a href={"mailto:#{cliente.email_receptor}"} class="text-blue-600 hover:text-blue-800 hover:underline"><%= cliente.email_receptor %></a>
+                          <% else %>
+                            <span class="text-gray-400 italic">Sin email</span>
+                          <% end %>
+                        </td>
+                      <% end %>
+                      <%= if @visible_columns["forma_pago"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.forma_pago %></td>
+                      <% end %>
+                      <%= if @visible_columns["metodo_pago"] do %>
+                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.metodo_pago %></td>
+                      <% end %>
+                      <%= if @visible_columns["estatus"] do %>
+                        <td class="px-6 py-4 text-sm text-center">
+                          <span class={[
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm",
+                            if(cliente.estatus == "ACTIVO", do: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white", else: "bg-gradient-to-r from-gray-400 to-gray-500 text-white")
+                          ]}>
+                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
+                            <%= cliente.estatus %>
+                          </span>
+                        </td>
                       <% end %>
                     </tr>
                   <% end %>

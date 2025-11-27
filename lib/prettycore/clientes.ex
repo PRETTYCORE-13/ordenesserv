@@ -245,17 +245,32 @@ defmodule Prettycore.Clientes do
         distinct: true,
         order_by: [asc: c.ctecli_codigo_k],
         select: %{
+          # Campos principales para mostrar en tabla
+          udn: ruta.sysudn_codigo_k,
+          preventa: d.vtarut_codigo_k_pre,
+          entrega: d.vtarut_codigo_k_ent,
+          autoventa: d.vtarut_codigo_k_aut,
+          ctedir_codigo_k: d.ctedir_codigo_k,
+          rfc: c.ctecli_rfc,
           codigo: c.ctecli_codigo_k,
           razon_social: c.ctecli_razonsocial,
+          diascredito: c.ctecli_diascredito,
+          limite_credito: c.ctecli_limitecredi,
+          paquete_codigo: c.ctepaq_codigo_k,
+          frecuencia_codigo: d.ctepfr_codigo_k,
+          email_receptor: c.ctecli_fereceptormail,
+          forma_pago: c.ctecli_formapago,
+          metodo_pago: c.ctecli_metodopago,
+          estatus: fragment(
+            "CASE WHEN ? = 10 THEN 'ACTIVO' WHEN ? = 30 THEN 'PROSPECTO' ELSE 'BAJA' END",
+            c.s_maqedo, c.s_maqedo
+          ),
+          # Campos adicionales (visibles al seleccionar)
           nombre_comercial: c.ctecli_dencomercia,
-          rfc: c.ctecli_rfc,
           telefono: d.ctedir_telefono,
           estado: edo.mapedo_descripcion,
           colonia: d.ctedir_colonia,
-          calle: d.ctedir_calle,
-          preventa: d.vtarut_codigo_k_pre,
-          entrega: d.vtarut_codigo_k_ent,
-          autoventa: d.vtarut_codigo_k_aut
+          calle: d.ctedir_calle
         }
 
     # Configurar Flop con 20 registros por página
