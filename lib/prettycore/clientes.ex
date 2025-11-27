@@ -4,16 +4,32 @@ defmodule Prettycore.Clientes do
   """
   import Ecto.Query, warn: false
   alias Prettycore.Repo
-  alias Prettycore.Clientes.{Cliente, Direccion, PatronFrecuencia, Canal, Subcanal, Cadena, PaqueteServicio, Regimen, Estado, Municipio, Localidad, Ruta}
+
+  alias Prettycore.Clientes.{
+    Cliente,
+    Direccion,
+    PatronFrecuencia,
+    Canal,
+    Subcanal,
+    Cadena,
+    PaqueteServicio,
+    Regimen,
+    Estado,
+    Municipio,
+    Localidad,
+    Ruta
+  }
 
   # Función helper para convertir Latin-1 a UTF-8
   defp fix_encoding(nil), do: nil
+
   defp fix_encoding(str) when is_binary(str) do
     case :unicode.characters_to_binary(str, :latin1, :utf8) do
       {:error, _, _} -> str
       result -> result
     end
   end
+
   defp fix_encoding(value), do: value
 
   # Limpia la codificación de todos los campos string en un map
@@ -35,45 +51,52 @@ defmodule Prettycore.Clientes do
   """
   def list_clientes_completo(sysudn_codigo_k, vtarut_codigo_k_ini, vtarut_codigo_k_fin) do
     query =
-      from c in Cliente,
+      from(c in Cliente,
         left_join: d in Direccion,
-          on: c.ctecli_codigo_k == d.ctecli_codigo_k,
+        on: c.ctecli_codigo_k == d.ctecli_codigo_k,
         left_join: pf in PatronFrecuencia,
-          on: d.ctepfr_codigo_k == pf.ctepfr_codigo_k,
+        on: d.ctepfr_codigo_k == pf.ctepfr_codigo_k,
         left_join: can in Canal,
-          on: c.ctecan_codigo_k == can.ctecan_codigo_k,
+        on: c.ctecan_codigo_k == can.ctecan_codigo_k,
         left_join: sca in Subcanal,
-          on: can.ctecan_codigo_k == sca.ctecan_codigo_k and c.ctesca_codigo_k == sca.ctesca_codigo_k,
+        on:
+          can.ctecan_codigo_k == sca.ctecan_codigo_k and c.ctesca_codigo_k == sca.ctesca_codigo_k,
         left_join: cad in Cadena,
-          on: c.ctecad_codigo_k == cad.ctecad_codigo_k,
+        on: c.ctecad_codigo_k == cad.ctecad_codigo_k,
         left_join: paq in PaqueteServicio,
-          on: c.ctepaq_codigo_k == paq.ctepaq_codigo_k,
+        on: c.ctepaq_codigo_k == paq.ctepaq_codigo_k,
         left_join: reg in Regimen,
-          on: c.ctereg_codigo_k == reg.ctereg_codigo_k,
+        on: c.ctereg_codigo_k == reg.ctereg_codigo_k,
         left_join: edo in Estado,
-          on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
+        on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
         left_join: mun in Municipio,
-          on: d.mapedo_codigo_k == mun.mapedo_codigo_k and d.mapmun_codigo_k == mun.mapmun_codigo_k,
+        on: d.mapedo_codigo_k == mun.mapedo_codigo_k and d.mapmun_codigo_k == mun.mapmun_codigo_k,
         left_join: loc in Localidad,
-          on: d.mapedo_codigo_k == loc.mapedo_codigo_k and
-             d.mapmun_codigo_k == loc.mapmun_codigo_k and
-             d.maploc_codigo_k == loc.maploc_codigo_k,
+        on:
+          d.mapedo_codigo_k == loc.mapedo_codigo_k and
+            d.mapmun_codigo_k == loc.mapmun_codigo_k and
+            d.maploc_codigo_k == loc.maploc_codigo_k,
         left_join: ruta in Ruta,
-          on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
+        on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
         where: c.s_maqedo == 10,
         where:
-          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
+          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and
+             d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
         where: ruta.sysudn_codigo_k == ^sysudn_codigo_k,
         distinct: true,
         order_by: [asc: c.ctecli_codigo_k],
         select: %{
           # Estatus calculado
-          estatus: fragment(
-            "CASE WHEN ? = 10 THEN '---ACTIVO---' WHEN ? = 30 THEN '---PROSPECTO---' ELSE '---BAJA---' END",
-            c.s_maqedo, c.s_maqedo
-          ),
+          estatus:
+            fragment(
+              "CASE WHEN ? = 10 THEN '---ACTIVO---' WHEN ? = 30 THEN '---PROSPECTO---' ELSE '---BAJA---' END",
+              c.s_maqedo,
+              c.s_maqedo
+            ),
 
           # Datos de ruta
           udn: ruta.sysudn_codigo_k,
@@ -93,7 +116,8 @@ defmodule Prettycore.Clientes do
           canal: fragment("CONCAT(?, '-', ?)", can.ctecan_codigo_k, can.ctecan_descripcion),
           subcanal: fragment("CONCAT(?, '-', ?)", sca.ctesca_codigo_k, sca.ctesca_descripcion),
           cadena: fragment("CONCAT(?, '-', ?)", cad.ctecad_codigo_k, cad.ctecad_dcomercial),
-          paquete_serv: fragment("CONCAT(?, '-', ?)", paq.ctepaq_codigo_k, paq.ctepaq_descripcion),
+          paquete_serv:
+            fragment("CONCAT(?, '-', ?)", paq.ctepaq_codigo_k, paq.ctepaq_descripcion),
           regimen: fragment("CONCAT(?, '-', ?)", reg.ctereg_codigo_k, reg.ctereg_descripcion),
 
           # Ubicación concatenada
@@ -177,6 +201,7 @@ defmodule Prettycore.Clientes do
           s_usuariodb: c.s_usuariodb,
           s_guidnot: c.s_guidnot
         }
+      )
 
     Repo.all(query)
   end
@@ -186,18 +211,21 @@ defmodule Prettycore.Clientes do
   """
   def list_clientes_resumen(sysudn_codigo_k, vtarut_codigo_k_ini, vtarut_codigo_k_fin) do
     query =
-      from c in Cliente,
+      from(c in Cliente,
         left_join: d in Direccion,
-          on: c.ctecli_codigo_k == d.ctecli_codigo_k,
+        on: c.ctecli_codigo_k == d.ctecli_codigo_k,
         left_join: ruta in Ruta,
-          on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
+        on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
         left_join: edo in Estado,
-          on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
+        on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
         where: c.s_maqedo == 10,
         where:
-          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
+          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and
+             d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
         where: ruta.sysudn_codigo_k == ^sysudn_codigo_k,
         distinct: true,
         order_by: [asc: c.ctecli_codigo_k],
@@ -214,6 +242,7 @@ defmodule Prettycore.Clientes do
           entrega: d.vtarut_codigo_k_ent,
           autoventa: d.vtarut_codigo_k_aut
         }
+      )
 
     query
     |> Repo.all()
@@ -229,18 +258,21 @@ defmodule Prettycore.Clientes do
     vtarut_codigo_k_fin = "999"
 
     base_query =
-      from c in Cliente,
+      from(c in Cliente,
         left_join: d in Direccion,
-          on: c.ctecli_codigo_k == d.ctecli_codigo_k,
+        on: c.ctecli_codigo_k == d.ctecli_codigo_k,
         left_join: ruta in Ruta,
-          on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
+        on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
         left_join: edo in Estado,
-          on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
+        on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
         where: c.s_maqedo == 10,
         where:
-          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
-          (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
+          (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and
+             d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
+            (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and
+               d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
         where: ruta.sysudn_codigo_k == ^sysudn_codigo_k,
         distinct: true,
         order_by: [asc: c.ctecli_codigo_k],
@@ -257,6 +289,7 @@ defmodule Prettycore.Clientes do
           entrega: d.vtarut_codigo_k_ent,
           autoventa: d.vtarut_codigo_k_aut
         }
+      )
 
     # Configurar Flop con 20 registros por página
     flop_params = Map.merge(%{"page_size" => "20"}, params)

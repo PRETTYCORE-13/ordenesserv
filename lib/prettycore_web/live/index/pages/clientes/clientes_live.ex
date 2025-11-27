@@ -120,12 +120,13 @@ defmodule PrettycoreWeb.Clientes do
         {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
 
       "clientes" ->
-        {:noreply, socket}  # ya estás aquí
-
+        # ya estás aquí
+        {:noreply, socket}
 
       "config" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/configuracion")}
-      _->
+
+      _ ->
         {:noreply, socket}
     end
   end
@@ -143,6 +144,7 @@ defmodule PrettycoreWeb.Clientes do
           Enum.reduce(nested_map, acc, fn {nested_key, nested_value}, inner_acc ->
             Map.put(inner_acc, "visible_columns[#{nested_key}]", nested_value)
           end)
+
         _ ->
           Map.put(acc, key, value)
       end
@@ -184,28 +186,23 @@ defmodule PrettycoreWeb.Clientes do
           <div class="w-10 h-10 rounded-full inline-flex items-center justify-center bg-gradient-to-br from-purple-600 to-slate-900 shadow-sm shadow-indigo-400/40 text-2xl">
             👥
           </div>
+
           <div>
-            <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-              Clientes
-            </h1>
-            <p class="text-sm text-gray-500 mt-1">
-              Visualiza y gestiona tus clientes activos.
-            </p>
+            <h1 class="text-xl font-semibold tracking-tight text-gray-900">Clientes</h1>
+
+            <p class="text-sm text-gray-500 mt-1">Visualiza y gestiona tus clientes activos.</p>
           </div>
         </div>
 
         <div class="flex flex-col gap-3">
           <div class="flex gap-3">
-            <div class="min-w-[140px] px-3.5 py-2.5 rounded-xl bg-gradient-to-br from-purple-600 to-purple-600 border border-slate-300/35 flex flex-col gap-0.5">
-              <span class="text-[11px] uppercase tracking-wider text-white">
-                Clientes activos
-              </span>
+            <div class="min-w-[140px] px-3.5 py-2.5 rounded-xl bg-gradient-to-br from-purple-800 to-purple-800 border border-slate-300/35 flex flex-col gap-0.5">
+              <span class="text-[11px] uppercase tracking-wider text-white">Clientes activos</span>
               <span class="text-xl font-semibold text-white">
-                <%= Map.get(@meta, :total_count, length(@clientes)) %>
+                {Map.get(@meta, :total_count, length(@clientes))}
               </span>
             </div>
           </div>
-
           <!-- Botón para abrir el menú lateral de columnas -->
           <button
             type="button"
@@ -220,18 +217,20 @@ defmodule PrettycoreWeb.Clientes do
                 />
               </svg>
             </span>
-            <span class="text-sm font-medium">
-              Columnas
-            </span>
+             <span class="text-sm font-medium">Columnas</span>
           </button>
         </div>
       </header>
-
       <!-- Drawer lateral de columnas -->
       <div class={"fixed inset-y-0 right-0 w-80 bg-white border-l border-gray-200 shadow-2xl transform transition-transform duration-300 ease-in-out z-50 " <> if @filters_open, do: "translate-x-0", else: "translate-x-full"}>
         <div class="flex items-center justify-between p-4 border-b border-gray-200">
           <h2 class="text-base font-semibold text-gray-900">Columnas visibles</h2>
-          <button type="button" class="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors" phx-click="toggle_filters">
+
+          <button
+            type="button"
+            class="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-900 transition-colors"
+            phx-click="toggle_filters"
+          >
             <svg viewBox="0 0 24 24" aria-hidden="true" class="w-5 h-5">
               <path
                 fill="currentColor"
@@ -243,8 +242,9 @@ defmodule PrettycoreWeb.Clientes do
 
         <div class="flex flex-col gap-2 p-4 overflow-y-auto max-h-screen">
           <div class="flex flex-col gap-3">
-            <label class="text-[11px] uppercase tracking-wider text-gray-600">Selecciona las columnas a mostrar</label>
-
+            <label class="text-[11px] uppercase tracking-wider text-gray-600">
+              Selecciona las columnas a mostrar
+            </label>
             <!-- Checkbox para Seleccionar/Deseleccionar todas -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-800 border-2 border-indigo-600 rounded-lg cursor-pointer hover:bg-purple-900 hover:border-indigo-500 hover:shadow-sm hover:shadow-indigo-500/10 transition-all select-none mb-2">
               <input
@@ -255,7 +255,6 @@ defmodule PrettycoreWeb.Clientes do
               />
               <span class="flex-1 text-[15px] font-semibold text-indigo-200">Seleccionar todas</span>
             </label>
-
             <!-- Checkbox para Código -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -264,10 +263,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="codigo"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Código</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Código</span>
             </label>
-
             <!-- Checkbox para Razón Social -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -276,10 +273,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="razon_social"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Razón Social</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Razón Social</span>
             </label>
-
             <!-- Checkbox para Nombre Comercial -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -288,10 +283,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="nombre_comercial"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Nombre Comercial</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Nombre Comercial</span>
             </label>
-
             <!-- Checkbox para RFC -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -300,10 +293,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="rfc"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">RFC</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">RFC</span>
             </label>
-
             <!-- Checkbox para Teléfono -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -312,10 +303,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="telefono"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Teléfono</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Teléfono</span>
             </label>
-
             <!-- Checkbox para Estado -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -324,10 +313,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="estado"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Estado</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Estado</span>
             </label>
-
             <!-- Checkbox para Colonia -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -336,10 +323,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="colonia"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Colonia</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Colonia</span>
             </label>
-
             <!-- Checkbox para Calle -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -348,10 +333,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="calle"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Calle</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Calle</span>
             </label>
-
             <!-- Checkbox para Preventa -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -360,10 +343,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="preventa"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Preventa</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Preventa</span>
             </label>
-
             <!-- Checkbox para Entrega -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -372,10 +353,8 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="entrega"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Entrega</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Entrega</span>
             </label>
-
             <!-- Checkbox para Autoventa -->
             <label class="flex items-center gap-3 px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-lg cursor-pointer hover:bg-slate-800 hover:border-slate-600 transition-all select-none">
               <input
@@ -384,20 +363,17 @@ defmodule PrettycoreWeb.Clientes do
                 phx-click="toggle_column"
                 phx-value-column="autoventa"
                 class="w-[18px] h-[18px] cursor-pointer accent-indigo-600 border-2 border-gray-400 rounded transition-all focus:outline-2 focus:outline-indigo-600 focus:outline-offset-2"
-              />
-              <span class="flex-1 text-[15px] text-slate-300">Autoventa</span>
+              /> <span class="flex-1 text-[15px] text-slate-300">Autoventa</span>
             </label>
           </div>
         </div>
       </div>
-
       <!-- Mensaje de error si existe -->
       <%= if @error do %>
         <div class="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-5">
-          <strong>⚠ Error:</strong> <%= @error %>
+          <strong>⚠ Error:</strong> {@error}
         </div>
       <% end %>
-
       <!-- Tabla de clientes -->
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
@@ -405,40 +381,73 @@ defmodule PrettycoreWeb.Clientes do
             <thead>
               <tr class="bg-gradient-to-r from-slate-900 to-purple-950 border-b border-slate-700">
                 <%= if @visible_columns["codigo"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Código</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Código
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["razon_social"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Razón Social</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Razón Social
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["nombre_comercial"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Nombre Comercial</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Nombre Comercial
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["rfc"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">RFC</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    RFC
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["telefono"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Teléfono</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Teléfono
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["estado"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Estado</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Estado
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["colonia"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Colonia</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Colonia
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["calle"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Calle</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Calle
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["preventa"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Preventa</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Preventa
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["entrega"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Entrega</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Entrega
+                  </th>
                 <% end %>
+
                 <%= if @visible_columns["autoventa"] do %>
-                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">Autoventa</th>
+                  <th class="px-4 py-3 text-left text-xs font-semibold text-white tracking-wide">
+                    Autoventa
+                  </th>
                 <% end %>
               </tr>
             </thead>
+
             <tbody>
               <%= if @loading do %>
                 <tr>
@@ -457,37 +466,47 @@ defmodule PrettycoreWeb.Clientes do
                   <%= for cliente <- @clientes do %>
                     <tr class="border-b border-gray-100 hover:bg-purple-50 transition-colors">
                       <%= if @visible_columns["codigo"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.codigo %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.codigo}</td>
                       <% end %>
+
                       <%= if @visible_columns["razon_social"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.razon_social %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.razon_social}</td>
                       <% end %>
+
                       <%= if @visible_columns["nombre_comercial"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.nombre_comercial %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.nombre_comercial}</td>
                       <% end %>
+
                       <%= if @visible_columns["rfc"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.rfc %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.rfc}</td>
                       <% end %>
+
                       <%= if @visible_columns["telefono"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.telefono %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.telefono}</td>
                       <% end %>
+
                       <%= if @visible_columns["estado"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.estado %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.estado}</td>
                       <% end %>
+
                       <%= if @visible_columns["colonia"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.colonia %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.colonia}</td>
                       <% end %>
+
                       <%= if @visible_columns["calle"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.calle %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.calle}</td>
                       <% end %>
+
                       <%= if @visible_columns["preventa"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.preventa %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.preventa}</td>
                       <% end %>
+
                       <%= if @visible_columns["entrega"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.entrega %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.entrega}</td>
                       <% end %>
+
                       <%= if @visible_columns["autoventa"] do %>
-                        <td class="px-4 py-3 text-sm text-gray-700"><%= cliente.autoventa %></td>
+                        <td class="px-4 py-3 text-sm text-gray-700">{cliente.autoventa}</td>
                       <% end %>
                     </tr>
                   <% end %>
@@ -497,52 +516,53 @@ defmodule PrettycoreWeb.Clientes do
           </table>
         </div>
       </div>
-
       <!-- Paginación personalizada (igual que workorder) -->
       <%= if Map.get(@meta, :total_pages, 0) > 1 do %>
-          <div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
-            <!-- Botón Anterior -->
-            <%= if Map.get(@meta, :has_previous_page?, false) do %>
-              <a
-                href={build_pagination_path(%{"page" => Map.get(@meta, :previous_page, 1)}, @params)}
-                class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-sm hover:shadow-md"
-              >
-                Anterior
-              </a>
-            <% else %>
-              <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">Anterior</span>
-            <% end %>
-
-            <!-- Números de página visibles (solo 3) -->
-            <div class="flex items-center gap-1">
-              <%= for page <- get_visible_pages(Map.get(@meta, :current_page, 1), Map.get(@meta, :total_pages, 1), 3) do %>
-                <%= if page == Map.get(@meta, :current_page, 1) do %>
-                  <span class="min-w-[40px] h-10 flex items-center justify-center text-sm font-semibold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg shadow-md">
-                    <%= page %>
-                  </span>
-                <% else %>
-                  <a
-                    href={build_pagination_path(%{"page" => page}, @params)}
-                    class="min-w-[40px] h-10 flex items-center justify-center text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-all"
-                  >
-                    <%= page %>
-                  </a>
-                <% end %>
+        <div class="flex items-center justify-center gap-2 mt-6 flex-wrap">
+          <!-- Botón Anterior -->
+          <%= if Map.get(@meta, :has_previous_page?, false) do %>
+            <a
+              href={build_pagination_path(%{"page" => Map.get(@meta, :previous_page, 1)}, @params)}
+              class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-sm hover:shadow-md"
+            >
+              Anterior
+            </a>
+          <% else %>
+            <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">
+              Anterior
+            </span>
+          <% end %>
+          <!-- Números de página visibles (solo 3) -->
+          <div class="flex items-center gap-1">
+            <%= for page <- get_visible_pages(Map.get(@meta, :current_page, 1), Map.get(@meta, :total_pages, 1), 3) do %>
+              <%= if page == Map.get(@meta, :current_page, 1) do %>
+                <span class="min-w-[40px] h-10 flex items-center justify-center text-sm font-semibold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg shadow-md">
+                  {page}
+                </span>
+              <% else %>
+                <a
+                  href={build_pagination_path(%{"page" => page}, @params)}
+                  class="min-w-[40px] h-10 flex items-center justify-center text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 transition-all"
+                >
+                  {page}
+                </a>
               <% end %>
-            </div>
-
-            <!-- Botón Siguiente -->
-            <%= if Map.get(@meta, :has_next_page?, false) do %>
-              <a
-                href={build_pagination_path(%{"page" => Map.get(@meta, :next_page, 1)}, @params)}
-                class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-sm hover:shadow-md"
-              >
-                Siguiente
-              </a>
-            <% else %>
-              <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">Siguiente</span>
             <% end %>
           </div>
+          <!-- Botón Siguiente -->
+          <%= if Map.get(@meta, :has_next_page?, false) do %>
+            <a
+              href={build_pagination_path(%{"page" => Map.get(@meta, :next_page, 1)}, @params)}
+              class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-purple-700 rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-sm hover:shadow-md"
+            >
+              Siguiente
+            </a>
+          <% else %>
+            <span class="px-4 py-2 text-sm font-medium text-gray-400 bg-gray-200 rounded-lg cursor-not-allowed">
+              Siguiente
+            </span>
+          <% end %>
+        </div>
       <% end %>
     </section>
     """

@@ -39,12 +39,13 @@ defmodule PrettycoreWeb.HerramientaSql do
         {:noreply, push_navigate(socket, to: ~p"/admin/programacion")}
 
       "programacion_sql" ->
-        {:noreply, socket} # ya estás aquí
+        # ya estás aquí
+        {:noreply, socket}
 
       "workorder" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
 
-              "clientes" ->
+      "clientes" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/clientes")}
 
       "config" ->
@@ -71,9 +72,11 @@ defmodule PrettycoreWeb.HerramientaSql do
 
       not allowed_sql?(sql) ->
         {:noreply,
-         assign(socket, :error,
+         assign(
+           socket,
+           :error,
            "Solo se permiten SELECT, UPDATE, INSERT, DELETE, " <>
-           "CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE o WITH (CTE)."
+             "CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE o WITH (CTE)."
          )}
 
       true ->
@@ -88,29 +91,31 @@ defmodule PrettycoreWeb.HerramientaSql do
                 end)
 
               {:noreply,
-                socket
-                |> assign(:sql_query, query)
-                |> assign(:error, nil)
-                |> assign(:columns, columns)
-                |> assign(:rows, rows_norm)}
+               socket
+               |> assign(:sql_query, query)
+               |> assign(:error, nil)
+               |> assign(:columns, columns)
+               |> assign(:rows, rows_norm)}
             else
               {:noreply,
-                socket
-                |> assign(:sql_query, query)
-                |> assign(:error, nil)
-                |> assign(:columns, ["Resultado"])
-                |> assign(:rows, [[
-                  "Comando ejecutado con éxito (#{res.num_rows || 0} filas afectadas)"
-                ]])}
+               socket
+               |> assign(:sql_query, query)
+               |> assign(:error, nil)
+               |> assign(:columns, ["Resultado"])
+               |> assign(:rows, [
+                 [
+                   "Comando ejecutado con éxito (#{res.num_rows || 0} filas afectadas)"
+                 ]
+               ])}
             end
 
           {:error, reason} ->
             {:noreply,
-              socket
-              |> assign(:sql_query, query)
-              |> assign(:error, "Error al ejecutar: #{inspect(reason)}")
-              |> assign(:columns, [])
-              |> assign(:rows, [])}
+             socket
+             |> assign(:sql_query, query)
+             |> assign(:error, "Error al ejecutar: #{inspect(reason)}")
+             |> assign(:columns, [])
+             |> assign(:rows, [])}
         end
     end
   end
@@ -121,85 +126,80 @@ defmodule PrettycoreWeb.HerramientaSql do
   @impl true
   def render(assigns) do
     ~H"""
-      <section>
-        <header class="pc-page-header">
-          <h1>Programación · Herramienta SQL</h1>
-          <p>
-            Ejecuta consultas SELECT, UPDATE, INSERT, DELETE,
-            CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE
-            o WITH (CTE) directamente contra tu base SQL Server.
-          </p>
+    <section>
+      <header class="pc-page-header">
+        <h1>Programación · Herramienta SQL</h1>
 
-          <p class="pc-small-muted">
-            Correo actual: {@current_user_email} <br />
-            URL actual: {@current_path}
-          </p>
-        </header>
+        <p>Ejecuta consultas SELECT, UPDATE, INSERT, DELETE,
+          CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE
+          o WITH (CTE) directamente contra tu base SQL Server.</p>
 
-        <div class="pc-page-card sql-console">
-          <form phx-submit="run_sql">
-            <label class="sql-console-label">
-              Consulta SQL
-            </label>
+        <p class="pc-small-muted">
+          Correo actual: {@current_user_email} <br /> URL actual: {@current_path}
+        </p>
+      </header>
 
-            <textarea
-              name="sql_query"
-              class="sql-editor"
-              rows="6"
-            ><%= @sql_query %></textarea>
+      <div class="pc-page-card mt-3">
+        <form phx-submit="run_sql">
+          <label class="block text-xs font-medium text-gray-600 mb-1.5">Consulta SQL</label>
+          <textarea
+            name="sql_query"
+            class="w-full font-mono text-xs leading-snug rounded-lg border border-gray-300 px-3 py-2.5 resize-y min-h-[120px] outline-none bg-gray-50 focus:border-indigo-600 focus:shadow-[0_0_0_1px_rgba(79,70,229,0.35)] focus:bg-white transition-all"
+            rows="6"
+          ><%= @sql_query %></textarea>
+          <div class="mt-2 flex items-center gap-2.5">
+            <button
+              type="submit"
+              class="border-none rounded-full px-3.5 py-1.5 text-xs font-medium cursor-pointer bg-gray-900 text-gray-50 inline-flex items-center gap-1.5 hover:bg-gray-950 transition-colors"
+            >
+              Ejecutar consulta
+            </button>
+            <span class="text-[11px] text-gray-400">
+              Se permiten SELECT, UPDATE, INSERT, DELETE, CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW, ALTER TABLE y WITH (CTE).
+            </span>
+          </div>
+        </form>
 
-            <div class="sql-console-actions">
-              <button type="submit" class="sql-run-btn">
-                Ejecutar consulta
-              </button>
-              <span class="sql-console-hint">
-                Se permiten SELECT, UPDATE, INSERT, DELETE,
-                CREATE TABLE, CREATE VIEW, CREATE OR ALTER VIEW,
-                ALTER TABLE y WITH (CTE).
-              </span>
-            </div>
-          </form>
-
-          <%= if @error do %>
-            <div class="sql-console-error">
-              <%= @error %>
-            </div>
-          <% end %>
-        </div>
-
-        <%= if @columns != [] do %>
-          <div class="pc-page-card sql-result-card">
-            <div class="sql-result-header">
-              <span>Resultados</span>
-              <span class="sql-result-meta">
-                <%= length(@rows) %> filas
-              </span>
-            </div>
-
-            <div class="sql-result-wrapper">
-              <table class="sql-result-table">
-                <thead>
-                  <tr>
-                    <%= for col <- @columns do %>
-                      <th><%= col %></th>
-                    <% end %>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  <%= for row <- @rows do %>
-                    <tr>
-                      <%= for cell <- row do %>
-                        <td><%= cell %></td>
-                      <% end %>
-                    </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </div>
+        <%= if @error do %>
+          <div class="mt-2.5 text-xs text-red-700 bg-red-50 rounded-lg border border-red-200 px-2.5 py-2">
+            {@error}
           </div>
         <% end %>
-      </section>
+      </div>
+
+      <%= if @columns != [] do %>
+        <div class="pc-page-card mt-4">
+          <div class="flex justify-between items-center text-xs mb-2 text-gray-600">
+            <span>Resultados</span>
+            <span class="text-gray-400">{length(@rows)} filas</span>
+          </div>
+
+          <div class="max-h-[360px] overflow-auto rounded-lg border border-gray-200">
+            <table class="w-full border-collapse text-xs">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <%= for col <- @columns do %>
+                    <th class="px-2 py-1.5 border-b border-gray-200 text-left font-medium text-gray-600 whitespace-nowrap">
+                      {col}
+                    </th>
+                  <% end %>
+                </tr>
+              </thead>
+
+              <tbody>
+                <%= for row <- @rows do %>
+                  <tr class="odd:bg-gray-50/50">
+                    <%= for cell <- row do %>
+                      <td class="px-2 py-1.5 border-b border-gray-200 whitespace-nowrap">{cell}</td>
+                    <% end %>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+    </section>
     """
   end
 

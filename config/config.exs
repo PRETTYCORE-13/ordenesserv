@@ -16,10 +16,14 @@ config :prettycore, Prettycore.Repo,
   pool_size: 10,
   encrypt: false,
   trust_server_certificate: true,
-  timeout: 60_000,           # 60 segundos para queries complejas
-  connect_timeout: 30_000,   # 30 segundos para conectar
-  idle_timeout: 300_000,     # 5 minutos antes de cerrar conexiones idle
-  queue_target: 5_000,       # Tiempo objetivo en cola
+  # 60 segundos para queries complejas
+  timeout: 60_000,
+  # 30 segundos para conectar
+  connect_timeout: 30_000,
+  # 5 minutos antes de cerrar conexiones idle
+  idle_timeout: 300_000,
+  # Tiempo objetivo en cola
+  queue_target: 5_000,
   queue_interval: 1_000
 
 config :prettycore,

@@ -56,7 +56,7 @@ defmodule PrettycoreWeb do
     end
   end
 
-    def live_view_admin do
+  def live_view_admin do
     quote do
       use Phoenix.LiveView,
         layout: {PrettycoreWeb.Layouts, :app}
@@ -72,8 +72,6 @@ defmodule PrettycoreWeb do
       unquote(html_helpers())
     end
   end
-
-
 
   def html do
     quote do

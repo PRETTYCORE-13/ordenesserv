@@ -10,6 +10,7 @@ defmodule PrettycoreWeb.AccessOkLive do
     <div class="pc-login-wrap">
       <div class="pc-login-card">
         <h1>Acceso exitoso</h1>
+
         <p>Ya puedes usar el sistema.</p>
       </div>
     </div>

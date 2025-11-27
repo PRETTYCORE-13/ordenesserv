@@ -41,7 +41,7 @@ defmodule PrettycoreWeb.Inicio do
       "workorder" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/workorder")}
 
-              "clientes" ->
+      "clientes" ->
         {:noreply, push_navigate(socket, to: ~p"/admin/clientes")}
 
       "config" ->
@@ -59,21 +59,24 @@ defmodule PrettycoreWeb.Inicio do
     <section>
       <header class="pc-page-header">
         <h1>Inicio</h1>
+
         <p>Resumen general de tu espacio PrettyCore.</p>
+
         <p class="pc-small-muted">
-          Correo actual: {@current_user_email} <br />
-          URL actual: {@current_path}
+          Correo actual: {@current_user_email} <br /> URL actual: {@current_path}
         </p>
       </header>
 
       <div class="pc-page-grid">
         <div class="pc-page-card">
           <h2>Actividad reciente</h2>
+
           <p>Aquí puedes mostrar un resumen de lo último que pasó.</p>
         </div>
 
         <div class="pc-page-card">
           <h2>Accesos rápidos</h2>
+
           <p>Enlaces, dashboards o módulos frecuentes.</p>
         </div>
       </div>
