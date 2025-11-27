@@ -138,129 +138,100 @@
         <p class="text-sm text-gray-500">No hay órdenes para el filtro seleccionado.</p>
       </div>
     <% else %>
-      <!-- Tabla normal con paginación -->
-      <div class="w-full overflow-x-auto">
-        <table class="w-full border-separate border-spacing-0 text-sm">
-          <thead class="sticky top-0 z-10">
-            <tr>
-              <th class="text-left px-5 py-2.5 text-[11px] uppercase tracking-wider text-black bg-gradient-to-b from-white to-white border-b border-black whitespace-nowrap first:rounded-tl-2xl">
-                Identificador
-              </th>
-              
-              <th class="text-left px-5 py-2.5 text-[11px] uppercase tracking-wider text-black bg-gradient-to-b from-white to-white border-b border-black whitespace-nowrap">
-                Descripción
-              </th>
-              
-              <th class="text-left px-5 py-2.5 text-[11px] uppercase tracking-wider text-black bg-gradient-to-b from-white to-white border-b border-black whitespace-nowrap">
-                Tipo
-              </th>
-              
-              <th class="text-center px-5 py-2.5 text-[11px] uppercase tracking-wider text-black bg-gradient-to-b from-white to-white border-b border-black whitespace-nowrap">
-                Estado
-              </th>
-              
-              <th class="text-center px-5 py-2.5 text-[11px] uppercase tracking-wider text-black bg-gradient-to-b from-white to-white border-b border-black whitespace-nowrap last:rounded-tr-2xl">
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          
-          <tbody>
-            <%= for w <- @workorders do %>
-              <% key = "#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
-              <!-- Fila principal -->
-              <tr class={"cursor-pointer transition-all " <> if @open_key == key, do: "bg-slate-50", else: "hover:bg-gray-50"}>
-                <!-- Identificador: aquí va el toggle_detalle -->
-                <td
-                  class="px-5 py-2.5 border-b border-black text-black"
-                  phx-click="toggle_detalle"
-                  phx-value-sysudn={w.sysudn}
-                  phx-value-systra={w.systra}
-                  phx-value-serie={w.serie}
-                  phx-value-folio={w.folio}
-                >
-                  {"#{w.sysudn} #{w.serie} #{w.folio}"}
-                </td>
-                
-                <td class="px-5 py-2.5 border-b border-black text-black">
-                  {Map.get(w, :descripcion, "")}
-                </td>
-                
-                <td class="px-5 py-2.5 border-b border-black text-black">
-                  <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">
-                    {w.tipo.descripcion}
-                  </span>
-                </td>
-                <!-- Estado -->
-                <td class="px-5 py-2.5 border-b border-black text-center text-black">
-                  <span class={estado_class(w.estado)}>{estado_label(w.estado)}</span>
-                </td>
-                <!-- Acciones -->
-                <td class="px-5 py-2.5 border-b border-black text-center text-white">
-                  <% botones_desactivados? = params["estado"] == "todas" and w.estado != 100 %>
-                  <.button
-                    type="button"
-                    class="px-3 py-1.5 rounded-md text-sm font-medium border-none bg-green-500 text-white mx-1 hover:opacity-85 transition-opacity"
-                    phx-click="cambiar_estado"
-                    phx-value-ref={w.referencia}
-                    phx-value-estado="1"
-                    disabled={botones_desactivados?}
-                  >
-                    Aceptar
-                  </.button>
-                  <.button
-                    type="button"
-                    class="px-3 py-1.5 rounded-md text-sm font-medium border-none bg-red-500 text-white mx-1 hover:opacity-85 transition-opacity"
-                    phx-click="cambiar_estado"
-                    phx-value-ref={w.referencia}
-                    phx-value-estado="0"
-                    disabled={botones_desactivados?}
-                  >
-                    Rechazar
-                  </.button>
-                </td>
-              </tr>
-              <!-- Fila de detalles -->
-              <%= if @open_key==key do %>
-                <tr class="bg-gray-50">
-                  <td colspan="5" class="px-5 py-4 border-b border-gray-200">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <% detalles = Map.get(@detalles, key, []) %> <% visibles =
-                        Enum.filter(detalles, fn d ->
-                          src = image_src(Map.get(d, :image_url))
-                          not is_nil(src)
-                        end) %>
-                      <%= if visibles==[] do %>
-                        <div class="col-span-full px-4 py-6 text-center text-sm text-gray-500 bg-gray-100 rounded-lg border border-dashed border-gray-300">
-                          Sin imágenes
-                        </div>
-                      <% else %>
-                        <%= for det <- visibles do %>
-                          <% src = image_src(Map.get(det, :image_url)) %>
-                          <div class="flex flex-col gap-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between">
-                              <span class="text-xs font-medium text-gray-700">
-                                {Map.get(det, :descripcion) ||
-                                  Map.get(det, :concepto) || "Detalle"}
-                              </span>
-                            </div>
-                            
-                            <img
-                              class="w-full h-48 object-cover rounded-md"
-                              src={src}
-                              alt="Imagen de la orden"
-                            />
-                          </div>
-                        <% end %>
-                      <% end %>
+      <!-- Tabla con componente reutilizable -->
+      <.table id="workorders-table" rows={@workorders}>
+        <:col :let={w} label="Identificador">
+          <div
+            class="cursor-pointer"
+            phx-click="toggle_detalle"
+            phx-value-sysudn={w.sysudn}
+            phx-value-systra={w.systra}
+            phx-value-serie={w.serie}
+            phx-value-folio={w.folio}
+          >
+            {"#{w.sysudn} #{w.serie} #{w.folio}"}
+          </div>
+        </:col>
+
+        <:col :let={w} label="Descripción">
+          {Map.get(w, :descripcion, "")}
+        </:col>
+
+        <:col :let={w} label="Tipo">
+          <span class="inline-flex px-2 py-0.5 text-xs font-medium rounded-full bg-indigo-100 text-indigo-700">
+            {w.tipo.descripcion}
+          </span>
+        </:col>
+
+        <:col :let={w} label="Estado">
+          <span class={estado_class(w.estado)}>{estado_label(w.estado)}</span>
+        </:col>
+
+        <:action :let={w}>
+          <% botones_desactivados? = params["estado"] == "todas" and w.estado != 100 %>
+          <div class="flex gap-2 justify-center">
+            <.button
+              type="button"
+              class="px-3 py-1.5 rounded-md text-sm font-medium border-none bg-green-500 text-white hover:opacity-85 transition-opacity"
+              phx-click="cambiar_estado"
+              phx-value-ref={w.referencia}
+              phx-value-estado="1"
+              disabled={botones_desactivados?}
+            >
+              Aceptar
+            </.button>
+            <.button
+              type="button"
+              class="px-3 py-1.5 rounded-md text-sm font-medium border-none bg-red-500 text-white hover:opacity-85 transition-opacity"
+              phx-click="cambiar_estado"
+              phx-value-ref={w.referencia}
+              phx-value-estado="0"
+              disabled={botones_desactivados?}
+            >
+              Rechazar
+            </.button>
+          </div>
+        </:action>
+
+        <:expanded :let={w}>
+          <% key = "#{w.sysudn}|#{w.systra}|#{w.serie}|#{w.folio}" %>
+
+          <%= if @open_key == key do %>
+            <div class="px-5 py-4 bg-gray-50">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% detalles = Map.get(@detalles, key, []) %>
+                <% visibles = Enum.filter(detalles, fn d ->
+                  src = image_src(Map.get(d, :image_url))
+                  not is_nil(src)
+                end) %>
+
+                <%= if visibles == [] do %>
+                  <div class="col-span-full px-4 py-6 text-center text-sm text-gray-500 bg-gray-100 rounded-lg border border-dashed border-gray-300">
+                    Sin imágenes
+                  </div>
+                <% else %>
+                  <%= for det <- visibles do %>
+                    <% src = image_src(Map.get(det, :image_url)) %>
+                    <div class="flex flex-col gap-2 p-3 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                      <div class="flex items-center justify-between">
+                        <span class="text-xs font-medium text-gray-700">
+                          {Map.get(det, :descripcion) || Map.get(det, :concepto) || "Detalle"}
+                        </span>
+                      </div>
+
+                      <img
+                        class="w-full h-48 object-cover rounded-md"
+                        src={src}
+                        alt="Imagen de la orden"
+                      />
                     </div>
-                  </td>
-                </tr>
-              <% end %>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </:expanded>
+      </.table>
       <!-- Controles de paginación con Flop Phoenix -->
       <div class="flex justify-center items-center gap-3 mt-4 px-4">
         <!-- Botón Anterior -->

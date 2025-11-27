@@ -327,6 +327,8 @@ defmodule PrettycoreWeb.CoreComponents do
 
   slot :action, doc: "the slot for showing user actions in the last table column"
 
+  slot :expanded, doc: "optional slot for expandable row content"
+
   def table(assigns) do
     assigns =
       with %{rows: %Phoenix.LiveView.LiveStream{}} <- assigns do
@@ -351,29 +353,40 @@ defmodule PrettycoreWeb.CoreComponents do
             </tr>
           </thead>
           <tbody id={@id} phx-update={is_struct(@rows, Phoenix.LiveView.LiveStream) && "stream"}>
-            <tr
-              :for={row <- @rows}
-              id={@row_id && @row_id.(row)}
-              class="border-b border-gray-100 hover:bg-purple-50 transition-colors"
-            >
-              <td
-                :for={col <- @col}
-                phx-click={@row_click && @row_click.(row)}
-                class={[
-                  "px-4 py-3 text-sm text-gray-700",
-                  @row_click && "hover:cursor-pointer"
-                ]}
+            <%= for row <- @rows do %>
+              <tr
+                id={@row_id && @row_id.(row)}
+                class="border-b border-gray-100 hover:bg-purple-50 transition-colors"
               >
-                {render_slot(col, @row_item.(row))}
-              </td>
-              <td :if={@action != []} class="px-4 py-3 text-sm">
-                <div class="flex gap-4">
-                  <%= for action <- @action do %>
-                    {render_slot(action, @row_item.(row))}
-                  <% end %>
-                </div>
-              </td>
-            </tr>
+                <td
+                  :for={col <- @col}
+                  phx-click={@row_click && @row_click.(row)}
+                  class={[
+                    "px-4 py-3 text-sm text-gray-700",
+                    @row_click && "hover:cursor-pointer"
+                  ]}
+                >
+                  {render_slot(col, @row_item.(row))}
+                </td>
+                <td :if={@action != []} class="px-4 py-3 text-sm">
+                  <div class="flex gap-4">
+                    <%= for action <- @action do %>
+                      {render_slot(action, @row_item.(row))}
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+
+              <%= if @expanded != [] do %>
+                <tr class="border-b border-gray-100">
+                  <td colspan={length(@col) + if(@action != [], do: 1, else: 0)} class="p-0">
+                    <%= for expanded <- @expanded do %>
+                      {render_slot(expanded, @row_item.(row))}
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            <% end %>
           </tbody>
         </table>
       </div>
