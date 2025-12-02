@@ -44,8 +44,16 @@ defmodule PrettycoreWeb.Router do
       live "/programacion/sql", HerramientaSql
       live "/workorder", WorkOrderLive
       live "/clientes", Clientes
+      live "/clientes/new", ClienteFormLive
       live "/configuracion", ConfiguracionLive
     end
+  end
+
+  ## Rutas para descarga de Excel (protegidas pero no LiveView)
+  scope "/admin", PrettycoreWeb do
+    pipe_through :browser
+
+    get "/clientes/export/excel", ClientesExcelController, :download
   end
 
   ## Health simple (sin login)

@@ -3,10 +3,34 @@ defmodule PrettycoreWeb.Clientes do
 
   import PrettycoreWeb.MenuLayout
   alias Prettycore.Clientes
+  import Ecto.Changeset
+
+  # Esquema embedded para los filtros
+  defmodule FilterParams do
+    use Ecto.Schema
+    import Ecto.Changeset
+
+    @primary_key false
+    embedded_schema do
+      field :search, :string
+      field :sysudn, :string
+      field :ruta_desde, :string
+      field :ruta_hasta, :string
+    end
+
+    def changeset(params, attrs) do
+      params
+      |> cast(attrs, [:search, :sysudn, :ruta_desde, :ruta_hasta])
+    end
+  end
 
   # Recibimos el :email desde la ruta /admin/clientes
   @impl true
   def mount(_params, session, socket) do
+    # Opciones para los filtros (podrían venir de BD)
+    sysudn_opts = ["100", "200", "300"]
+    ruta_opts = ["001", "002", "003", "999"]
+
     {:ok,
      socket
      |> assign(:current_page, "clientes")
@@ -16,9 +40,8 @@ defmodule PrettycoreWeb.Clientes do
      |> assign(:current_path, "/admin/clientes")
      |> assign(:filters_open, false)
      |> assign(:expanded_clients, MapSet.new())
-     |> assign(:search_query, "")
-     |> assign(:filter_ruta, "")
-     |> assign(:filter_udn, "")}
+     |> assign(:sysudn_opts, sysudn_opts)
+     |> assign(:ruta_opts, ruta_opts)}
   end
 
   @impl true
@@ -34,7 +57,9 @@ defmodule PrettycoreWeb.Clientes do
       |> Enum.into(%{})
 
     # Columnas visibles desde params o por defecto todas visibles
+    # Incluye TODOS los campos de list_clientes_completo para Excel export
     default_visible_columns = %{
+      # Campos mostrados en tabla (por defecto visibles)
       "udn" => true,
       "preventa" => true,
       "entrega" => true,
@@ -50,23 +75,117 @@ defmodule PrettycoreWeb.Clientes do
       "email_receptor" => true,
       "forma_pago" => true,
       "metodo_pago" => true,
-      "estatus" => true
+      "estatus" => true,
+      # Campos adicionales de list_clientes_completo (ocultos por defecto)
+      "nombre_comercial" => false,
+      "telefono" => false,
+      "estado" => false,
+      "colonia" => false,
+      "calle" => false,
+      "ctepfr_codigo_k" => false,
+      "frecuencia" => false,
+      "canal" => false,
+      "subcanal" => false,
+      "cadena" => false,
+      "paquete_serv" => false,
+      "regimen" => false,
+      "municipio" => false,
+      "localidad" => false,
+      "map_x" => false,
+      "map_y" => false,
+      "ctedir_callenumext" => false,
+      "ctedir_callenumint" => false,
+      "ctedir_responsable" => false,
+      "ctedir_calleentre1" => false,
+      "ctedir_calleentre2" => false,
+      "ctedir_cp" => false,
+      "ctecli_fechaalta" => false,
+      "ctecli_fechabaja" => false,
+      "ctecli_causabaja" => false,
+      "ctecli_edocred" => false,
+      "ctecli_tipodefact" => false,
+      "ctecli_tipofacdes" => false,
+      "ctecli_tipopago" => false,
+      "ctecli_creditoobs" => false,
+      "ctetpo_codigo_k" => false,
+      "ctesca_codigo_k" => false,
+      "ctepaq_codigo_k" => false,
+      "ctereg_codigo_k" => false,
+      "ctecad_codigo_k" => false,
+      "ctecli_generico" => false,
+      "cfgmon_codigo_k" => false,
+      "ctecli_observaciones" => false,
+      "systra_codigo_k" => false,
+      "facadd_codigo_k" => false,
+      "ctecli_fereceptor" => false,
+      "ctepor_codigo_k" => false,
+      "ctecli_tipodefacr" => false,
+      "condim_codigo_k" => false,
+      "ctecli_cxcliq" => false,
+      "ctecli_nocta" => false,
+      "ctecli_dscantimp" => false,
+      "ctecli_desglosaieps" => false,
+      "ctecli_periodorefac" => false,
+      "ctecli_contacto" => false,
+      "cfgban_codigo_k" => false,
+      "ctecli_cargaespecifica" => false,
+      "ctecli_caducidadmin" => false,
+      "ctecli_ctlsanitario" => false,
+      "ctecli_regtrib" => false,
+      "ctecli_pais" => false,
+      "ctecli_factablero" => false,
+      "sat_uso_cfdi_k" => false,
+      "ctecli_complemento" => false,
+      "ctecli_aplicacanje" => false,
+      "ctecli_aplicadev" => false,
+      "ctecli_desglosakit" => false,
+      "faccom_codigo_k" => false,
+      "ctecli_facgrupo" => false,
+      "facads_codigo_k" => false,
+      "s_maqedo" => false,
+      "s_fecha" => false,
+      "s_fi" => false,
+      "s_guid" => false,
+      "s_guidlog" => false,
+      "s_usuario" => false,
+      "s_usuariodb" => false,
+      "s_guidnot" => false
     }
 
     visible_columns = Map.merge(default_visible_columns, visible_columns_params)
+
+    # Crear changeset para el formulario de filtros
+    filter_params = %FilterParams{
+      search: params["search"],
+      sysudn: params["sysudn"],
+      ruta_desde: params["ruta_desde"],
+      ruta_hasta: params["ruta_hasta"]
+    }
+
+    filter_form = to_form(FilterParams.changeset(filter_params, %{}))
+
+    # Meta por defecto en caso de error
+    default_meta = %Flop.Meta{
+      current_page: 1,
+      total_pages: 1,
+      total_count: 0,
+      page_size: 20,
+      has_next_page?: false,
+      has_previous_page?: false
+    }
 
     # Cargar clientes con paginación usando Flop
     {clientes, meta, error} =
       try do
         case Clientes.list_clientes_with_flop(params) do
           {:ok, {clientes, meta}} -> {clientes, meta, nil}
-          {:error, _meta} -> {[], %Flop.Meta{}, "Error al cargar clientes"}
+          {:error, _meta} -> {[], default_meta, "Error al cargar clientes"}
         end
       rescue
         e ->
           require Logger
           Logger.error("Error cargando clientes: #{inspect(e)}")
-          {[], %Flop.Meta{}, "Error al cargar clientes. Por favor intenta de nuevo."}
+          {[], default_meta, "Error al cargar clientes. Por favor intenta de nuevo."}
       end
 
     {:noreply,
@@ -76,13 +195,27 @@ defmodule PrettycoreWeb.Clientes do
      |> assign(:params, params)
      |> assign(:loading, false)
      |> assign(:error, error)
-     |> assign(:visible_columns, visible_columns)}
+     |> assign(:visible_columns, visible_columns)
+     |> assign(:filter_form, filter_form)}
   end
 
   ## Handle event para toggle de filtros
   @impl true
   def handle_event("toggle_filters", _params, socket) do
     {:noreply, update(socket, :filters_open, &(not &1))}
+  end
+
+  ## Handle event para aplicar filtros
+  def handle_event("set_filter", %{"filter_params" => filter_params}, socket) do
+    # Construir los nuevos params con los filtros
+    new_params =
+      socket.assigns.params
+      |> Map.merge(filter_params)
+      |> Map.put("page", "1")  # Reset a página 1 cuando se filtra
+
+    # Navegar con los nuevos filtros
+    query_string = URI.encode_query(flatten_params(new_params))
+    {:noreply, push_patch(socket, to: "/admin/clientes?#{query_string}")}
   end
 
   ## Handle event para expandir/colapsar detalles de cliente
@@ -256,6 +389,11 @@ defmodule PrettycoreWeb.Clientes do
   end
 
   ## Funciones helper para paginación (igual que workorder)
+  def get_visible_pages(current_page, total_pages, max_visible)
+      when is_nil(current_page) or is_nil(total_pages) or total_pages == 0 do
+    [1]
+  end
+
   def get_visible_pages(current_page, total_pages, max_visible) do
     cond do
       total_pages <= max_visible ->
@@ -278,6 +416,18 @@ defmodule PrettycoreWeb.Clientes do
     flattened_params = flatten_params(merged_params)
     query_string = URI.encode_query(flattened_params)
     "/admin/clientes?#{query_string}"
+  end
+
+  ## Helper para construir la URL de descarga de Excel
+  def build_excel_download_path(current_params, visible_columns) do
+    # Combinar parámetros actuales con columnas visibles
+    params_with_columns = Map.merge(current_params, %{
+      "visible_columns" => visible_columns
+    })
+
+    flattened_params = flatten_params(params_with_columns)
+    query_string = URI.encode_query(flattened_params)
+    "/admin/clientes/export/excel?#{query_string}"
   end
 
   ## Render

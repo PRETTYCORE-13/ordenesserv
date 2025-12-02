@@ -111,19 +111,18 @@ defmodule Prettycore.Clientes do
           # RFC
           rfc: c.ctecli_rfc,
 
-          # Catálogos concatenados
-          frecuencia: fragment("CONCAT(?, '-', ?)", pf.ctepfr_codigo_k, pf.ctepfr_descipcion),
-          canal: fragment("CONCAT(?, '-', ?)", can.ctecan_codigo_k, can.ctecan_descripcion),
-          subcanal: fragment("CONCAT(?, '-', ?)", sca.ctesca_codigo_k, sca.ctesca_descripcion),
-          cadena: fragment("CONCAT(?, '-', ?)", cad.ctecad_codigo_k, cad.ctecad_dcomercial),
-          paquete_serv:
-            fragment("CONCAT(?, '-', ?)", paq.ctepaq_codigo_k, paq.ctepaq_descripcion),
-          regimen: fragment("CONCAT(?, '-', ?)", reg.ctereg_codigo_k, reg.ctereg_descripcion),
+          # Catálogos concatenados (convertir explícitamente a string para evitar errores de tipo)
+          frecuencia: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", pf.ctepfr_codigo_k, pf.ctepfr_descipcion), :string),
+          canal: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", can.ctecan_codigo_k, can.ctecan_descripcion), :string),
+          subcanal: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", sca.ctesca_codigo_k, sca.ctesca_descripcion), :string),
+          cadena: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", cad.ctecad_codigo_k, cad.ctecad_dcomercial), :string),
+          paquete_serv: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", paq.ctepaq_codigo_k, paq.ctepaq_descripcion), :string),
+          regimen: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", reg.ctereg_codigo_k, reg.ctereg_descripcion), :string),
 
-          # Ubicación concatenada
-          estado: fragment("CONCAT(?, '-', ?)", edo.mapedo_codigo_k, edo.mapedo_descripcion),
-          municipio: fragment("CONCAT(?, '-', ?)", mun.mapmun_codigo_k, mun.mapmun_descripcion),
-          localidad: fragment("CONCAT(?, '-', ?)", loc.maploc_codigo_k, loc.maploc_descripcion),
+          # Ubicación concatenada (convertir explícitamente a string)
+          estado: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", edo.mapedo_codigo_k, edo.mapedo_descripcion), :string),
+          municipio: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", mun.mapmun_codigo_k, mun.mapmun_descripcion), :string),
+          localidad: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", loc.maploc_codigo_k, loc.maploc_descripcion), :string),
 
           # Coordenadas
           map_x: d.map_x,
@@ -251,11 +250,18 @@ defmodule Prettycore.Clientes do
 
   @doc """
   Lista clientes con paginación usando Flop
+
+  ## Filtros soportados:
+  - sysudn: Código de UDN
+  - ruta: Código de ruta (preventa/entrega/autoventa)
+  - estatus: Estado del cliente (A/I)
+  - search: Búsqueda por código, razón social o RFC
   """
   def list_clientes_with_flop(params \\ %{}) do
-    sysudn_codigo_k = "100"
-    vtarut_codigo_k_ini = "001"
-    vtarut_codigo_k_fin = "999"
+    # Valores por defecto - manejar tanto nil como string vacío
+    sysudn_codigo_k = get_param_or_default(params["sysudn"], "100")
+    vtarut_codigo_k_ini = get_param_or_default(params["ruta_desde"], "001")
+    vtarut_codigo_k_fin = get_param_or_default(params["ruta_hasta"], "99999")
 
     base_query =
       from(c in Cliente,
@@ -294,7 +300,7 @@ defmodule Prettycore.Clientes do
           forma_pago: c.ctecli_formapago,
           metodo_pago: c.ctecli_metodopago,
           estatus: fragment(
-            "CASE WHEN ? = 10 THEN 'ACTIVO' WHEN ? = 30 THEN 'PROSPECTO' ELSE 'BAJA' END",
+            "CASE WHEN ? = 10 THEN 'A' WHEN ? = 30 THEN 'P' ELSE 'B' END",
             c.s_maqedo, c.s_maqedo
           ),
           # Campos adicionales (visibles al seleccionar)
@@ -306,10 +312,76 @@ defmodule Prettycore.Clientes do
         }
       )
 
+    # Aplicar filtro de búsqueda si existe
+    # NOTA: No podemos filtrar por aliases del select, necesitamos usar los campos originales
+    filtered_query =
+      case params["search"] do
+        nil ->
+          base_query
+
+        "" ->
+          base_query
+
+        search ->
+          search_term = "%#{String.trim(search)}%"
+
+          from(c in Cliente,
+            left_join: d in Direccion,
+            on: c.ctecli_codigo_k == d.ctecli_codigo_k,
+            left_join: ruta in Ruta,
+            on: ruta.vtarut_codigo_k in [d.vtarut_codigo_k_pre, d.vtarut_codigo_k_aut],
+            left_join: edo in Estado,
+            on: d.mapedo_codigo_k == edo.mapedo_codigo_k,
+            where: c.s_maqedo == 10,
+            where:
+              (d.vtarut_codigo_k_pre >= ^vtarut_codigo_k_ini and
+                 d.vtarut_codigo_k_pre <= ^vtarut_codigo_k_fin) or
+                (d.vtarut_codigo_k_ent >= ^vtarut_codigo_k_ini and
+                   d.vtarut_codigo_k_ent <= ^vtarut_codigo_k_fin) or
+                (d.vtarut_codigo_k_aut >= ^vtarut_codigo_k_ini and
+                   d.vtarut_codigo_k_aut <= ^vtarut_codigo_k_fin),
+            where: ruta.sysudn_codigo_k == ^sysudn_codigo_k,
+            where:
+              ilike(c.ctecli_codigo_k, ^search_term) or
+                ilike(c.ctecli_razonsocial, ^search_term) or
+                ilike(c.ctecli_rfc, ^search_term),
+            distinct: true,
+            order_by: [asc: c.ctecli_codigo_k],
+            select: %{
+              udn: ruta.sysudn_codigo_k,
+              preventa: d.vtarut_codigo_k_pre,
+              entrega: d.vtarut_codigo_k_ent,
+              autoventa: d.vtarut_codigo_k_aut,
+              ctedir_codigo_k: d.ctedir_codigo_k,
+              rfc: c.ctecli_rfc,
+              codigo: c.ctecli_codigo_k,
+              razon_social: c.ctecli_razonsocial,
+              diascredito: c.ctecli_diascredito,
+              limite_credito: c.ctecli_limitecredi,
+              paquete_codigo: c.ctepaq_codigo_k,
+              frecuencia_codigo: d.ctepfr_codigo_k,
+              email_receptor: c.ctecli_fereceptormail,
+              forma_pago: c.ctecli_formapago,
+              metodo_pago: c.ctecli_metodopago,
+              estatus:
+                fragment(
+                  "CASE WHEN ? = 10 THEN 'A' WHEN ? = 30 THEN 'P' ELSE 'B' END",
+                  c.s_maqedo,
+                  c.s_maqedo
+                ),
+              nombre_comercial: c.ctecli_dencomercia,
+              telefono: d.ctedir_telefono,
+              estado: edo.mapedo_descripcion,
+              colonia: d.ctedir_colonia,
+              calle: d.ctedir_calle
+            }
+          )
+      end
+
     # Configurar Flop con 20 registros por página
     flop_params = Map.merge(%{"page_size" => "20"}, params)
 
-    case Flop.validate_and_run(base_query, flop_params, for: Cliente) do
+    case Flop.validate_and_run(filtered_query, flop_params, for: Cliente) do
       {:ok, {clientes, meta}} ->
         clientes_fixed = Enum.map(clientes, &fix_map_encoding/1)
         {:ok, {clientes_fixed, meta}}
@@ -318,4 +390,10 @@ defmodule Prettycore.Clientes do
         {:error, meta}
     end
   end
+
+  # Helper para obtener parámetro o usar valor por defecto
+  # Maneja tanto nil como string vacío
+  defp get_param_or_default(nil, default), do: default
+  defp get_param_or_default("", default), do: default
+  defp get_param_or_default(value, _default) when is_binary(value), do: value
 end

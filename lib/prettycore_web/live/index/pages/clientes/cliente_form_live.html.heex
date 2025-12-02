@@ -1,0 +1,216 @@
+    <section class="flex flex-col gap-6 p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <!-- HEADER -->
+      <header class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <.link navigate={~p"/admin/clientes"} class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </.link>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">{@page_title}</h1>
+              <p class="text-sm text-gray-500 mt-0.5">Complete los datos del cliente</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- FORMULARIO -->
+      <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
+        <!-- DATOS BÁSICOS -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Datos Básicos</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <.input
+              field={@form[:ctecli_codigo_k]}
+              type="text"
+              label="Código Cliente *"
+              placeholder="0001"
+            />
+
+            <.input
+              field={@form[:ctecli_rfc]}
+              type="text"
+              label="RFC *"
+              placeholder="XAXX010101000"
+            />
+
+            <.input
+              field={@form[:ctecli_razonsocial]}
+              type="text"
+              label="Razón Social *"
+              placeholder="Nombre o razón social del cliente"
+              class="md:col-span-2"
+            />
+
+            <.input
+              field={@form[:ctecli_dencomercia]}
+              type="text"
+              label="Nombre Comercial *"
+              placeholder="Nombre comercial del negocio"
+              class="md:col-span-2"
+            />
+
+            <.input
+              field={@form[:ctecli_fereceptormail]}
+              type="email"
+              label="Email para facturación"
+              placeholder="cliente@ejemplo.com"
+            />
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN DE CRÉDITO -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Crédito</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <.input
+              field={@form[:ctecli_diascredito]}
+              type="number"
+              label="Días de Crédito"
+              value="0"
+            />
+
+            <.input
+              field={@form[:ctecli_limitecredi]}
+              type="number"
+              label="Límite de Crédito"
+              value="0.00"
+              step="0.01"
+            />
+
+            <.input
+              field={@form[:ctecli_edocred]}
+              type="select"
+              label="Estado de Crédito"
+              options={[{"Sin crédito", 0}, {"Crédito activo", 1}]}
+            />
+          </div>
+        </div>
+
+        <!-- FACTURACIÓN -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Facturación</h2>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <.input
+              field={@form[:ctecli_formapago]}
+              type="select"
+              label="Forma de Pago"
+              options={[
+                {"01 - Efectivo", "01"},
+                {"02 - Cheque", "02"},
+                {"03 - Transferencia", "03"},
+                {"04 - Tarjeta de Crédito", "04"}
+              ]}
+            />
+
+            <.input
+              field={@form[:ctecli_metodopago]}
+              type="select"
+              label="Método de Pago"
+              options={[
+                {"PUE - Pago en una sola exhibición", "PUE"},
+                {"PPD - Pago en parcialidades", "PPD"}
+              ]}
+            />
+
+            <.input
+              field={@form[:sat_uso_cfdi_k]}
+              type="select"
+              label="Uso de CFDI"
+              options={[
+                {"S01 - Sin efectos fiscales", "S01"},
+                {"G01 - Adquisición de mercancías", "G01"},
+                {"G03 - Gastos en general", "G03"}
+              ]}
+            />
+          </div>
+        </div>
+
+        <!-- DIRECCIÓN -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">Dirección Principal</h2>
+
+          <.inputs_for :let={f_dir} field={@form[:direccion]}>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <.input
+                field={f_dir[:ctedir_calle]}
+                type="text"
+                label="Calle *"
+                placeholder="Nombre de la calle"
+              />
+
+              <.input
+                field={f_dir[:ctedir_callenumext]}
+                type="text"
+                label="Número Exterior"
+                placeholder="S/N"
+              />
+
+              <.input
+                field={f_dir[:ctedir_colonia]}
+                type="text"
+                label="Colonia"
+                placeholder="Nombre de la colonia"
+              />
+
+              <.input
+                field={f_dir[:ctedir_cp]}
+                type="text"
+                label="Código Postal *"
+                placeholder="00000"
+              />
+
+              <.input
+                field={f_dir[:ctedir_telefono]}
+                type="text"
+                label="Teléfono"
+                placeholder="5551234567"
+              />
+
+              <.input
+                field={f_dir[:ctedir_celular]}
+                type="text"
+                label="Celular"
+                placeholder="5559876543"
+              />
+
+              <.input
+                field={f_dir[:vtarut_codigo_k_pre]}
+                type="text"
+                label="Ruta Preventa *"
+                placeholder="20001"
+              />
+
+              <.input
+                field={f_dir[:vtarut_codigo_k_ent]}
+                type="text"
+                label="Ruta Entrega *"
+                placeholder="30001"
+              />
+            </div>
+          </.inputs_for>
+        </div>
+
+        <!-- BOTONES -->
+        <div class="flex justify-end gap-3">
+          <.link
+            navigate={~p"/admin/clientes"}
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </.link>
+
+          <button
+            type="submit"
+            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            Guardar Cliente
+          </button>
+        </div>
+      </.form>
+    </section>
