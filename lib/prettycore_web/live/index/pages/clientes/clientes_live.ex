@@ -14,7 +14,11 @@ defmodule PrettycoreWeb.Clientes do
      |> assign(:show_programacion_children, false)
      |> assign(:current_user_email, session["user_email"])
      |> assign(:current_path, "/admin/clientes")
-     |> assign(:filters_open, false)}
+     |> assign(:filters_open, false)
+     |> assign(:expanded_clients, MapSet.new())
+     |> assign(:search_query, "")
+     |> assign(:filter_ruta, "")
+     |> assign(:filter_udn, "")}
   end
 
   @impl true
@@ -81,6 +85,43 @@ defmodule PrettycoreWeb.Clientes do
     {:noreply, update(socket, :filters_open, &(not &1))}
   end
 
+  ## Handle event para expandir/colapsar detalles de cliente
+  def handle_event("toggle_client_details", %{"codigo" => codigo, "dir" => dir}, socket) do
+    key = "#{codigo}|#{dir}"
+    expanded_clients = socket.assigns.expanded_clients
+
+    new_expanded_clients =
+      if MapSet.member?(expanded_clients, key) do
+        MapSet.delete(expanded_clients, key)
+      else
+        MapSet.put(expanded_clients, key)
+      end
+
+    {:noreply, assign(socket, :expanded_clients, new_expanded_clients)}
+  end
+
+  ## Handle event para ver detalles completos del cliente
+  def handle_event("show_details", %{"client-id" => client_id}, socket) do
+    # Aquí puedes redirigir a una página de detalles o abrir un modal
+    # Por ahora solo expandimos la fila
+    expanded_rows = MapSet.put(socket.assigns.expanded_rows, client_id)
+    {:noreply, assign(socket, :expanded_rows, expanded_rows)}
+  end
+
+  ## Handle event para editar cliente
+  def handle_event("edit_client", %{"client-id" => client_id}, socket) do
+    # Aquí puedes redirigir a la página de edición o abrir un modal
+    # Por ejemplo: push_navigate(socket, to: ~p"/admin/clientes/#{client_id}/edit")
+    {:noreply, socket}
+  end
+
+  ## Handle event para enviar email al cliente
+  def handle_event("send_email", %{"email" => email}, socket) do
+    # Aquí puedes implementar la lógica para enviar email
+    # Por ejemplo, abrir el cliente de email o un modal de composición
+    {:noreply, socket}
+  end
+
   ## Handle event para toggle de columnas
   def handle_event("toggle_column", %{"column" => column}, socket) do
     visible_columns = socket.assigns.visible_columns
@@ -140,6 +181,66 @@ defmodule PrettycoreWeb.Clientes do
     Enum.all?(visible_columns, fn {_k, v} -> v end)
   end
 
+  ## Helper para verificar si un cliente está expandido
+  defp client_expanded?(expanded_clients, codigo, dir) do
+    key = "#{codigo}|#{dir}"
+    MapSet.member?(expanded_clients, key)
+  end
+
+  ## Helper para obtener la inicial del cliente
+  defp get_initial(razon_social) when is_binary(razon_social) do
+    razon_social
+    |> String.trim()
+    |> String.first()
+    |> String.upcase()
+  end
+  defp get_initial(_), do: "?"
+
+  ## Helper para obtener color de avatar basado en código
+  defp avatar_color(codigo) when is_binary(codigo) do
+    colors = [
+      "bg-purple-600",
+      "bg-blue-600",
+      "bg-emerald-600",
+      "bg-amber-600",
+      "bg-rose-600",
+      "bg-indigo-600",
+      "bg-cyan-600",
+      "bg-pink-600"
+    ]
+
+    hash = :erlang.phash2(codigo, length(colors))
+    Enum.at(colors, hash)
+  end
+  defp avatar_color(_), do: "bg-gray-600"
+
+  ## Helper para obtener etiqueta de estatus
+  defp estatus_label("A"), do: "Activo"
+  defp estatus_label("I"), do: "Inactivo"
+  defp estatus_label(_), do: "?"
+
+  ## Helper para color del badge de estatus
+  defp estatus_badge_class("A"), do: "px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium"
+  defp estatus_badge_class("I"), do: "px-1.5 py-0.5 bg-red-100 text-red-700 rounded text-xs font-medium"
+  defp estatus_badge_class(_), do: "px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium"
+
+  ## Helper para obtener estado de crédito (simulado)
+  defp credit_status(_cliente) do
+    # Aquí podrías implementar lógica real basada en pagos
+    # Por ahora retornamos un valor aleatorio para demostración
+    Enum.random(["Al Corriente", "Vencido", "Sin Crédito"])
+  end
+
+  ## Helper para color del badge de crédito
+  defp credit_badge_class(status) do
+    case status do
+      "Al Corriente" -> "bg-emerald-500 text-white"
+      "Vencido" -> "bg-amber-500 text-white"
+      "Sin Crédito" -> "bg-rose-500 text-white"
+      _ -> "bg-gray-500 text-white"
+    end
+  end
+
   ## Helper para aplanar params anidados
   defp flatten_params(params) do
     Enum.reduce(params, %{}, fn {key, value}, acc ->
@@ -183,51 +284,85 @@ defmodule PrettycoreWeb.Clientes do
   @impl true
   def render(assigns) do
     ~H"""
-    <section class="flex flex-col gap-6 p-6 max-w-7xl mx-auto">
-      <header class="flex justify-between items-start gap-4 flex-wrap">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-full inline-flex items-center justify-center bg-gradient-to-br from-purple-600 to-slate-900 shadow-sm shadow-indigo-400/40 text-2xl">
-            👥
-          </div>
-          <div>
-            <h1 class="text-xl font-semibold tracking-tight text-gray-900">
-              Clientes
-            </h1>
-            <p class="text-sm text-gray-500 mt-1">
-              Visualiza y gestiona tus clientes activos.
-            </p>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <div class="flex gap-3">
-            <div class="min-w-[140px] px-3.5 py-2.5 rounded-xl bg-gradient-to-br from-purple-600 to-purple-600 border border-slate-300/35 flex flex-col gap-0.5">
-              <span class="text-[11px] uppercase tracking-wider text-white">
-                Clientes activos
-              </span>
-              <span class="text-xl font-semibold text-white">
-                <%= Map.get(@meta, :total_count, length(@clientes)) %>
-              </span>
+    <section class="flex flex-col gap-6 p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <!-- HEADER MODERNO -->
+      <header class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between gap-4 mb-6">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">Clientes</h1>
+              <p class="text-sm text-gray-500 mt-0.5">Gestiona y visualiza tus clientes</p>
             </div>
           </div>
 
-          <!-- Botón para abrir el menú lateral de columnas -->
+          <div class="flex items-center gap-3">
+            <!-- Contador de Clientes -->
+            <div class="px-4 py-2 bg-purple-50 rounded-lg border border-purple-200">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-purple-700">Total:</span>
+                <span class="text-xl font-bold text-purple-900">
+                  <%= Map.get(@meta, :total_count, length(@clientes)) %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Botón Nuevo Cliente -->
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Nuevo Cliente
+            </button>
+          </div>
+        </div>
+
+        <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Búsqueda Principal -->
+          <div class="flex-1 min-w-[300px]">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar por código, nombre, RFC..."
+                class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Filtros Rápidos -->
+          <select class="px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+            <option value="">Todas las Rutas</option>
+            <option value="R01">Ruta 01</option>
+            <option value="R02">Ruta 02</option>
+          </select>
+
+          <select class="px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+            <option value="">Todas las UDN</option>
+            <option value="100">UDN 100</option>
+            <option value="200">UDN 200</option>
+          </select>
+
+          <!-- Botón Filtros Avanzados -->
           <button
             type="button"
-            class={"inline-flex items-center gap-2 px-4 py-2 rounded-lg border transition-all " <> if @filters_open, do: "bg-slate-900 border-indigo-500 shadow-sm shadow-indigo-500/50 text-white", else: "bg-white border-gray-300 hover:bg-gray-50 text-gray-700"}
             phx-click="toggle_filters"
+            class={"inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all " <> if @filters_open, do: "bg-purple-600 text-white shadow-lg", else: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"}
           >
-            <span class="w-4 h-4">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M5 7h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Zm3 5h8a1 1 0 0 1 0 2H8a1 1 0 0 1 0-2Zm3 5h2a1 1 0 0 1 0 2h-2a1 1 0 0 1 0-2Z"
-                />
-              </svg>
-            </span>
-            <span class="text-sm font-medium">
-              Columnas
-            </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+            </svg>
+            Filtros Avanzados
           </button>
         </div>
       </header>
@@ -367,176 +502,259 @@ defmodule PrettycoreWeb.Clientes do
         </div>
       <% end %>
 
-      <!-- Tabla de clientes estilo dashboard -->
-      <div class="bg-white rounded-2xl shadow-lg border border-gray-200/80 overflow-hidden backdrop-blur-sm">
-        <div class="overflow-x-auto">
-          <table class="w-full min-w-max">
-            <thead>
-              <tr class="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900">
-                <%= if @visible_columns["udn"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">UDN</th>
-                <% end %>
-                <%= if @visible_columns["preventa"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Preventa</th>
-                <% end %>
-                <%= if @visible_columns["entrega"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Entrega</th>
-                <% end %>
-                <%= if @visible_columns["autoventa"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Autoventa</th>
-                <% end %>
-                <%= if @visible_columns["ctedir_codigo_k"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Cód. Dirección</th>
-                <% end %>
-                <%= if @visible_columns["rfc"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">RFC</th>
-                <% end %>
-                <%= if @visible_columns["codigo"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Código Cliente</th>
-                <% end %>
-                <%= if @visible_columns["razon_social"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Razón Social</th>
-                <% end %>
-                <%= if @visible_columns["diascredito"] do %>
-                  <th class="px-6 py-4 text-center text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Días Crédito</th>
-                <% end %>
-                <%= if @visible_columns["limite_credito"] do %>
-                  <th class="px-6 py-4 text-right text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Límite Crédito</th>
-                <% end %>
-                <%= if @visible_columns["paquete_codigo"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Lista Precios</th>
-                <% end %>
-                <%= if @visible_columns["frecuencia_codigo"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Frecuencia</th>
-                <% end %>
-                <%= if @visible_columns["email_receptor"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Email Receptor</th>
-                <% end %>
-                <%= if @visible_columns["forma_pago"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Forma Pago</th>
-                <% end %>
-                <%= if @visible_columns["metodo_pago"] do %>
-                  <th class="px-6 py-4 text-left text-[11px] font-bold text-purple-200 uppercase tracking-wider border-r border-slate-700/50">Método Pago</th>
-                <% end %>
-                <%= if @visible_columns["estatus"] do %>
-                  <th class="px-6 py-4 text-center text-[11px] font-bold text-purple-200 uppercase tracking-wider">Estatus</th>
-                <% end %>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-100">
-              <%= if @loading do %>
-                <tr>
-                  <td colspan="16" class="text-center py-16 text-gray-500 text-sm">
-                    <div class="flex flex-col items-center gap-3">
-                      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
-                      <span class="font-medium">Cargando clientes...</span>
-                    </div>
-                  </td>
-                </tr>
-              <% else %>
-                <%= if Enum.empty?(@clientes) do %>
-                  <tr>
-                    <td colspan="16" class="text-center py-16 text-gray-500 text-sm">
-                      <div class="flex flex-col items-center gap-2">
-                        <svg class="w-16 h-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                        </svg>
-                        <span class="font-medium text-gray-600">No se encontraron clientes</span>
-                        <span class="text-xs text-gray-400">Intenta ajustar los filtros de búsqueda</span>
+      <!-- LISTA DE CLIENTES CON CARDS EXPANDIBLES (sin espacios) -->
+      <div class="rounded-2xl bg-white/95 border border-white/95 shadow-2xl shadow-white/80 overflow-hidden">
+        <%= if @loading do %>
+          <div class="p-12 text-center">
+            <div class="flex flex-col items-center gap-3">
+              <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+              <span class="font-medium text-gray-600">Cargando clientes...</span>
+            </div>
+          </div>
+        <% else %>
+          <%= if Enum.empty?(@clientes) do %>
+            <div class="py-10 px-6 text-center grid place-items-center gap-2.5">
+              <div class="w-10 h-10 rounded-full inline-flex items-center justify-center text-2xl bg-slate-900 border border-dashed border-slate-400/50">
+                👥
+              </div>
+              <h2 class="text-base font-medium text-gray-900">Sin clientes registrados</h2>
+              <p class="text-sm text-gray-500">No hay clientes para el filtro seleccionado.</p>
+            </div>
+          <% else %>
+            <!-- ENCABEZADOS DE COLUMNAS -->
+            <div class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-slate-900 to-slate-800 border-b-2 border-slate-700">
+              <!-- Avatar Header -->
+              <div class="w-9 flex-shrink-0">
+                <span class="text-xs font-bold text-slate-300 uppercase tracking-wide"></span>
+              </div>
+
+              <!-- UDN Header -->
+              <div class="w-16 flex-shrink-0">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">UDN</span>
+              </div>
+
+              <!-- Código Header -->
+              <div class="w-20 flex-shrink-0">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Código</span>
+              </div>
+
+              <!-- Dir Header -->
+              <div class="w-16 flex-shrink-0">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Dir</span>
+              </div>
+
+              <!-- Nombre Header -->
+              <div class="flex-1 min-w-0">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Nombre</span>
+              </div>
+
+              <!-- RFC Header -->
+              <div class="w-32 flex-shrink-0 hidden md:block">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">RFC</span>
+              </div>
+
+              <!-- Preventa Header -->
+              <div class="w-20 flex-shrink-0 hidden lg:block">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Preventa</span>
+              </div>
+
+              <!-- Entrega Header -->
+              <div class="w-20 flex-shrink-0 hidden lg:block">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Entrega</span>
+              </div>
+
+              <!-- Autoventa Header -->
+              <div class="w-20 flex-shrink-0 hidden xl:block">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Autoventa</span>
+              </div>
+
+              <!-- Estatus Header -->
+              <div class="w-20 flex-shrink-0 hidden xl:block">
+                <span class="text-xs font-bold text-slate-200 uppercase tracking-wide">Estatus</span>
+              </div>
+
+              <!-- Chevron Header (vacío) -->
+              <div class="flex-shrink-0">
+                <span class="w-5 h-5 inline-block"></span>
+              </div>
+            </div>
+
+            <!-- REGISTROS COMPACTOS SIN ESPACIOS -->
+            <%= for cliente <- @clientes do %>
+              <% is_expanded = client_expanded?(@expanded_clients, cliente.codigo, cliente.ctedir_codigo_k) %>
+              <% initial = get_initial(cliente.razon_social) %>
+              <% avatar_bg = avatar_color(cliente.codigo) %>
+
+              <div class="border-b border-gray-200 last:border-b-0">
+                <!-- VISTA COMPACTA: Una sola línea clickeable -->
+                <div
+                  class="flex items-center gap-3 px-4 py-2.5 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent cursor-pointer transition-all duration-200"
+                  phx-click="toggle_client_details"
+                  phx-value-codigo={cliente.codigo}
+                  phx-value-dir={cliente.ctedir_codigo_k}
+                >
+                  <!-- AVATAR -->
+                  <div class={"w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow #{avatar_bg}"}>
+                    <%= initial %>
+                  </div>
+
+                  <!-- UDN -->
+                  <div class="w-16 flex-shrink-0">
+                    <span class="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-xs font-semibold">
+                      <%= cliente.udn %>
+                    </span>
+                  </div>
+
+                  <!-- CÓDIGO -->
+                  <div class="w-20 flex-shrink-0">
+                    <span class="text-sm font-bold text-gray-900"><%= cliente.codigo %></span>
+                  </div>
+
+                  <!-- DIR -->
+                  <div class="w-16 flex-shrink-0">
+                    <span class="text-xs text-gray-600"><%= cliente.ctedir_codigo_k %></span>
+                  </div>
+
+                  <!-- NOMBRE -->
+                  <div class="flex-1 min-w-0">
+                    <span class="text-sm font-medium text-gray-900 truncate block" title={cliente.razon_social}>
+                      <%= cliente.razon_social %>
+                    </span>
+                  </div>
+
+                  <!-- RFC -->
+                  <div class="w-32 flex-shrink-0 hidden md:block">
+                    <span class="text-xs font-mono text-gray-700"><%= cliente.rfc %></span>
+                  </div>
+
+                  <!-- PREVENTA -->
+                  <div class="w-20 flex-shrink-0 hidden lg:block">
+                    <span class="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                      <%= cliente.preventa %>
+                    </span>
+                  </div>
+
+                  <!-- ENTREGA -->
+                  <div class="w-20 flex-shrink-0 hidden lg:block">
+                    <span class="px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">
+                      <%= cliente.entrega %>
+                    </span>
+                  </div>
+
+                  <!-- AUTOVENTA -->
+                  <div class="w-20 flex-shrink-0 hidden xl:block">
+                    <%= if cliente.autoventa do %>
+                      <span class="px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded text-xs font-medium">
+                        <%= cliente.autoventa %>
+                      </span>
+                    <% else %>
+                      <span class="text-xs text-gray-400">—</span>
+                    <% end %>
+                  </div>
+
+                  <!-- ESTADO -->
+                  <div class="w-20 flex-shrink-0 hidden xl:block">
+                    <span class={estatus_badge_class(cliente.estatus)}>
+                      <%= estatus_label(cliente.estatus) %>
+                    </span>
+                  </div>
+
+                  <!-- CHEVRON -->
+                  <div class="flex-shrink-0">
+                    <svg
+                      class={[
+                        "w-5 h-5 text-gray-400 transition-transform duration-300",
+                        if(is_expanded, do: "rotate-180", else: "rotate-0")
+                      ]}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- VISTA EXPANDIDA -->
+                <div class={[
+                  "transition-all duration-300 ease-in-out overflow-hidden bg-gradient-to-r from-slate-50 to-purple-50/30",
+                  if(is_expanded, do: "max-h-96 opacity-100", else: "max-h-0 opacity-0")
+                ]}>
+                  <div class="px-4 py-4 space-y-3">
+
+                    <!-- SECCIÓN FINANCIERO -->
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="text-lg">💳</span>
+                      <span class="font-semibold text-gray-700">Financiero:</span>
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <span class="text-gray-800">
+                          Días Crédito: <span class="font-bold text-indigo-600"><%= cliente.diascredito %>d</span>
+                        </span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-800">
+                          Límite: <span class="font-bold text-emerald-600">$<%= if cliente.limite_credito, do: :erlang.float_to_binary(Decimal.to_float(cliente.limite_credito), decimals: 2), else: "0.00" %></span>
+                        </span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-800">
+                          Lista: <span class="font-bold text-purple-600"><%= cliente.paquete_codigo %></span>
+                        </span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-800">
+                          Frecuencia: <span class="font-bold text-gray-700"><%= cliente.frecuencia_codigo %></span>
+                        </span>
                       </div>
-                    </td>
-                  </tr>
-                <% else %>
-                  <%= for cliente <- @clientes do %>
-                    <tr class="group hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent transition-all duration-200 cursor-pointer border-l-4 border-transparent hover:border-purple-500">
-                      <%= if @visible_columns["udn"] do %>
-                        <td class="px-6 py-4 text-sm font-medium text-gray-900 border-r border-gray-100/50">
-                          <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-purple-500"></span>
-                            <%= cliente.udn %>
-                          </div>
-                        </td>
+                    </div>
+
+                    <!-- SECCIÓN CONTACTO -->
+                    <div class="flex items-center gap-2 text-sm">
+                      <span class="text-lg">📧</span>
+                      <span class="font-semibold text-gray-700">Contacto:</span>
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <%= if cliente.email_receptor do %>
+                          <a href={"mailto:#{cliente.email_receptor}"} class="text-blue-600 hover:underline font-medium">
+                            <%= cliente.email_receptor %>
+                          </a>
+                        <% else %>
+                          <span class="text-amber-600 font-medium">Sin email</span>
+                        <% end %>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-800">
+                          Forma Pago: <span class="font-bold"><%= cliente.forma_pago %></span>
+                        </span>
+                        <span class="text-gray-400">|</span>
+                        <span class="text-gray-800">
+                          Método Pago: <span class="font-bold"><%= cliente.metodo_pago %></span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- BOTONES DE ACCIÓN -->
+                    <div class="flex gap-2 pt-2">
+                      <button
+                        type="button"
+                        phx-click="edit_client"
+                        phx-value-client-id={cliente.codigo}
+                        class="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-colors"
+                      >
+                        ✏️ Editar
+                      </button>
+                      <%= if cliente.email_receptor do %>
+                        <button
+                          type="button"
+                          phx-click="send_email"
+                          phx-value-email={cliente.email_receptor}
+                          class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded transition-colors"
+                        >
+                          📧 Email
+                        </button>
                       <% end %>
-                      <%= if @visible_columns["preventa"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
-                          <span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-medium text-xs"><%= cliente.preventa %></span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["entrega"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
-                          <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-xs"><%= cliente.entrega %></span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["autoventa"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
-                          <span class="px-2.5 py-1 bg-orange-50 text-orange-700 rounded-lg font-medium text-xs"><%= cliente.autoventa %></span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["ctedir_codigo_k"] do %>
-                        <td class="px-6 py-4 text-sm font-mono text-gray-600 border-r border-gray-100/50"><%= cliente.ctedir_codigo_k %></td>
-                      <% end %>
-                      <%= if @visible_columns["rfc"] do %>
-                        <td class="px-6 py-4 text-sm font-mono text-gray-900 border-r border-gray-100/50 uppercase"><%= cliente.rfc %></td>
-                      <% end %>
-                      <%= if @visible_columns["codigo"] do %>
-                        <td class="px-6 py-4 text-sm font-semibold text-purple-900 border-r border-gray-100/50"><%= cliente.codigo %></td>
-                      <% end %>
-                      <%= if @visible_columns["razon_social"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-800 font-medium border-r border-gray-100/50 max-w-xs truncate" title={cliente.razon_social}><%= cliente.razon_social %></td>
-                      <% end %>
-                      <%= if @visible_columns["diascredito"] do %>
-                        <td class="px-6 py-4 text-sm text-center border-r border-gray-100/50">
-                          <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold text-xs">
-                            <%= cliente.diascredito %>
-                          </span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["limite_credito"] do %>
-                        <td class="px-6 py-4 text-sm text-right font-semibold text-gray-900 border-r border-gray-100/50">
-                          <span class="text-emerald-600">$<%= if cliente.limite_credito, do: :erlang.float_to_binary(Decimal.to_float(cliente.limite_credito), decimals: 2), else: "0.00" %></span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["paquete_codigo"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50">
-                          <span class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg font-medium text-xs"><%= cliente.paquete_codigo %></span>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["frecuencia_codigo"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.frecuencia_codigo %></td>
-                      <% end %>
-                      <%= if @visible_columns["email_receptor"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-600 border-r border-gray-100/50 max-w-xs truncate" title={cliente.email_receptor}>
-                          <%= if cliente.email_receptor do %>
-                            <a href={"mailto:#{cliente.email_receptor}"} class="text-blue-600 hover:text-blue-800 hover:underline"><%= cliente.email_receptor %></a>
-                          <% else %>
-                            <span class="text-gray-400 italic">Sin email</span>
-                          <% end %>
-                        </td>
-                      <% end %>
-                      <%= if @visible_columns["forma_pago"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.forma_pago %></td>
-                      <% end %>
-                      <%= if @visible_columns["metodo_pago"] do %>
-                        <td class="px-6 py-4 text-sm text-gray-700 border-r border-gray-100/50"><%= cliente.metodo_pago %></td>
-                      <% end %>
-                      <%= if @visible_columns["estatus"] do %>
-                        <td class="px-6 py-4 text-sm text-center">
-                          <span class={[
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm",
-                            if(cliente.estatus == "ACTIVO", do: "bg-gradient-to-r from-emerald-500 to-emerald-600 text-white", else: "bg-gradient-to-r from-gray-400 to-gray-500 text-white")
-                          ]}>
-                            <span class="w-1.5 h-1.5 rounded-full bg-white"></span>
-                            <%= cliente.estatus %>
-                          </span>
-                        </td>
-                      <% end %>
-                    </tr>
-                  <% end %>
-                <% end %>
-              <% end %>
-            </tbody>
-          </table>
-        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
       </div>
 
       <!-- Paginación personalizada (igual que workorder) -->
