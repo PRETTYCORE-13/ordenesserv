@@ -51,22 +51,22 @@ config :prettycore, PrettycoreWeb.Endpoint,
 # Configures the mailer
 #
 # SMTP Configuration for Gmail con opciones TLS mejoradas
-config :prettycore, Prettycore.Mailer,
-  adapter: Swoosh.Adapters.SMTP,
-  relay: "smtp.gmail.com",
-  username: "servicios.ennovacore@gmail.com",
-  password: System.get_env("SMTP_PASSWORD") || "tazooiiaqvtfobtu",
-  ssl: false,
-  tls: :always,
-  tls_options: [
-    verify: :verify_none,
-    versions: [:"tlsv1.2", :"tlsv1.3"],
-    cacerts: :public_key.cacerts_get()
-  ],
-  auth: :always,
-  port: 587,
-  retries: 3,
-  timeout: 10_000
+#config :prettycore, Prettycore.Mailer,
+#  adapter: Swoosh.Adapters.SMTP,
+#  relay: "smtp.gmail.com",
+#  username: "servicios.ennovacore@gmail.com",
+#  password: System.get_env("SMTP_PASSWORD") || "tazooiiaqvtfobtu",
+#  ssl: false,
+#  tls: :always,
+#  tls_options: [
+#    verify: :verify_none,
+#    versions: [:"tlsv1.2", :"tlsv1.3"],
+#    cacerts: :public_key.cacerts_get()
+#  ],
+#  auth: :always,
+#  port: 587,
+#  retries: 3,
+#  timeout: 10_000
 
 # Configure esbuild (the version is required)
 config :esbuild,
