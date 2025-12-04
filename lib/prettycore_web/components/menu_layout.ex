@@ -37,7 +37,7 @@ defmodule PrettycoreWeb.MenuLayout do
           <div class="pc-platform-logo-group mini">
             <img
               class="pc-platform-logo-img"
-              src="https://direem.com.mx/IMAGENES/DIREEM%20SIN%20FONDO%20(1).png"
+              src="https://th.bing.com/th/id/R.7d592b78f7652da436b9ab21fc4fc25f?rik=g7VE7dZo6JaZrA&riu=http%3a%2f%2fgetwallpapers.com%2fwallpaper%2ffull%2f6%2f6%2f1%2f579397.jpg&ehk=WXw%2bNSZCri4XZrLylh33jyOiBetpiK2UKJLVW0%2bp5Fk%3d&risl=&pid=ImgRaw&r=0"
               alt="Direem Negocios logo"
             />
           </div>
@@ -77,7 +77,7 @@ defmodule PrettycoreWeb.MenuLayout do
           <!-- TEXTO (oculto si sidebar está cerrado) -->
           <div class="pc-user-info">
             <div class="pc-user-name">{@current_user_email || "desconocido"}</div>
-
+            
             <div class="pc-user-role">Usuario</div>
           </div>
         </div>
