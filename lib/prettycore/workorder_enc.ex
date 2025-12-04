@@ -18,7 +18,7 @@ defmodule Prettycore.Workorders.WorkorderEnc do
     field(:systra, :string, source: :SYSTRA_CODIGO_K)
     field(:serie, :string, source: :WOKE_SERIE_K)
     field(:folio, :integer, source: :WOKE_FOLIO_K)
-    field(:referencia, :string, source: :WOKE_REFERENCIA)
+    field(:referencia, Latin1String, source: :WOKE_REFERENCIA)
 
     # Foreign key field must be defined when using define_field: false
     field(:tipo_id, :string, source: :WOKTPO_CODIGO_K)
@@ -30,8 +30,8 @@ defmodule Prettycore.Workorders.WorkorderEnc do
     )
 
     field(:estado, :integer, source: :S_MAQEDO)
-    field(:descripcion, :string, source: :WOKE_DESCRIPCION)
+    field(:descripcion, Latin1String, source: :WOKE_DESCRIPCION)
     field(:fecha, :naive_datetime, source: :S_FECHA)
-    field(:usuario, :string, source: :WOKE_USUARIO)
+    field(:usuario, Latin1String, source: :WOKE_USUARIO)
   end
 end
