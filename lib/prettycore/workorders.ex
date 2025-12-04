@@ -58,7 +58,8 @@ defmodule Prettycore.Workorders do
         flop_params
       else
         # Use string keys to match the rest of the params
-        Map.put(flop_params, "order_by", ["fecha"])
+        # Order by folio descending (from highest to lowest)
+        Map.put(flop_params, "order_by", ["folio"])
         |> Map.put("order_directions", ["desc"])
       end
 

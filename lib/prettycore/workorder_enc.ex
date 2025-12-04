@@ -8,7 +8,7 @@ defmodule Prettycore.Workorders.WorkorderEnc do
   @derive {
     Flop.Schema,
     filterable: [:sysudn, :estado, :usuario, :fecha],
-    sortable: [:fecha, :sysudn, :estado],
+    sortable: [:fecha, :sysudn, :estado, :folio],
     default_limit: 20,
     max_limit: 100
   }

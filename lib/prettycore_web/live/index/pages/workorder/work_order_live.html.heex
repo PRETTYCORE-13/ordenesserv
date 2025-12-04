@@ -163,6 +163,16 @@
           </span>
         </:col>
 
+        <:col :let={w} label="Fecha">
+          <%= if w.fecha do %>
+            <span class="text-sm text-gray-700">
+              {Calendar.strftime(w.fecha, "%d/%m/%Y %H:%M")}
+            </span>
+          <% else %>
+            <span class="text-sm text-gray-400">-</span>
+          <% end %>
+        </:col>
+
         <:col :let={w} label="Estado">
           <span class={estado_class(w.estado)}>{estado_label(w.estado)}</span>
         </:col>
