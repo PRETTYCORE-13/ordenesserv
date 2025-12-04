@@ -10,7 +10,7 @@ defmodule Prettycore.TdsClient do
     port = System.get_env("SQLSERVER_PORT") || "#{cfg[:port] || 1433}"
     user = System.get_env("SQLSERVER_USER") || cfg[:username] || "sa"
     pass = System.get_env("SQLSERVER_PASS") || cfg[:password] || "N0vacore"
-    db = System.get_env("SQLSERVER_DB") || cfg[:database] || "ECORE_PRD_10"
+    db = System.get_env("SQLSERVER_DB") || cfg[:database] || "ECOREDES2"
 
     [
       hostname: host,

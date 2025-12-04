@@ -19,7 +19,14 @@
       "Bash(findstr:*)",
       "Bash(timeout 10 bash:*)",
       "Bash(taskkill:*)",
-      "Bash(mix clean:*)"
+      "Bash(mix clean:*)",
+      "Bash(timeout 3 bash:*)",
+      "Bash(mix run:*)",
+      "Bash(if [ ! -d \"priv/repo/migrations\" ])",
+      "Bash(then mkdir -p priv/repo/migrations)",
+      "Bash(else echo \"Migrations directory exists\")",
+      "Bash(fi)",
+      "Bash(mix deps:*)"
     ],
     "deny": [],
     "ask": []

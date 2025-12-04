@@ -6,7 +6,7 @@ config :prettycore, :tds,
   port: 1433,
   username: "sa",
   password: "N0vacore",
-  database: "ECORE_PRD_10",
+  database: "ECOREDES2",
   pool_size: 10,
   # Encryption settings (use true for Azure/SSL)
   encrypt: false,

@@ -1,7 +1,7 @@
 defmodule Prettycore.WorkorderApi do
   @moduledoc false
 
-  @url "http://ecore.ath.cx:1406/SP/EN_RESTHELPER/workorderEstado"
+  @url "http://ecore.ath.cx:1405/SP/EN_RESTHELPER/workorderEstado"
 
   # estado: 1 = aceptar, 0 = rechazar
   # AHORA RECIBE TAMBIÉN EL password DEL SELECT
@@ -24,6 +24,7 @@ defmodule Prettycore.WorkorderApi do
         {:ok, resp_body}
 
       {:ok, %Req.Response{status: status, body: resp_body}} ->
+        IO.inspect(body, label: " error body")
         IO.inspect(resp_body, label: "workorderEstado error body")
         {:error, {:http_error, status}}
 

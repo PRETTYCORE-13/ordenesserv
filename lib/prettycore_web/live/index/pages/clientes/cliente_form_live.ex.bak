@@ -305,7 +305,6 @@ defmodule PrettycoreWeb.ClienteFormLive do
      |> assign(:current_path, "/admin/clientes/new")
      |> assign(:form, form)
      |> assign(:page_title, "Nuevo Cliente")
-     |> assign(:current_tab, "basicos")
      |> assign(:tipos_cliente, tipos_cliente)
      |> assign(:canales, canales)
      |> assign(:subcanales, [])
@@ -444,101 +443,21 @@ defmodule PrettycoreWeb.ClienteFormLive do
   end
 
   @impl true
-  def handle_event("canal_change", %{"_target" => _target, "cliente_form" => params}, socket) do
-    # Get canal_codigo from params
-    canal_codigo = get_in(params, ["ctecan_codigo_k"])
-
-    if canal_codigo && canal_codigo != "" do
-      subcanales = Catalogos.listar_subcanales(canal_codigo)
-      {:noreply, assign(socket, :subcanales, subcanales)}
-    else
-      {:noreply, assign(socket, :subcanales, [])}
-    end
+  def handle_event("canal_change", %{"canal_codigo" => canal_codigo}, socket) do
+    subcanales = Catalogos.listar_subcanales(canal_codigo)
+    {:noreply, assign(socket, :subcanales, subcanales)}
   end
 
   @impl true
-  def handle_event("estado_change", %{"_target" => target, "cliente_form" => params}, socket) do
-    # Extract direccion index from target path
-    # Target path: ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]
-    direccion_index = Enum.at(target, 2)
-
-    # Get estado_codigo from the direccion at the index
-    estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
-
-    if estado_codigo && estado_codigo != "" do
-      municipios = Catalogos.listar_municipios(estado_codigo)
-      {:noreply, socket |> assign(:municipios, municipios) |> assign(:localidades, [])}
-    else
-      {:noreply, socket |> assign(:municipios, []) |> assign(:localidades, [])}
-    end
+  def handle_event("estado_change", %{"estado_codigo" => estado_codigo}, socket) do
+    municipios = Catalogos.listar_municipios(estado_codigo)
+    {:noreply, assign(socket, :municipios, municipios, :localidades, [])}
   end
 
   @impl true
-  def handle_event("municipio_change", %{"_target" => target, "cliente_form" => params}, socket) do
-    # Extract direccion index from target path
-    # Target path: ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]
-    direccion_index = Enum.at(target, 2)
-
-    # Get estado_codigo and municipio_codigo from the direccion at the index
-    estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
-    municipio_codigo = get_in(params, ["direcciones", direccion_index, "mapmun_codigo_k"])
-
-    if estado_codigo && estado_codigo != "" && municipio_codigo && municipio_codigo != "" do
-      localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
-      {:noreply, assign(socket, :localidades, localidades)}
-    else
-      {:noreply, assign(socket, :localidades, [])}
-    end
-  end
-
-  @impl true
-  def handle_event("cp_blur", %{"codigo_postal" => cp, "direccion_index" => index_str}, socket) do
-    if String.match?(cp, ~r/^\d{5}$/) do
-      case Catalogos.buscar_por_cp(cp) do
-        {:ok, ubicacion} ->
-          municipios = Catalogos.listar_municipios(ubicacion.estado_codigo)
-          localidades = Catalogos.listar_localidades(ubicacion.estado_codigo, ubicacion.municipio_codigo)
-
-          current_form = socket.assigns.form
-          params = current_form.params || %{}
-          direcciones = Map.get(params, "direcciones", [])
-          index = String.to_integer(index_str)
-
-          updated_direccion =
-            Enum.at(direcciones, index)
-            |> Map.put("mapedo_codigo_k", ubicacion.estado_codigo)
-            |> Map.put("mapmun_codigo_k", ubicacion.municipio_codigo)
-            |> Map.put("maploc_codigo_k", ubicacion.localidad_codigo)
-
-          updated_direcciones = List.replace_at(direcciones, index, updated_direccion)
-          updated_params = Map.put(params, "direcciones", updated_direcciones)
-
-          changeset =
-            %ClienteForm{}
-            |> ClienteForm.changeset(updated_params)
-            |> Map.put(:action, :validate)
-
-          {:noreply,
-           socket
-           |> assign(:form, to_form(changeset))
-           |> assign(:municipios, municipios)
-           |> assign(:localidades, localidades)
-           |> put_flash(:info, "Ubicación encontrada: #{ubicacion.estado_nombre}, #{ubicacion.municipio_nombre}")}
-
-        {:error, :not_found} ->
-          {:noreply, put_flash(socket, :error, "No se encontró ubicación para el CP: #{cp}")}
-
-        {:error, :invalid_cp} ->
-          {:noreply, socket}
-      end
-    else
-      {:noreply, socket}
-    end
-  end
-
-  @impl true
-  def handle_event("change_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, :current_tab, tab)}
+  def handle_event("municipio_change", %{"estado_codigo" => estado_codigo, "municipio_codigo" => municipio_codigo}, socket) do
+    localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
+    {:noreply, assign(socket, :localidades, localidades)}
   end
 
   @impl true

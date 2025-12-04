@@ -12,7 +12,7 @@ config :prettycore, Prettycore.Repo,
   port: 1433,
   username: "sa",
   password: "N0vacore",
-  database: "ECORE_PRD_10",
+  database: "ECOREDES2",
   pool_size: 10,
   encrypt: false,
   trust_server_certificate: true,
@@ -51,7 +51,7 @@ config :prettycore, PrettycoreWeb.Endpoint,
 # Configures the mailer
 #
 # SMTP Configuration for Gmail con opciones TLS mejoradas
-#config :prettycore, Prettycore.Mailer,
+# config :prettycore, Prettycore.Mailer,
 #  adapter: Swoosh.Adapters.SMTP,
 #  relay: "smtp.gmail.com",
 #  username: "servicios.ennovacore@gmail.com",

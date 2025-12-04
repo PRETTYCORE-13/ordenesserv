@@ -1,216 +1,285 @@
-    <section class="flex flex-col gap-6 p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
-      <!-- HEADER -->
-      <header class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <section class="flex flex-col gap-4 p-4 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <!-- HEADER COMPACTO -->
+      <header class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <.link navigate={~p"/admin/clientes"} class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
               </svg>
             </.link>
             <div>
-              <h1 class="text-2xl font-bold text-gray-900">{@page_title}</h1>
-              <p class="text-sm text-gray-500 mt-0.5">Complete los datos del cliente</p>
+              <h1 class="text-xl font-bold text-gray-900">{@page_title}</h1>
+              <p class="text-xs text-gray-500">* Campos obligatorios</p>
             </div>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              Cancelar
+            </button>
+            <button type="submit" form="cliente-form" class="px-4 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg shadow-sm">
+              Guardar
+            </button>
           </div>
         </div>
       </header>
 
-      <!-- FORMULARIO -->
-      <.form for={@form} phx-change="validate" phx-submit="save" class="space-y-6">
-        <!-- DATOS BÁSICOS -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Datos Básicos</h2>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <.input
-              field={@form[:ctecli_codigo_k]}
-              type="text"
-              label="Código Cliente *"
-              placeholder="0001"
-            />
-
-            <.input
-              field={@form[:ctecli_rfc]}
-              type="text"
-              label="RFC *"
-              placeholder="XAXX010101000"
-            />
-
-            <.input
-              field={@form[:ctecli_razonsocial]}
-              type="text"
-              label="Razón Social *"
-              placeholder="Nombre o razón social del cliente"
-              class="md:col-span-2"
-            />
-
-            <.input
-              field={@form[:ctecli_dencomercia]}
-              type="text"
-              label="Nombre Comercial *"
-              placeholder="Nombre comercial del negocio"
-              class="md:col-span-2"
-            />
-
-            <.input
-              field={@form[:ctecli_fereceptormail]}
-              type="email"
-              label="Email para facturación"
-              placeholder="cliente@ejemplo.com"
-            />
+      <!-- FORMULARIO CON TABS -->
+      <.form id="cliente-form" for={@form} phx-change="validate" phx-submit="save">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+          <!-- TABS NAVEGACIÓN -->
+          <div class="border-b border-gray-200">
+            <nav class="flex -mb-px overflow-x-auto scrollbar-hide" aria-label="Tabs">
+              <button
+                type="button"
+                phx-click="change_tab"
+                phx-value-tab="basicos"
+                class={"px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap #{if @current_tab == "basicos", do: "border-purple-500 text-purple-600", else: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}"}
+              >
+                📋 Datos Básicos
+              </button>
+              <button
+                type="button"
+                phx-click="change_tab"
+                phx-value-tab="clasificacion"
+                class={"px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap #{if @current_tab == "clasificacion", do: "border-purple-500 text-purple-600", else: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}"}
+              >
+                🏷️ Clasificación *
+              </button>
+              <button
+                type="button"
+                phx-click="change_tab"
+                phx-value-tab="facturacion"
+                class={"px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap #{if @current_tab == "facturacion", do: "border-purple-500 text-purple-600", else: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}"}
+              >
+                💰 Facturación
+              </button>
+              <button
+                type="button"
+                phx-click="change_tab"
+                phx-value-tab="direcciones"
+                class={"px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap #{if @current_tab == "direcciones", do: "border-purple-500 text-purple-600", else: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}"}
+              >
+                📍 Direcciones ({length(@form[:direcciones].value || [])})
+              </button>
+              <button
+                type="button"
+                phx-click="change_tab"
+                phx-value-tab="opcionales"
+                class={"px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap #{if @current_tab == "opcionales", do: "border-purple-500 text-purple-600", else: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"}"}
+              >
+                ⚙️ Opcionales
+              </button>
+            </nav>
           </div>
-        </div>
 
-        <!-- INFORMACIÓN DE CRÉDITO -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Crédito</h2>
+          <!-- CONTENIDO DE TABS -->
+          <div class="p-6">
+            <!-- TAB: DATOS BÁSICOS -->
+            <div class={if @current_tab == "basicos", do: "block", else: "hidden"}>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+                <div class="md:col-span-2">
+                  <h3 class="text-sm font-semibold text-gray-700 mb-3">Identificación</h3>
+                </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <.input
-              field={@form[:ctecli_diascredito]}
-              type="number"
-              label="Días de Crédito"
-              value="0"
-            />
+                <.input field={@form[:ctecli_codigo_k]} type="text" label="Código Cliente *" placeholder="Ej: CLI001" />
+                <.input field={@form[:ctecli_rfc]} type="text" label="RFC" placeholder="XAXX010101000" />
 
-            <.input
-              field={@form[:ctecli_limitecredi]}
-              type="number"
-              label="Límite de Crédito"
-              value="0.00"
-              step="0.01"
-            />
+                <div class="md:col-span-2">
+                  <.input field={@form[:ctecli_razonsocial]} type="text" label="Razón Social" placeholder="Razón social del cliente" />
+                </div>
 
-            <.input
-              field={@form[:ctecli_edocred]}
-              type="select"
-              label="Estado de Crédito"
-              options={[{"Sin crédito", 0}, {"Crédito activo", 1}]}
-            />
-          </div>
-        </div>
+                <div class="md:col-span-2">
+                  <.input field={@form[:ctecli_dencomercia]} type="text" label="Nombre Comercial" placeholder="Nombre comercial" />
+                </div>
 
-        <!-- FACTURACIÓN -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Facturación</h2>
+                <.input field={@form[:ctecli_fereceptormail]} type="email" label="Email Facturación" placeholder="email@ejemplo.com" />
+                <.input field={@form[:ctecli_nocta]} type="text" label="Número de Cuenta" placeholder="Cuenta contable" />
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <.input
-              field={@form[:ctecli_formapago]}
-              type="select"
-              label="Forma de Pago"
-              options={[
-                {"01 - Efectivo", "01"},
-                {"02 - Cheque", "02"},
-                {"03 - Transferencia", "03"},
-                {"04 - Tarjeta de Crédito", "04"}
-              ]}
-            />
+                <div class="md:col-span-2 mt-4">
+                  <h3 class="text-sm font-semibold text-gray-700 mb-3">Crédito</h3>
+                </div>
 
-            <.input
-              field={@form[:ctecli_metodopago]}
-              type="select"
-              label="Método de Pago"
-              options={[
-                {"PUE - Pago en una sola exhibición", "PUE"},
-                {"PPD - Pago en parcialidades", "PPD"}
-              ]}
-            />
-
-            <.input
-              field={@form[:sat_uso_cfdi_k]}
-              type="select"
-              label="Uso de CFDI"
-              options={[
-                {"S01 - Sin efectos fiscales", "S01"},
-                {"G01 - Adquisición de mercancías", "G01"},
-                {"G03 - Gastos en general", "G03"}
-              ]}
-            />
-          </div>
-        </div>
-
-        <!-- DIRECCIÓN -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h2 class="text-lg font-semibold text-gray-900 mb-4">Dirección Principal</h2>
-
-          <.inputs_for :let={f_dir} field={@form[:direccion]}>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <.input
-                field={f_dir[:ctedir_calle]}
-                type="text"
-                label="Calle *"
-                placeholder="Nombre de la calle"
-              />
-
-              <.input
-                field={f_dir[:ctedir_callenumext]}
-                type="text"
-                label="Número Exterior"
-                placeholder="S/N"
-              />
-
-              <.input
-                field={f_dir[:ctedir_colonia]}
-                type="text"
-                label="Colonia"
-                placeholder="Nombre de la colonia"
-              />
-
-              <.input
-                field={f_dir[:ctedir_cp]}
-                type="text"
-                label="Código Postal *"
-                placeholder="00000"
-              />
-
-              <.input
-                field={f_dir[:ctedir_telefono]}
-                type="text"
-                label="Teléfono"
-                placeholder="5551234567"
-              />
-
-              <.input
-                field={f_dir[:ctedir_celular]}
-                type="text"
-                label="Celular"
-                placeholder="5559876543"
-              />
-
-              <.input
-                field={f_dir[:vtarut_codigo_k_pre]}
-                type="text"
-                label="Ruta Preventa *"
-                placeholder="20001"
-              />
-
-              <.input
-                field={f_dir[:vtarut_codigo_k_ent]}
-                type="text"
-                label="Ruta Entrega *"
-                placeholder="30001"
-              />
+                <.input field={@form[:ctecli_diascredito]} type="number" label="Días de Crédito" value="0" />
+                <.input field={@form[:ctecli_limitecredi]} type="number" label="Límite de Crédito" value="0.00" step="0.01" />
+                <.input field={@form[:ctecli_edocred]} type="select" label="Estado de Crédito" options={[{"Sin crédito", 0}, {"Crédito activo", 1}]} />
+              </div>
             </div>
-          </.inputs_for>
+
+            <!-- TAB: CLASIFICACIÓN -->
+            <div class={if @current_tab == "clasificacion", do: "block", else: "hidden"}>
+              <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-blue-800">⚠️ Todos los campos de esta sección son obligatorios</p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+                <.input field={@form[:ctetpo_codigo_k]} type="select" label="Tipo de Cliente *" options={@tipos_cliente} prompt="Seleccione..." />
+                <.input field={@form[:ctereg_codigo_k]} type="select" label="Régimen *" options={@regimenes} prompt="Seleccione..." />
+
+                <.input field={@form[:ctecan_codigo_k]} type="select" label="Canal *" options={@canales} prompt="Seleccione..." phx-change="canal_change" />
+                <.input field={@form[:ctesca_codigo_k]} type="select" label="Subcanal *" options={@subcanales} prompt="Primero seleccione canal" />
+
+                <.input field={@form[:systra_codigo_k]} type="select" label="Transacción *" options={@transacciones} prompt="Seleccione..." />
+                <.input field={@form[:cfgmon_codigo_k]} type="select" label="Moneda" options={@monedas} prompt="Seleccione..." />
+              </div>
+            </div>
+
+            <!-- TAB: FACTURACIÓN -->
+            <div class={if @current_tab == "facturacion", do: "block", else: "hidden"}>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl">
+                <.input field={@form[:ctecli_formapago]} type="select" label="Forma de Pago SAT" options={@formas_pago} prompt="Seleccione..." />
+                <.input field={@form[:ctecli_metodopago]} type="select" label="Método de Pago" options={@metodos_pago} prompt="Seleccione..." />
+                <.input field={@form[:sat_uso_cfdi_k]} type="select" label="Uso de CFDI" options={@usos_cfdi} prompt="Seleccione..." />
+                <.input field={@form[:cfgreg_codigo_k]} type="select" label="Régimen Fiscal SAT" options={@regimenes_fiscales} prompt="Seleccione..." />
+              </div>
+            </div>
+
+            <!-- TAB: DIRECCIONES -->
+            <div class={if @current_tab == "direcciones", do: "block", else: "hidden"}>
+              <div class="flex justify-between items-center mb-4">
+                <p class="text-sm text-gray-600">Mínimo 1 dirección requerida</p>
+                <button
+                  type="button"
+                  phx-click="add_direccion"
+                  class="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                  </svg>
+                  Nueva Dirección
+                </button>
+              </div>
+
+              <.inputs_for :let={f_dir} field={@form[:direcciones]}>
+                <div class="mb-4 p-4 border-2 border-gray-200 rounded-lg bg-white hover:border-purple-200 transition-colors">
+                  <!-- Header de Dirección -->
+                  <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                      <span class="flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-600 rounded-full text-sm font-bold">
+                        {f_dir.index + 1}
+                      </span>
+                      <h3 class="font-semibold text-gray-900">Dirección {f_dir.index + 1}</h3>
+                    </div>
+                    <%= if length(@form[:direcciones].value || []) > 1 do %>
+                      <button
+                        type="button"
+                        phx-click="remove_direccion"
+                        phx-value-index={f_dir.index}
+                        class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    <% end %>
+                  </div>
+
+                  <input type="hidden" name={f_dir[:ctedir_codigo_k].name} value={f_dir[:ctedir_codigo_k].value || to_string(f_dir.index + 1)} />
+
+                  <!-- Campos en Grid Compacto -->
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <!-- Ubicación con Auto-complete -->
+                    <div class="md:col-span-3">
+                      <label class="block text-xs font-medium text-gray-700 mb-2">📍 Ubicación (Auto-completado por CP)</label>
+                    </div>
+
+                    <.input
+                      field={f_dir[:ctedir_cp]}
+                      type="text"
+                      label="Código Postal *"
+                      placeholder="00000"
+                      maxlength="5"
+                      phx-blur="cp_blur"
+                      phx-value-codigo_postal={f_dir[:ctedir_cp].value}
+                      phx-value-direccion_index={f_dir.index}
+                    />
+
+                    <.input field={f_dir[:mapedo_codigo_k]} type="select" label="Estado *" options={@estados} prompt="Seleccione..." phx-change="estado_change" />
+                    <.input field={f_dir[:mapmun_codigo_k]} type="select" label="Municipio *" options={@municipios} prompt="Seleccione estado" phx-change="municipio_change" />
+                    <.input field={f_dir[:maploc_codigo_k]} type="select" label="Localidad *" options={@localidades} prompt="Seleccione municipio" />
+                    <.input field={f_dir[:ctedir_colonia]} type="text" label="Colonia" placeholder="Nombre" />
+
+                    <!-- Dirección Física -->
+                    <div class="md:col-span-3 mt-2">
+                      <label class="block text-xs font-medium text-gray-700 mb-2">🏠 Dirección</label>
+                    </div>
+
+                    <.input field={f_dir[:ctedir_calle]} type="text" label="Calle *" placeholder="Nombre de calle" />
+                    <.input field={f_dir[:ctedir_callenumext]} type="text" label="Núm. Ext *" placeholder="S/N" />
+                    <.input field={f_dir[:ctedir_callenumint]} type="text" label="Núm. Int" placeholder="Opcional" />
+
+                    <!-- Contacto -->
+                    <div class="md:col-span-3 mt-2">
+                      <label class="block text-xs font-medium text-gray-700 mb-2">👤 Contacto</label>
+                    </div>
+
+                    <.input field={f_dir[:ctedir_responsable]} type="text" label="Responsable" placeholder="Nombre" />
+                    <.input field={f_dir[:ctedir_telefono]} type="text" label="Teléfono" placeholder="5551234567" />
+                    <.input field={f_dir[:ctedir_celular]} type="text" label="Celular" placeholder="5559876543" />
+                    <.input field={f_dir[:ctedir_mail]} type="email" label="Email" placeholder="contacto@ejemplo.com" class="md:col-span-2" />
+
+                    <!-- Rutas -->
+                    <div class="md:col-span-3 mt-2">
+                      <label class="block text-xs font-medium text-gray-700 mb-2">🚚 Rutas</label>
+                    </div>
+
+                    <.input field={f_dir[:vtarut_codigo_k_pre]} type="select" label="Preventa" options={@rutas} prompt="Seleccione..." />
+                    <.input field={f_dir[:vtarut_codigo_k_ent]} type="select" label="Entrega" options={@rutas} prompt="Seleccione..." />
+                    <.input field={f_dir[:vtarut_codigo_k_cob]} type="select" label="Cobranza" options={@rutas} prompt="Seleccione..." />
+                    <.input field={f_dir[:vtarut_codigo_k_aut]} type="select" label="Autoventa" options={@rutas} prompt="Seleccione..." />
+                  </div>
+                </div>
+              </.inputs_for>
+
+              <%= if length(@form[:direcciones].value || []) == 0 do %>
+                <div class="text-center py-12 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                  <svg class="w-16 h-16 mx-auto mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <p class="font-medium">No hay direcciones agregadas</p>
+                  <p class="text-sm mt-1">Haga clic en "Nueva Dirección" para comenzar</p>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- TAB: OPCIONALES -->
+            <div class={if @current_tab == "opcionales", do: "block", else: "hidden"}>
+              <div class="mb-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                <p class="text-sm text-gray-600">Campos opcionales con referencias a catálogos del sistema</p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <.input field={@form[:ctepaq_codigo_k]} type="text" label="Paquete" placeholder="Código" />
+                <.input field={@form[:facadd_codigo_k]} type="text" label="Adenda" placeholder="Código" />
+                <.input field={@form[:ctepor_codigo_k]} type="text" label="Portafolio" placeholder="Código" />
+                <.input field={@form[:condim_codigo_k]} type="text" label="Dimensión" placeholder="Código" />
+                <.input field={@form[:ctecad_codigo_k]} type="text" label="Cadena" placeholder="Código" />
+                <.input field={@form[:cfgban_codigo_k]} type="text" label="Banco" placeholder="Código" />
+                <.input field={@form[:sysemp_codigo_k]} type="text" label="Empresa" placeholder="Código" />
+                <.input field={@form[:faccom_codigo_k]} type="text" label="Comprobante" placeholder="Código" />
+                <.input field={@form[:facads_codigo_k]} type="text" label="Adenda SAT" placeholder="Código" />
+                <.input field={@form[:cteseg_codigo_k]} type="text" label="Segmento" placeholder="Código" />
+                <.input field={@form[:catind_codigo_k]} type="text" label="Industria" placeholder="Código" />
+                <.input field={@form[:catpfi_codigo_k]} type="text" label="Perfil" placeholder="Código" />
+                <.input field={@form[:satexp_codigo_k]} type="text" label="Exportación SAT" placeholder="01" />
+                <.input field={@form[:ctecli_pais]} type="text" label="País" placeholder="MEX" />
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- BOTONES -->
-        <div class="flex justify-end gap-3">
-          <.link
-            navigate={~p"/admin/clientes"}
-            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            Cancelar
-          </.link>
-
-          <button
-            type="submit"
-            class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            Guardar Cliente
-          </button>
+        <!-- BOTONES FLOTANTES (STICKY) -->
+        <div class="sticky bottom-0 mt-4 p-4 bg-white border-t border-gray-200 rounded-lg shadow-lg flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            Tab actual: <span class="font-semibold">{@current_tab}</span>
+          </div>
+          <div class="flex gap-3">
+            <.link navigate={~p"/admin/clientes"} class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+              Cancelar
+            </.link>
+            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-md">
+              💾 Guardar Cliente
+            </button>
+          </div>
         </div>
       </.form>
     </section>
