@@ -158,7 +158,13 @@ defmodule PrettycoreWeb.WorkOrderLive do
   # Drawer de filtros
   # ------------------------------------------------------------------
   def handle_event("toggle_filters", _params, socket) do
-    {:noreply, update(socket, :filters_open, fn open -> not open end)}
+    # When called from phx-click-away, only close if open
+    # When called from button, toggle
+    if socket.assigns.filters_open do
+      {:noreply, assign(socket, :filters_open, false)}
+    else
+      {:noreply, assign(socket, :filters_open, true)}
+    end
   end
 
   # ------------------------------------------------------------------

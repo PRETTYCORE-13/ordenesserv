@@ -59,7 +59,7 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT CTESCA_CODIGO_K as codigo, CTESCA_DESCRIPCION as nombre
     FROM CTE_SUBCANAL
-    WHERE CTECAN_CODIGO_K = ?
+    WHERE CTECAN_CODIGO_K = @1
     ORDER BY CTESCA_DESCRIPCION
     """
 
@@ -173,7 +173,7 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT MAPMUN_CODIGO_K as codigo, MAPMUN_DESCRIPCION as nombre
     FROM MAP_MUNICIPIO
-    WHERE MAPEDO_CODIGO_K = ?
+    WHERE MAPEDO_CODIGO_K = @1
     ORDER BY MAPMUN_DESCRIPCION
     """
 
@@ -199,7 +199,7 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT MAPLOC_CODIGO_K as codigo, MAPLOC_DESCRIPCION as nombre
     FROM MAP_LOCALIDAD
-    WHERE MAPEDO_CODIGO_K = ? AND MAPMUN_CODIGO_K = ?
+    WHERE MAPEDO_CODIGO_K = @1 AND MAPMUN_CODIGO_K = @2
     ORDER BY MAPLOC_DESCRIPCION
     """
 
@@ -331,7 +331,7 @@ defmodule Prettycore.Catalogos do
     INNER JOIN MAP_ESTADO e ON l.MAPEDO_CODIGO_K = e.MAPEDO_CODIGO_K
     INNER JOIN MAP_MUNICIPIO m ON l.MAPEDO_CODIGO_K = m.MAPEDO_CODIGO_K
       AND l.MAPMUN_CODIGO_K = m.MAPMUN_CODIGO_K
-    WHERE l.MAPLOC_CP_K = ?
+    WHERE l.MAPLOC_CP_K = @1
     """
 
     case Repo.query(query, [codigo_postal]) do

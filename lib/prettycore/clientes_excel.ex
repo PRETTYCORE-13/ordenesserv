@@ -68,10 +68,10 @@ defmodule Prettycore.ClientesExcel do
     end)
   end
 
-  defp columna_real("preventa"), do: :vtarut_codigo_k_pre
-defp columna_real("entrega"),  do: :vtarut_codigo_k_ent
-defp columna_real("autoventa"), do: :vtarut_codigo_k_aut
-defp columna_real("udn"), do: :sysudn_codigo_k
+  defp columna_real("preventa"), do: :preventa
+defp columna_real("entrega"),  do: :entrega
+defp columna_real("autoventa"), do: :autoventa
+defp columna_real("udn"), do: :udn
 # Y el resto coinciden:
 defp columna_real(key), do: String.to_existing_atom(key)
 
