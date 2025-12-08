@@ -57,7 +57,7 @@ end
 defmodule Prettycore.Clientes.Estado do
   use Ecto.Schema
 
-  @primary_key {:mapedo_codigo_k, :string, autogenerate: false}
+  @primary_key {:mapedo_codigo_k, :integer, autogenerate: false}
   schema "MAP_ESTADO" do
     field(:mapedo_descripcion, :string)
   end
@@ -68,8 +68,8 @@ defmodule Prettycore.Clientes.Municipio do
 
   @primary_key false
   schema "MAP_MUNICIPIO" do
-    field(:mapedo_codigo_k, :string, primary_key: true)
-    field(:mapmun_codigo_k, :string, primary_key: true)
+    field(:mapedo_codigo_k, :integer, primary_key: true)
+    field(:mapmun_codigo_k, :integer, primary_key: true)
     field(:mapmun_descripcion, :string)
   end
 end
@@ -79,9 +79,9 @@ defmodule Prettycore.Clientes.Localidad do
 
   @primary_key false
   schema "MAP_LOCALIDAD" do
-    field(:mapedo_codigo_k, :string, primary_key: true)
-    field(:mapmun_codigo_k, :string, primary_key: true)
-    field(:maploc_codigo_k, :string, primary_key: true)
+    field(:mapedo_codigo_k, :integer, primary_key: true)
+    field(:mapmun_codigo_k, :integer, primary_key: true)
+    field(:maploc_codigo_k, :integer, primary_key: true)
     field(:maploc_descripcion, :string)
   end
 end

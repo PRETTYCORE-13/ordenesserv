@@ -188,7 +188,7 @@ defmodule Prettycore.ClientesApiTest do
 
       ClientesApi.crear_cliente(
         cliente_data,
-        "qA+bp/If0eYlweqf3yqGW197tzsrqz0NL5jC87GzCuJUdyd3Oe0/iIGDOFczWRf9"
+        "bdIG5U6GDNIpCH58yMXG34m2xvrV+RateJhpSr6BE8IQ5pXYzN+iRAcNUmx/SwvarrCbK4B1hS3ODViMdi5mdg=="
       )
     end
 

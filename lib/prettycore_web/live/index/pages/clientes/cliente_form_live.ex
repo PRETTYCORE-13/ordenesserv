@@ -31,9 +31,9 @@ defmodule PrettycoreWeb.ClienteFormLive do
       field :ctedir_mail, :string
 
       # Ubicación geográfica (obligatorios)
-      field :mapedo_codigo_k, :string
-      field :mapmun_codigo_k, :string
-      field :maploc_codigo_k, :string
+      field :mapedo_codigo_k, :integer
+      field :mapmun_codigo_k, :integer
+      field :maploc_codigo_k, :integer
       field :map_x, :string
       field :map_y, :string
 

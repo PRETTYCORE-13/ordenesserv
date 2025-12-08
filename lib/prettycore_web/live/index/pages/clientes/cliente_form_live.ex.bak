@@ -168,7 +168,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
       field :ctecli_fereceptormail, :string
 
       # Catálogos obligatorios (NOT NULL)
-      field :ctetpo_codigo_k, :string
+      field :ctetpo_codigo_k, :integer
       field :ctecan_codigo_k, :string
       field :ctesca_codigo_k, :string
       field :ctereg_codigo_k, :string

@@ -111,22 +111,22 @@ defmodule Prettycore.Clientes do
           # RFC
           rfc: c.ctecli_rfc,
 
-          # Catálogos concatenados (convertir explícitamente a string para evitar errores de tipo)
-          frecuencia: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", pf.ctepfr_codigo_k, pf.ctepfr_descipcion), :string),
-          canal: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", can.ctecan_codigo_k, can.ctecan_descripcion), :string),
-          subcanal: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", sca.ctesca_codigo_k, sca.ctesca_descripcion), :string),
-          cadena: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", cad.ctecad_codigo_k, cad.ctecad_dcomercial), :string),
-          paquete_serv: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", paq.ctepaq_codigo_k, paq.ctepaq_descripcion), :string),
-          regimen: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", reg.ctereg_codigo_k, reg.ctereg_descripcion), :string),
+          # Catálogos concatenados (convertir a string, NULL si están vacíos)
+          frecuencia: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", pf.ctepfr_codigo_k, pf.ctepfr_descipcion),
+          canal: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", can.ctecan_codigo_k, can.ctecan_descripcion),
+          subcanal: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", sca.ctesca_codigo_k, sca.ctesca_descripcion),
+          cadena: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", cad.ctecad_codigo_k, cad.ctecad_dcomercial),
+          paquete_serv: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", paq.ctepaq_codigo_k, paq.ctepaq_descripcion),
+          regimen: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", reg.ctereg_codigo_k, reg.ctereg_descripcion),
 
-          # Ubicación concatenada (convertir explícitamente a string)
-          estado: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", edo.mapedo_codigo_k, edo.mapedo_descripcion), :string),
-          municipio: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", mun.mapmun_codigo_k, mun.mapmun_descripcion), :string),
-          localidad: type(fragment("CONCAT(COALESCE(CAST(? AS VARCHAR), ''), '-', COALESCE(?, ''))", loc.maploc_codigo_k, loc.maploc_descripcion), :string),
+          # Ubicación concatenada (convertir a string, NULL si están vacíos)
+          estado: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", edo.mapedo_codigo_k, edo.mapedo_descripcion),
+          municipio: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", mun.mapmun_codigo_k, mun.mapmun_descripcion),
+          localidad: fragment("NULLIF(CAST(CONCAT(?, '-', ?) AS VARCHAR(255)), '0')", loc.maploc_codigo_k, loc.maploc_descripcion),
 
-          # Coordenadas
-          map_x: d.map_x,
-          map_y: d.map_y,
+          # Coordenadas (convertir a string ya que son latitud/longitud)
+          map_x: fragment("CAST(? AS VARCHAR(50))", d.map_x),
+          map_y: fragment("CAST(? AS VARCHAR(50))", d.map_y),
 
           # Dirección física
           ctedir_calle: d.ctedir_calle,
@@ -202,8 +202,35 @@ defmodule Prettycore.Clientes do
         }
       )
 
-    Repo.all(query)
+    query
+    |> Repo.all()
+    |> Enum.map(&fix_concat_types/1)
   end
+
+  # Convierte valores enteros a strings en campos concatenados que SQL Server puede retornar como enteros
+  defp fix_concat_types(cliente) do
+    %{
+      cliente
+      | frecuencia: safe_to_string(cliente.frecuencia),
+        canal: safe_to_string(cliente.canal),
+        subcanal: safe_to_string(cliente.subcanal),
+        cadena: safe_to_string(cliente.cadena),
+        paquete_serv: safe_to_string(cliente.paquete_serv),
+        regimen: safe_to_string(cliente.regimen),
+        estado: safe_to_string(cliente.estado),
+        municipio: safe_to_string(cliente.municipio),
+        localidad: safe_to_string(cliente.localidad),
+        map_x: safe_to_string(cliente.map_x),
+        map_y: safe_to_string(cliente.map_y)
+    }
+  end
+
+  defp safe_to_string(nil), do: nil
+  defp safe_to_string(value) when is_binary(value), do: value
+  defp safe_to_string(value) when is_integer(value), do: Integer.to_string(value)
+  defp safe_to_string(value) when is_float(value), do: Float.to_string(value)
+  defp safe_to_string(%Decimal{} = value), do: Decimal.to_string(value)
+  defp safe_to_string(value), do: to_string(value)
 
   @doc """
   Lista clientes resumidos (solo info básica para tabla)
