@@ -377,8 +377,8 @@ defmodule PrettycoreWeb.Clientes do
   ## Helper para aplanar params anidados
   defp flatten_params(params) do
     Enum.reduce(params, %{}, fn {key, value}, acc ->
-      case value do
-        %{} = nested_map when is_map(nested_map) ->
+      case {key, value} do
+        {"visible_columns", %{} = nested_map} when is_map(nested_map) ->
           Enum.reduce(nested_map, acc, fn {nested_key, nested_value}, inner_acc ->
             Map.put(inner_acc, "visible_columns[#{nested_key}]", nested_value)
           end)

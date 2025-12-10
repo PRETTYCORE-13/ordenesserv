@@ -68,15 +68,40 @@ defmodule Prettycore.ClientesExcel do
     end)
   end
 
+  # Mapeo de nombres de columnas de la vista a nombres en list_clientes_completo
+  defp columna_real("udn"), do: :udn
   defp columna_real("preventa"), do: :preventa
-defp columna_real("entrega"),  do: :entrega
-defp columna_real("autoventa"), do: :autoventa
-defp columna_real("udn"), do: :udn
-# Y el resto coinciden:
-defp columna_real(key), do: String.to_existing_atom(key)
+  defp columna_real("entrega"), do: :entrega
+  defp columna_real("autoventa"), do: :autoventa
+  defp columna_real("codigo"), do: :ctecli_codigo_k
+  defp columna_real("razon_social"), do: :ctecli_razonsocial
+  defp columna_real("nombre_comercial"), do: :ctecli_dencomercia
+  defp columna_real("telefono"), do: :ctedir_telefono
+  defp columna_real("estado"), do: :estado
+  defp columna_real("colonia"), do: :ctedir_colonia
+  defp columna_real("calle"), do: :ctedir_calle
+  defp columna_real("diascredito"), do: :ctecli_diascredito
+  defp columna_real("limite_credito"), do: :ctecli_limitecredi
+  defp columna_real("paquete_codigo"), do: :ctepaq_codigo_k
+  defp columna_real("frecuencia_codigo"), do: :ctepfr_codigo_k
+  defp columna_real("email_receptor"), do: :ctecli_fereceptormail
+  defp columna_real("forma_pago"), do: :ctecli_formapago
+  defp columna_real("metodo_pago"), do: :ctecli_metodopago
+  defp columna_real("estatus"), do: :estatus
+  defp columna_real("municipio"), do: :municipio
+  defp columna_real("localidad"), do: :localidad
+  # Para el resto que coinciden directamente con los nombres de BD:
+  defp columna_real(key) do
+    try do
+      String.to_existing_atom(key)
+    rescue
+      ArgumentError -> :ctecli_codigo_k  # fallback
+    end
+  end
 
 
   # Define TODAS las columnas disponibles con sus etiquetas
+  # Usa los nombres de la vista (los que están en los checkboxes)
   defp todas_las_columnas do
     [
       # Datos de ruta
@@ -85,13 +110,52 @@ defp columna_real(key), do: String.to_existing_atom(key)
       {"entrega", "Entrega"},
       {"autoventa", "Autoventa"},
 
-      # Identificadores
+      # Identificadores básicos (nombres de la vista)
       {"ctedir_codigo_k", "Código Dirección"},
-      {"ctepfr_codigo_k", "Código Frecuencia"},
       {"rfc", "RFC"},
-      {"ctecli_codigo_k", "Código Cliente"},
-      {"ctecli_razonsocial", "Razón Social"},
-      {"ctecli_dencomercia", "Nombre Comercial"},
+      {"codigo", "Código Cliente"},
+      {"razon_social", "Razón Social"},
+      {"nombre_comercial", "Nombre Comercial"},
+      {"telefono", "Teléfono"},
+      {"diascredito", "Días Crédito"},
+      {"limite_credito", "Límite Crédito"},
+      {"paquete_codigo", "Paquete Código"},
+      {"frecuencia_codigo", "Frecuencia Código"},
+      {"email_receptor", "Email Receptor"},
+      {"forma_pago", "Forma Pago"},
+      {"metodo_pago", "Método Pago"},
+      {"estatus", "Estatus"},
+      {"estado", "Estado"},
+      {"municipio", "Municipio"},
+      {"localidad", "Localidad"},
+      {"colonia", "Colonia"},
+      {"calle", "Calle"},
+
+      # Campos adicionales de dirección
+      {"ctedir_callenumext", "Número Exterior"},
+      {"ctedir_callenumint", "Número Interior"},
+      {"ctedir_cp", "Código Postal"},
+      {"ctedir_responsable", "Responsable"},
+      {"ctedir_calleentre1", "Entre Calle 1"},
+      {"ctedir_calleentre2", "Entre Calle 2"},
+
+      # Coordenadas
+      {"map_x", "Coordenada X"},
+      {"map_y", "Coordenada Y"},
+
+      # Catálogos
+      {"frecuencia", "Frecuencia"},
+      {"canal", "Canal"},
+      {"subcanal", "Subcanal"},
+      {"cadena", "Cadena"},
+      {"paquete_serv", "Paquete Servicio"},
+      {"regimen", "Régimen"},
+
+      # Campos completos de cliente (nombres de BD)
+      {"ctepfr_codigo_k", "Código Patrón Frecuencia"},
+      {"ctecli_codigo_k", "Código Cliente (BD)"},
+      {"ctecli_razonsocial", "Razón Social (BD)"},
+      {"ctecli_dencomercia", "Nombre Comercial (BD)"},
 
       # Fechas
       {"ctecli_fechaalta", "Fecha Alta"},

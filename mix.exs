@@ -69,7 +69,10 @@ defmodule Prettycore.MixProject do
       {:bandit, "~> 1.5"},
 
       # Excel export
-      {:elixlsx, "~> 0.6.0"}
+      {:elixlsx, "~> 0.6.0"},
+
+      # Test
+      {:lazy_html, ">= 0.1.0", only: :test}
     ]
   end
 
