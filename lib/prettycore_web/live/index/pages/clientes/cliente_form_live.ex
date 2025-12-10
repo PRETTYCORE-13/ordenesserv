@@ -323,6 +323,46 @@ defmodule PrettycoreWeb.ClienteFormLive do
   end
 
   @impl true
+  def handle_event("validate", %{"_target" => target, "cliente_form" => params} = event_params, socket) do
+    changeset =
+      %ClienteForm{}
+      |> ClienteForm.changeset(params)
+      |> Map.put(:action, :validate)
+
+    socket = assign(socket, :form, to_form(changeset))
+
+    # Check if the change was on a estado field
+    case target do
+      ["cliente_form", "direcciones", direccion_index, "mapedo_codigo_k"] ->
+        # Estado changed, load municipios
+        estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
+
+        if estado_codigo && estado_codigo != "" do
+          municipios = Catalogos.listar_municipios(estado_codigo)
+          {:noreply, socket |> assign(:municipios, municipios) |> assign(:localidades, [])}
+        else
+          {:noreply, socket |> assign(:municipios, []) |> assign(:localidades, [])}
+        end
+
+      ["cliente_form", "direcciones", direccion_index, "mapmun_codigo_k"] ->
+        # Municipio changed, load localidades
+        estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
+        municipio_codigo = get_in(params, ["direcciones", direccion_index, "mapmun_codigo_k"])
+
+        if estado_codigo && municipio_codigo && estado_codigo != "" && municipio_codigo != "" do
+          localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
+          {:noreply, assign(socket, :localidades, localidades)}
+        else
+          {:noreply, assign(socket, :localidades, [])}
+        end
+
+      _ ->
+        # Other field changed, just validate
+        {:noreply, socket}
+    end
+  end
+
+  # Fallback clause when _target is not present
   def handle_event("validate", %{"cliente_form" => params}, socket) do
     changeset =
       %ClienteForm{}
@@ -466,8 +506,36 @@ defmodule PrettycoreWeb.ClienteFormLive do
     estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
 
     if estado_codigo && estado_codigo != "" do
+      # Load municipios for the selected state
       municipios = Catalogos.listar_municipios(estado_codigo)
-      {:noreply, socket |> assign(:municipios, municipios) |> assign(:localidades, [])}
+
+      # Reset municipio and localidad values for this direccion
+      current_form = socket.assigns.form
+      form_params = current_form.params || %{}
+      direcciones = Map.get(form_params, "direcciones", %{})
+
+      # Get the current direccion
+      direccion = Map.get(direcciones, direccion_index, %{})
+
+      # Reset municipio and localidad
+      updated_direccion = direccion
+        |> Map.put("mapmun_codigo_k", "")
+        |> Map.put("maploc_codigo_k", "")
+
+      updated_direcciones = Map.put(direcciones, direccion_index, updated_direccion)
+      updated_params = Map.put(form_params, "direcciones", updated_direcciones)
+
+      # Create new changeset
+      changeset =
+        %ClienteForm{}
+        |> ClienteForm.changeset(updated_params)
+        |> Map.put(:action, :validate)
+
+      {:noreply,
+       socket
+       |> assign(:form, to_form(changeset))
+       |> assign(:municipios, municipios)
+       |> assign(:localidades, [])}
     else
       {:noreply, socket |> assign(:municipios, []) |> assign(:localidades, [])}
     end
@@ -484,8 +552,33 @@ defmodule PrettycoreWeb.ClienteFormLive do
     municipio_codigo = get_in(params, ["direcciones", direccion_index, "mapmun_codigo_k"])
 
     if estado_codigo && estado_codigo != "" && municipio_codigo && municipio_codigo != "" do
+      # Load localidades for the selected municipio
       localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
-      {:noreply, assign(socket, :localidades, localidades)}
+
+      # Reset localidad value for this direccion
+      current_form = socket.assigns.form
+      form_params = current_form.params || %{}
+      direcciones = Map.get(form_params, "direcciones", %{})
+
+      # Get the current direccion
+      direccion = Map.get(direcciones, direccion_index, %{})
+
+      # Reset localidad
+      updated_direccion = Map.put(direccion, "maploc_codigo_k", "")
+
+      updated_direcciones = Map.put(direcciones, direccion_index, updated_direccion)
+      updated_params = Map.put(form_params, "direcciones", updated_direcciones)
+
+      # Create new changeset
+      changeset =
+        %ClienteForm{}
+        |> ClienteForm.changeset(updated_params)
+        |> Map.put(:action, :validate)
+
+      {:noreply,
+       socket
+       |> assign(:form, to_form(changeset))
+       |> assign(:localidades, localidades)}
     else
       {:noreply, assign(socket, :localidades, [])}
     end
