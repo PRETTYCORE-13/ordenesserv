@@ -45,6 +45,7 @@ defmodule PrettycoreWeb.Router do
       live "/workorder", WorkOrderLive
       live "/clientes", Clientes
       live "/clientes/new", ClienteFormLive
+      live "/clientes/new/:tab", ClienteFormLive
       live "/configuracion", ConfiguracionLive
     end
   end

@@ -64,16 +64,19 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit form with empty required fields
-      result = view
-      |> form("form", cliente_form: %{
-        "ctecli_codigo_k" => "",
-        "ctetpo_codigo_k" => "",
-        "ctecan_codigo_k" => "",
-        "ctesca_codigo_k" => "",
-        "ctereg_codigo_k" => "",
-        "systra_codigo_k" => ""
-      })
-      |> render_change()
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "ctecli_codigo_k" => "",
+            "ctetpo_codigo_k" => "",
+            "ctecan_codigo_k" => "",
+            "ctesca_codigo_k" => "",
+            "ctereg_codigo_k" => "",
+            "systra_codigo_k" => ""
+          }
+        )
+        |> render_change()
 
       assert result =~ "Este campo es obligatorio"
     end
@@ -82,11 +85,14 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit with invalid RFC
-      result = view
-      |> form("form", cliente_form: %{
-        "ctecli_rfc" => "INVALID"
-      })
-      |> render_change()
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "ctecli_rfc" => "INVALID"
+          }
+        )
+        |> render_change()
 
       assert result =~ "formato RFC inválido"
     end
@@ -95,11 +101,14 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit with valid RFC
-      result = view
-      |> form("form", cliente_form: %{
-        "ctecli_rfc" => "TCO010101ABC"
-      })
-      |> render_change()
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "ctecli_rfc" => "TCO010101ABC"
+          }
+        )
+        |> render_change()
 
       refute result =~ "formato RFC inválido"
     end
@@ -108,15 +117,18 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit with invalid CP (too short)
-      result = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "ctedir_cp" => "123"
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "ctedir_cp" => "123"
+              }
+            }
           }
-        }
-      })
-      |> render_change()
+        )
+        |> render_change()
 
       assert result =~ "El CP debe tener 5 dígitos"
     end
@@ -125,15 +137,18 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit with non-numeric CP
-      result = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "ctedir_cp" => "abcde"
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "ctedir_cp" => "abcde"
+              }
+            }
           }
-        }
-      })
-      |> render_change()
+        )
+        |> render_change()
 
       assert result =~ "El CP debe contener solo números"
     end
@@ -142,15 +157,18 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Submit with valid CP
-      result = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "ctedir_cp" => "01000"
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "ctedir_cp" => "01000"
+              }
+            }
           }
-        }
-      })
-      |> render_change()
+        )
+        |> render_change()
 
       refute result =~ "El CP debe"
     end
@@ -159,11 +177,14 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # RFC too short
-      result = view
-      |> form("form", cliente_form: %{
-        "ctecli_rfc" => "ABC"
-      })
-      |> render_change()
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "ctecli_rfc" => "ABC"
+          }
+        )
+        |> render_change()
 
       assert result =~ "formato RFC inválido"
     end
@@ -220,27 +241,37 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Trigger form change
-      result = view
-      |> form("form", cliente_form: %{
-        "ctecli_codigo_k" => "TEST001",
-        "ctecli_razonsocial" => "Test Company"
-      })
-      |> render_change()
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "ctecli_codigo_k" => "TEST001",
+            "ctecli_razonsocial" => "Test Company"
+          }
+        )
+        |> render_change()
 
       # Should not crash and should return HTML
       assert result
     end
 
-    test "handles tab change event", %{conn: conn} do
+    test "handles tab change via event and URL", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Change to facturacion tab
-      result = view
-      |> element("button[phx-click='change_tab'][phx-value-tab='facturacion']")
-      |> render_click()
+      result =
+        view
+        |> element("button[phx-click='change_tab'][phx-value-tab='facturacion']")
+        |> render_click()
 
       # Should not crash
       assert result
+
+      # Check that we can also navigate directly to facturacion tab
+      {:ok, view2, html} = live(conn, ~p"/admin/clientes/new/facturacion")
+
+      # Should load the facturacion tab
+      assert html =~ "Facturación"
     end
 
     test "updates municipios when estado changes - using Estado de Mexico", %{conn: conn} do
@@ -250,15 +281,18 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       estado_codigo = "15"
 
       # Change the estado - this should trigger estado_change event and load municipios
-      result = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => estado_codigo
+      result =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "mapedo_codigo_k" => estado_codigo
+              }
+            }
           }
-        }
-      })
-      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+        )
+        |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
 
       # Verify the estado value is in the rendered HTML
       assert result =~ "value=\"#{estado_codigo}\""
@@ -269,6 +303,7 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
 
       # Debug: Print first 10 municipios to see what we have
       IO.puts("\n📋 First 10 municipios for Estado de Mexico:")
+
       Enum.take(municipios, 10)
       |> Enum.each(fn {nombre, codigo} ->
         # Use inspect to safely handle encoding issues
@@ -296,13 +331,16 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       if length(municipios) > 0 do
         {first_mun, _} = List.first(municipios)
         IO.puts("Checking for first municipio '#{first_mun}' in HTML...")
+
         if result =~ first_mun do
           IO.puts("✅ First municipio FOUND in HTML")
         else
           IO.puts("❌ First municipio NOT found in HTML")
 
           # Let's find the select for municipios in the HTML
-          municipio_select_regex = ~r/<select[^>]*name="[^"]*mapmun_codigo_k[^"]*"[^>]*>(.*?)<\/select>/s
+          municipio_select_regex =
+            ~r/<select[^>]*name="[^"]*mapmun_codigo_k[^"]*"[^>]*>(.*?)<\/select>/s
+
           case Regex.run(municipio_select_regex, result) do
             [full_match, options_html] ->
               IO.puts("\n📄 Municipio SELECT found:")
@@ -319,7 +357,9 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       # For now, let's just verify that municipios were loaded from the database
       # The rendering issue will be addressed separately
       assert length(municipios) > 0, "Municipios should be loaded from database"
-      assert Enum.any?(municipios, fn {nombre, _} -> nombre == "ACAMBAY" end), "ACAMBAY should be in municipios list"
+
+      assert Enum.any?(municipios, fn {nombre, _} -> nombre == "ACAMBAY" end),
+             "ACAMBAY should be in municipios list"
 
       # Verify the select for municipios is present and enabled
       assert result =~ "select"
@@ -346,13 +386,15 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
 
       # First select the estado
       view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => estado_codigo
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
           }
         }
-      })
+      )
       |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
 
       # Get first municipio and select it
@@ -361,16 +403,19 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
 
       {_mun_nombre, municipio_codigo} = List.first(municipios)
 
-      result_with_municipio = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => estado_codigo,
-            "mapmun_codigo_k" => municipio_codigo
+      result_with_municipio =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "mapedo_codigo_k" => estado_codigo,
+                "mapmun_codigo_k" => municipio_codigo
+              }
+            }
           }
-        }
-      })
-      |> render_change()
+        )
+        |> render_change()
 
       # Verify municipio is selected
       assert result_with_municipio =~ municipio_codigo
@@ -380,15 +425,18 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       # Step 2: Change to a different estado (e.g., Aguascalientes = 1)
       new_estado_codigo = "1"
 
-      result_after_change = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => new_estado_codigo
+      result_after_change =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "mapedo_codigo_k" => new_estado_codigo
+              }
+            }
           }
-        }
-      })
-      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+        )
+        |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
 
       # Verify new estado is selected
       assert result_after_change =~ "value=\"#{new_estado_codigo}\""
@@ -408,21 +456,26 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       IO.puts("✅ Estado change correctly resets municipios and localidades")
     end
 
-    test "full cascade: Estado de Mexico -> Acambay -> Localidades renders correctly", %{conn: conn} do
+    test "full cascade: Estado de Mexico -> Acambay -> Localidades renders correctly", %{
+      conn: conn
+    } do
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       # Step 1: Select Estado de Mexico (15)
       estado_codigo = "15"
 
-      result1 = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => estado_codigo
+      result1 =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "mapedo_codigo_k" => estado_codigo
+              }
+            }
           }
-        }
-      })
-      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+        )
+        |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
 
       # Verify estado is selected
       assert result1 =~ "value=\"#{estado_codigo}\""
@@ -434,9 +487,10 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       IO.puts("\n🗺️  Estado de Mexico has #{length(municipios)} municipios")
 
       # Find Acambay in the list (should be one of the first)
-      acambay = Enum.find(municipios, fn {nombre, _codigo} ->
-        String.upcase(nombre) =~ "ACAMBAY"
-      end)
+      acambay =
+        Enum.find(municipios, fn {nombre, _codigo} ->
+          String.upcase(nombre) =~ "ACAMBAY"
+        end)
 
       assert acambay != nil, "Acambay should be in Estado de Mexico municipios"
       {acambay_nombre, acambay_codigo} = acambay
@@ -447,16 +501,19 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
       assert result1 =~ acambay_nombre
 
       # Step 2: Select Acambay municipio
-      result2 = view
-      |> form("form", cliente_form: %{
-        "direcciones" => %{
-          "0" => %{
-            "mapedo_codigo_k" => estado_codigo,
-            "mapmun_codigo_k" => acambay_codigo
+      result2 =
+        view
+        |> form("form",
+          cliente_form: %{
+            "direcciones" => %{
+              "0" => %{
+                "mapedo_codigo_k" => estado_codigo,
+                "mapmun_codigo_k" => acambay_codigo
+              }
+            }
           }
-        }
-      })
-      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+        )
+        |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
 
       # Verify municipio is selected
       assert result2 =~ acambay_nombre
@@ -473,30 +530,36 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
         IO.puts("✅ First localidad: #{first_localidad_nombre} (#{first_localidad_codigo})")
 
         # Verify the localidad appears in the rendered HTML
-        assert result2 =~ first_localidad_nombre or result2 =~ String.upcase(first_localidad_nombre)
+        assert result2 =~ first_localidad_nombre or
+                 result2 =~ String.upcase(first_localidad_nombre)
 
         # Verify localidad select is present
         assert result2 =~ "maploc_codigo_k"
 
         # Step 3: Select the first localidad
-        result3 = view
-        |> form("form", cliente_form: %{
-          "direcciones" => %{
-            "0" => %{
-              "mapedo_codigo_k" => estado_codigo,
-              "mapmun_codigo_k" => acambay_codigo,
-              "maploc_codigo_k" => first_localidad_codigo
+        result3 =
+          view
+          |> form("form",
+            cliente_form: %{
+              "direcciones" => %{
+                "0" => %{
+                  "mapedo_codigo_k" => estado_codigo,
+                  "mapmun_codigo_k" => acambay_codigo,
+                  "maploc_codigo_k" => first_localidad_codigo
+                }
+              }
             }
-          }
-        })
-        |> render_change()
+          )
+          |> render_change()
 
         # Verify all three levels are present in the form
         assert result3 =~ estado_codigo
         assert result3 =~ acambay_codigo
         assert result3 =~ first_localidad_codigo
 
-        IO.puts("✅ Full cascade test passed: Estado (#{estado_codigo}) -> Municipio (#{acambay_nombre}) -> Localidad (#{first_localidad_nombre})")
+        IO.puts(
+          "✅ Full cascade test passed: Estado (#{estado_codigo}) -> Municipio (#{acambay_nombre}) -> Localidad (#{first_localidad_nombre})"
+        )
       else
         IO.puts("⚠️  No localidades found for Acambay")
       end
@@ -528,10 +591,402 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
   end
 
   describe "form submission" do
+    test "validates required fields on save", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Submit with missing required fields
+      invalid_attrs = %{
+        "ctecli_codigo_k" => "",
+        "ctecli_razonsocial" => "",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "",
+            "ctedir_callenumext" => "",
+            "ctedir_cp" => ""
+          }
+        }
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: invalid_attrs)
+        |> render_submit()
+
+      # Should show validation errors
+      assert result =~ "Este campo es obligatorio"
+    end
+
+    test "validates RFC format on save", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Step 1: Select estado to populate municipios
+      estado_codigo = "9"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+
+      # Step 2: Select municipio to populate localidades
+      municipio_codigo = "15"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo,
+              "mapmun_codigo_k" => municipio_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+
+      # Step 3: Submit form with invalid RFC
+      invalid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_rfc" => "INVALID",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
+        "systra_codigo_k" => "",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "Calle Principal",
+            "ctedir_callenumext" => "123",
+            "ctedir_cp" => "01000",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          }
+        }
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: invalid_attrs)
+        |> render_submit()
+
+      # Should show RFC format error
+      assert result =~ "formato RFC inválido"
+    end
+
+    test "validates direccion fields on save", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Step 1: Select estado to populate municipios
+      estado_codigo = "9"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+
+      # Step 2: Select municipio to populate localidades
+      municipio_codigo = "15"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo,
+              "mapmun_codigo_k" => municipio_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+
+      # Step 3: Submit form with invalid CP
+      invalid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_rfc" => "TCO010101ABC",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
+        "systra_codigo_k" => "",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "Calle Principal",
+            "ctedir_callenumext" => "123",
+            # Invalid CP - too short
+            "ctedir_cp" => "123",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          }
+        }
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: invalid_attrs)
+        |> render_submit()
+
+      # Should show CP validation error
+      assert result =~ "El CP debe tener 5 dígitos"
+    end
+
+    test "requires at least one direccion on save", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      invalid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_rfc" => "TCO010101ABC",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
+        "systra_codigo_k" => "FRCTE_CLIENTE",
+        "direcciones" => %{}
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: invalid_attrs)
+        |> render_submit()
+
+      # Should show direccion requirement error
+      assert result =~ "Debe agregar al menos una dirección"
+    end
+
+    test "handles valid data structure correctly", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Step 1: Select estado to populate municipios
+      estado_codigo = "9"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+
+      # Step 2: Select municipio to populate localidades
+      municipio_codigo = "15"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo,
+              "mapmun_codigo_k" => municipio_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+
+      # Step 3: Submit form with valid data
+      valid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_razonsocial" => "Test Company SA de CV",
+        "ctecli_dencomercia" => "Test Company",
+        "ctecli_rfc" => "TCO010101ABC",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
+        "systra_codigo_k" => "",
+        "ctecli_edocred" => "0",
+        "ctecli_diascredito" => "0",
+        "ctecli_limitecredi" => "0.00",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "Calle Principal",
+            "ctedir_callenumext" => "123",
+            "ctedir_cp" => "01000",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          }
+        }
+      }
+
+      # This will attempt to call the API, which should fail in test environment
+      # but the data structure should be validated correctly first
+      result =
+        view
+        |> form("form", cliente_form: valid_attrs)
+        |> render_submit()
+
+      # Since we don't have API mocking, it will likely fail at API call
+      # but validation should pass (no validation error messages should appear)
+      refute result =~ "Este campo es obligatorio"
+      refute result =~ "formato RFC inválido"
+      refute result =~ "El CP debe tener 5 dígitos"
+    end
+
+    test "validates all required catalog fields", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Step 1: Select estado to populate municipios
+      estado_codigo = "9"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+
+      # Step 2: Select municipio to populate localidades
+      municipio_codigo = "15"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo,
+              "mapmun_codigo_k" => municipio_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+
+      # Step 3: Submit form missing required catalog fields
+      invalid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_rfc" => "TCO010101ABC",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "Calle Principal",
+            "ctedir_callenumext" => "123",
+            "ctedir_cp" => "01000",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          }
+        }
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: invalid_attrs)
+        |> render_submit()
+
+      # Should show multiple validation errors for required fields
+      assert result =~ "Este campo es obligatorio"
+    end
+
+    test "accepts valid data with multiple direcciones", %{conn: conn} do
+      {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
+
+      # Step 1: Select estado for first direccion to populate municipios
+      estado_codigo = "9"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapedo_codigo_k"]})
+
+      # Step 2: Select municipio for first direccion to populate localidades
+      municipio_codigo = "15"
+
+      view
+      |> form("form",
+        cliente_form: %{
+          "direcciones" => %{
+            "0" => %{
+              "mapedo_codigo_k" => estado_codigo,
+              "mapmun_codigo_k" => municipio_codigo
+            }
+          }
+        }
+      )
+      |> render_change(%{"_target" => ["cliente_form", "direcciones", "0", "mapmun_codigo_k"]})
+
+      # Step 3: Submit form with valid data and multiple direcciones
+      valid_attrs = %{
+        "ctecli_codigo_k" => "TEST001",
+        "ctecli_razonsocial" => "Test Company SA de CV",
+        "ctecli_dencomercia" => "Test Company",
+        "ctecli_rfc" => "TCO010101ABC",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
+        "systra_codigo_k" => "",
+        "direcciones" => %{
+          "0" => %{
+            "ctedir_codigo_k" => "1",
+            "ctedir_calle" => "Calle Principal",
+            "ctedir_callenumext" => "123",
+            "ctedir_cp" => "01000",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          },
+          "1" => %{
+            "ctedir_codigo_k" => "2",
+            "ctedir_calle" => "Calle Secundaria",
+            "ctedir_callenumext" => "456",
+            "ctedir_cp" => "01010",
+            "mapedo_codigo_k" => estado_codigo,
+            "mapmun_codigo_k" => municipio_codigo,
+            "maploc_codigo_k" => "984"
+          }
+        }
+      }
+
+      result =
+        view
+        |> form("form", cliente_form: valid_attrs)
+        |> render_submit()
+
+      # Should pass validation for multiple direcciones
+      refute result =~ "Este campo es obligatorio"
+      refute result =~ "Debe agregar al menos una dirección"
+    end
+
     @tag :skip
-    test "creates cliente with valid data and mocked API", %{conn: conn} do
+    test "creates cliente successfully with API call", %{conn: conn} do
       # This test would require mocking ClientesApi.crear_cliente
-      # Skipped for now as it requires API mocking setup
+      # Skipped for now as it requires API mocking setup (e.g., Mox library)
       {:ok, view, _html} = live(conn, ~p"/admin/clientes/new")
 
       valid_attrs = %{
@@ -539,11 +994,10 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
         "ctecli_razonsocial" => "Test Company SA de CV",
         "ctecli_dencomercia" => "Test Company",
         "ctecli_rfc" => "TCO010101ABC",
-        "ctecli_fechaalta" => NaiveDateTime.utc_now() |> NaiveDateTime.to_iso8601(),
-        "ctetpo_codigo_k" => "01",
-        "ctecan_codigo_k" => "01",
-        "ctesca_codigo_k" => "01",
-        "ctereg_codigo_k" => "01",
+        "ctetpo_codigo_k" => "100",
+        "ctecan_codigo_k" => "100",
+        "ctesca_codigo_k" => "",
+        "ctereg_codigo_k" => "100",
         "systra_codigo_k" => "FRCTE_CLIENTE",
         "direcciones" => %{
           "0" => %{
@@ -553,15 +1007,14 @@ defmodule PrettycoreWeb.ClienteFormLiveTest do
             "ctedir_cp" => "01000",
             "mapedo_codigo_k" => "9",
             "mapmun_codigo_k" => "15",
-            "maploc_codigo_k" => "1"
+            "maploc_codigo_k" => "838"
           }
         }
       }
 
-      # Would need to mock API here before submitting
-      # result = view
-      # |> form("form", cliente_form: valid_attrs)
-      # |> render_submit()
+      # TODO: Mock ClientesApi.crear_cliente to return {:ok, response}
+      # Expect navigation to clientes list
+      # Expect flash message "Cliente creado exitosamente"
     end
   end
 end

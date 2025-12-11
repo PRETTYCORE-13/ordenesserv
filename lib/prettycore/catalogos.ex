@@ -31,7 +31,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -79,7 +80,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -105,7 +107,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -130,7 +133,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -142,7 +146,7 @@ defmodule Prettycore.Catalogos do
   """
   def listar_monedas do
     query = """
-    SELECT CFGMON_CODIGO_K as codigo, CFGMON_NOMBRE as nombre
+    SELECT CFGMON_CODIGO_K as codigo, CFGMON_DESCRIPCION as nombre
     FROM CFG_MONEDA
     ORDER BY CFGMON_NOMBRE
     """
@@ -154,7 +158,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -178,7 +183,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -203,7 +209,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -231,7 +238,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -257,7 +265,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -281,7 +290,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {" #{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -305,7 +315,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {"#{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -339,7 +350,8 @@ defmodule Prettycore.Catalogos do
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {"#{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
-        |> EncodingHelper.convert_catalog_list()  # Convert Latin-1 to UTF-8
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -379,7 +391,8 @@ defmodule Prettycore.Catalogos do
             localidad_codigo: to_string(row_map["localidad_codigo"]),
             localidad_nombre: row_map["localidad_nombre"]
           }
-          |> EncodingHelper.convert_map()  # Convert all name fields to UTF-8
+          # Convert all name fields to UTF-8
+          |> EncodingHelper.convert_map()
 
         {:ok, result}
 
