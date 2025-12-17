@@ -279,6 +279,10 @@ defmodule Prettycore.ClientesApi do
   @doc false
   def format_datetime(nil), do: nil
 
+  def format_datetime(value) do
+    "#{value}"
+  end
+
   @doc false
   def format_decimal(%Decimal{} = d) do
     Decimal.to_float(d)

@@ -192,8 +192,8 @@
                       phx-value-direccion_index={f_dir.index}
                     />
 
-                    <.input field={f_dir[:mapedo_codigo_k]} type="select" label="Estado *" options={@estados} prompt="Seleccione..." phx-change="estado_change" />
-                    <.input field={f_dir[:mapmun_codigo_k]} type="select" label="Municipio *" options={@municipios} prompt="Seleccione estado" phx-change="municipio_change" />
+                    <.input field={f_dir[:mapedo_codigo_k]} type="select" label="Estado *" options={@estados} prompt="Seleccione..." />
+                    <.input field={f_dir[:mapmun_codigo_k]} type="select" label="Municipio *" options={@municipios} prompt="Seleccione estado" />
                     <.input field={f_dir[:maploc_codigo_k]} type="select" label="Localidad *" options={@localidades} prompt="Seleccione municipio" />
                     <.input field={f_dir[:ctedir_colonia]} type="text" label="Colonia" placeholder="Nombre" />
 

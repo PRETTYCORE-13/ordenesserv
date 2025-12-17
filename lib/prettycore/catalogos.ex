@@ -1,11 +1,18 @@
 defmodule Prettycore.Catalogos do
   @moduledoc """
   Contexto para cargar catálogos desde la base de datos
-  para usar en los formularios de clientes
+  para usar en los formularios de clientes.
+
+  **Nota sobre encoding**: Este módulo usa `EncodingHelper` para convertir
+  datos Latin-1 de columnas VARCHAR a UTF-8, evitando errores de
+  `Jason.EncodeError` en LiveView con caracteres como "ó", "ñ", "á".
+
+  **TODO**: Migrar columnas VARCHAR a NVARCHAR en SQL Server para eliminar
+  la necesidad de conversión manual. Ver ENCODING_ISSUE_PROPOSAL.md
   """
 
-  import Ecto.Query
   alias Prettycore.Repo
+  alias Prettycore.EncodingHelper
 
   @doc """
   Obtiene la lista de tipos de cliente
@@ -19,10 +26,13 @@ defmodule Prettycore.Catalogos do
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -59,16 +69,19 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT CTESCA_CODIGO_K as codigo, CTESCA_DESCRIPCION as nombre
     FROM CTE_SUBCANAL
-    WHERE CTECAN_CODIGO_K = ?
+    WHERE CTECAN_CODIGO_K = @1
     ORDER BY CTESCA_DESCRIPCION
     """
 
     case Repo.query(query, [canal_codigo]) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -89,10 +102,13 @@ defmodule Prettycore.Catalogos do
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -112,10 +128,13 @@ defmodule Prettycore.Catalogos do
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -127,17 +146,20 @@ defmodule Prettycore.Catalogos do
   """
   def listar_monedas do
     query = """
-    SELECT CFGMON_CODIGO_K as codigo, CFGMON_NOMBRE as nombre
+    SELECT CFGMON_CODIGO_K as codigo, CFGMON_DESCRIPCION as nombre
     FROM CFG_MONEDA
     ORDER BY CFGMON_NOMBRE
     """
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -156,10 +178,13 @@ defmodule Prettycore.Catalogos do
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -173,16 +198,19 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT MAPMUN_CODIGO_K as codigo, MAPMUN_DESCRIPCION as nombre
     FROM MAP_MUNICIPIO
-    WHERE MAPEDO_CODIGO_K = ?
+    WHERE MAPEDO_CODIGO_K = @1
     ORDER BY MAPMUN_DESCRIPCION
     """
 
     case Repo.query(query, [estado_codigo]) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -199,16 +227,19 @@ defmodule Prettycore.Catalogos do
     query = """
     SELECT MAPLOC_CODIGO_K as codigo, MAPLOC_DESCRIPCION as nombre
     FROM MAP_LOCALIDAD
-    WHERE MAPEDO_CODIGO_K = ? AND MAPMUN_CODIGO_K = ?
+    WHERE MAPEDO_CODIGO_K = @1 AND MAPMUN_CODIGO_K = @2
     ORDER BY MAPLOC_DESCRIPCION
     """
 
     case Repo.query(query, [estado_codigo, municipio_codigo]) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], to_string(row_map["codigo"])}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -229,10 +260,13 @@ defmodule Prettycore.Catalogos do
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {row_map["nombre"], row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -244,17 +278,20 @@ defmodule Prettycore.Catalogos do
   """
   def listar_usos_cfdi do
     query = """
-    SELECT SATUSO_CODIGO_K as codigo, SATUSO_NOMBRE as nombre
+    SELECT SAT_USO_CFDI_K as codigo, SATUSO_CFDI_DESCRIPCION as nombre
     FROM CFG_USOCFDISAT
-    ORDER BY SATUSO_CODIGO_K
+    ORDER BY SAT_USO_CFDI_K
     """
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {" #{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -266,17 +303,20 @@ defmodule Prettycore.Catalogos do
   """
   def listar_formas_pago do
     query = """
-    SELECT SATFOR_CODIGO_K as codigo, SATFOR_NOMBRE as nombre
+    SELECT CTECLI_FORMAPAGO as codigo, SATFP_DESCRIPCION as nombre
     FROM CFG_FORMAPAGO_SAT
-    ORDER BY SATFOR_CODIGO_K
+    ORDER BY CTECLI_FORMAPAGO
     """
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {"#{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -298,17 +338,20 @@ defmodule Prettycore.Catalogos do
   """
   def listar_regimenes_fiscales do
     query = """
-    SELECT SATREG_CODIGO_K as codigo, SATREG_NOMBRE as nombre
+    SELECT CFGREG_CODIGO_K as codigo, CFGREG_DESCRIPCION as nombre
     FROM CFG_REGIMENFISCAL_SAT
     ORDER BY SATREG_CODIGO_K
     """
 
     case Repo.query(query) do
       {:ok, %{rows: rows, columns: columns}} ->
-        Enum.map(rows, fn row ->
+        rows
+        |> Enum.map(fn row ->
           row_map = Enum.zip(columns, row) |> Enum.into(%{})
           {"#{row_map["codigo"]} - #{row_map["nombre"]}", row_map["codigo"]}
         end)
+        # Convert Latin-1 to UTF-8
+        |> EncodingHelper.convert_catalog_list()
 
       {:error, _} ->
         []
@@ -331,22 +374,27 @@ defmodule Prettycore.Catalogos do
     INNER JOIN MAP_ESTADO e ON l.MAPEDO_CODIGO_K = e.MAPEDO_CODIGO_K
     INNER JOIN MAP_MUNICIPIO m ON l.MAPEDO_CODIGO_K = m.MAPEDO_CODIGO_K
       AND l.MAPMUN_CODIGO_K = m.MAPMUN_CODIGO_K
-    WHERE l.MAPLOC_CP_K = ?
+    WHERE l.MAPLOC_CP_K = @1
     """
 
     case Repo.query(query, [codigo_postal]) do
       {:ok, %{rows: [row], columns: columns}} ->
         row_map = Enum.zip(columns, row) |> Enum.into(%{})
 
-        {:ok,
-         %{
-           estado_codigo: to_string(row_map["estado_codigo"]),
-           estado_nombre: row_map["estado_nombre"],
-           municipio_codigo: to_string(row_map["municipio_codigo"]),
-           municipio_nombre: row_map["municipio_nombre"],
-           localidad_codigo: to_string(row_map["localidad_codigo"]),
-           localidad_nombre: row_map["localidad_nombre"]
-         }}
+        # Convert Latin-1 names to UTF-8
+        result =
+          %{
+            estado_codigo: to_string(row_map["estado_codigo"]),
+            estado_nombre: row_map["estado_nombre"],
+            municipio_codigo: to_string(row_map["municipio_codigo"]),
+            municipio_nombre: row_map["municipio_nombre"],
+            localidad_codigo: to_string(row_map["localidad_codigo"]),
+            localidad_nombre: row_map["localidad_nombre"]
+          }
+          # Convert all name fields to UTF-8
+          |> EncodingHelper.convert_map()
+
+        {:ok, result}
 
       _ ->
         {:error, :not_found}

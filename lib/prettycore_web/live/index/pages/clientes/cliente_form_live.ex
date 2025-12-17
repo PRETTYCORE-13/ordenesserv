@@ -15,122 +15,157 @@ defmodule PrettycoreWeb.ClienteFormLive do
     @primary_key false
     embedded_schema do
       # Datos de identificación (obligatorios)
-      field :ctedir_codigo_k, :string
-      field :ctedir_responsable, :string
-      field :ctedir_telefono, :string
+      field(:ctedir_codigo_k, :string)
+      field(:ctedir_responsable, :string)
+      field(:ctedir_telefono, :string)
 
       # Dirección física (obligatorios)
-      field :ctedir_calle, :string
-      field :ctedir_callenumext, :string
-      field :ctedir_callenumint, :string
-      field :ctedir_colonia, :string
-      field :ctedir_cp, :string
+      field(:ctedir_calle, :string)
+      field(:ctedir_callenumext, :string)
+      field(:ctedir_callenumint, :string)
+      field(:ctedir_colonia, :string)
+      field(:ctedir_cp, :string)
 
       # Contacto
-      field :ctedir_celular, :string
-      field :ctedir_mail, :string
+      field(:ctedir_celular, :string)
+      field(:ctedir_mail, :string)
 
       # Ubicación geográfica (obligatorios)
-      field :mapedo_codigo_k, :integer
-      field :mapmun_codigo_k, :integer
-      field :maploc_codigo_k, :integer
-      field :map_x, :string
-      field :map_y, :string
+      field(:mapedo_codigo_k, :integer)
+      field(:mapmun_codigo_k, :integer)
+      field(:maploc_codigo_k, :integer)
+      field(:map_x, :string)
+      field(:map_y, :string)
 
       # Rutas (varias obligatorias según tipo)
-      field :vtarut_codigo_k_pre, :string
-      field :vtarut_codigo_k_ent, :string
-      field :vtarut_codigo_k_cob, :string
-      field :vtarut_codigo_k_aut, :string
-      field :vtarut_codigo_k_simpre, :string
-      field :vtarut_codigo_k_siment, :string
-      field :vtarut_codigo_k_simcob, :string
-      field :vtarut_codigo_k_simaut, :string
-      field :vtarut_codigo_k_sup, :string
+      field(:vtarut_codigo_k_pre, :string)
+      field(:vtarut_codigo_k_ent, :string)
+      field(:vtarut_codigo_k_cob, :string)
+      field(:vtarut_codigo_k_aut, :string)
+      field(:vtarut_codigo_k_simpre, :string)
+      field(:vtarut_codigo_k_siment, :string)
+      field(:vtarut_codigo_k_simcob, :string)
+      field(:vtarut_codigo_k_simaut, :string)
+      field(:vtarut_codigo_k_sup, :string)
 
       # Configuración y catálogos
-      field :ctepfr_codigo_k, :string
-      field :cteclu_codigo_k, :string
-      field :ctezni_codigo_k, :string
-      field :ctecor_codigo_k, :string
-      field :condim_codigo_k, :string
-      field :ctepaq_codigo_k, :string
+      field(:ctepfr_codigo_k, :string)
+      field(:cteclu_codigo_k, :string)
+      field(:ctezni_codigo_k, :string)
+      field(:ctecor_codigo_k, :string)
+      field(:condim_codigo_k, :string)
+      field(:ctepaq_codigo_k, :string)
 
       # Embarque
-      field :ctevie_codigo_k, :string
-      field :ctesvi_codigo_k, :string
+      field(:ctevie_codigo_k, :string)
+      field(:ctesvi_codigo_k, :string)
 
       # SAT y CFDI 4.0
-      field :satcp_codigo_k, :string
-      field :satcol_codigo_k, :string
-      field :c_estado_k, :string
-      field :c_municipio_k, :string
-      field :c_localidad_k, :string
+      field(:satcp_codigo_k, :string)
+      field(:satcol_codigo_k, :string)
+      field(:c_estado_k, :string)
+      field(:c_municipio_k, :string)
+      field(:c_localidad_k, :string)
 
       # Estrategia
-      field :cfgest_codigo_k, :string
+      field(:cfgest_codigo_k, :string)
 
       # Flags (valores por defecto según spec)
-      field :ctedir_tipofis, :integer, default: 0
-      field :ctedir_tipoent, :integer, default: 0
-      field :ctedir_ivafrontera, :integer, default: 0
-      field :ctedir_secuencia, :integer, default: 0
-      field :ctedir_secuenciaent, :integer, default: 0
-      field :ctedir_reqgeo, :integer, default: 0
-      field :ctedir_distancia, :decimal, default: Decimal.new("1.0000")
-      field :ctedir_novalidavencimiento, :integer, default: 0
-      field :ctedir_edocred, :integer, default: 0
-      field :ctedir_diascredito, :integer, default: 0
-      field :ctedir_limitecredi, :decimal, default: Decimal.new("0")
-      field :ctedir_tipopago, :integer, default: 0
-      field :ctedir_tipodefacr, :integer, default: 0
-      field :s_maqedo, :integer, default: 0
+      field(:ctedir_tipofis, :integer, default: 0)
+      field(:ctedir_tipoent, :integer, default: 0)
+      field(:ctedir_ivafrontera, :integer, default: 0)
+      field(:ctedir_secuencia, :integer, default: 0)
+      field(:ctedir_secuenciaent, :integer, default: 0)
+      field(:ctedir_reqgeo, :integer, default: 0)
+      field(:ctedir_distancia, :decimal, default: Decimal.new("1.0000"))
+      field(:ctedir_novalidavencimiento, :integer, default: 0)
+      field(:ctedir_edocred, :integer, default: 0)
+      field(:ctedir_diascredito, :integer, default: 0)
+      field(:ctedir_limitecredi, :decimal, default: Decimal.new("0"))
+      field(:ctedir_tipopago, :integer, default: 0)
+      field(:ctedir_tipodefacr, :integer, default: 0)
+      field(:s_maqedo, :integer, default: 0)
     end
 
     def changeset(direccion, attrs) do
       direccion
       |> cast(attrs, [
         # Identificación
-        :ctedir_codigo_k, :ctedir_responsable, :ctedir_telefono,
+        :ctedir_codigo_k,
+        :ctedir_responsable,
+        :ctedir_telefono,
         # Dirección física
-        :ctedir_calle, :ctedir_callenumext, :ctedir_callenumint,
-        :ctedir_colonia, :ctedir_cp,
+        :ctedir_calle,
+        :ctedir_callenumext,
+        :ctedir_callenumint,
+        :ctedir_colonia,
+        :ctedir_cp,
         # Contacto
-        :ctedir_celular, :ctedir_mail,
+        :ctedir_celular,
+        :ctedir_mail,
         # Ubicación geográfica
-        :mapedo_codigo_k, :mapmun_codigo_k, :maploc_codigo_k,
-        :map_x, :map_y,
+        :mapedo_codigo_k,
+        :mapmun_codigo_k,
+        :maploc_codigo_k,
+        :map_x,
+        :map_y,
         # Rutas
-        :vtarut_codigo_k_pre, :vtarut_codigo_k_ent, :vtarut_codigo_k_cob,
-        :vtarut_codigo_k_aut, :vtarut_codigo_k_simpre, :vtarut_codigo_k_siment,
-        :vtarut_codigo_k_simcob, :vtarut_codigo_k_simaut, :vtarut_codigo_k_sup,
+        :vtarut_codigo_k_pre,
+        :vtarut_codigo_k_ent,
+        :vtarut_codigo_k_cob,
+        :vtarut_codigo_k_aut,
+        :vtarut_codigo_k_simpre,
+        :vtarut_codigo_k_siment,
+        :vtarut_codigo_k_simcob,
+        :vtarut_codigo_k_simaut,
+        :vtarut_codigo_k_sup,
         # Configuración y catálogos
-        :ctepfr_codigo_k, :cteclu_codigo_k, :ctezni_codigo_k,
-        :ctecor_codigo_k, :condim_codigo_k, :ctepaq_codigo_k,
+        :ctepfr_codigo_k,
+        :cteclu_codigo_k,
+        :ctezni_codigo_k,
+        :ctecor_codigo_k,
+        :condim_codigo_k,
+        :ctepaq_codigo_k,
         # Embarque
-        :ctevie_codigo_k, :ctesvi_codigo_k,
+        :ctevie_codigo_k,
+        :ctesvi_codigo_k,
         # SAT y CFDI 4.0
-        :satcp_codigo_k, :satcol_codigo_k, :c_estado_k,
-        :c_municipio_k, :c_localidad_k,
+        :satcp_codigo_k,
+        :satcol_codigo_k,
+        :c_estado_k,
+        :c_municipio_k,
+        :c_localidad_k,
         # Estrategia
         :cfgest_codigo_k,
         # Flags
-        :ctedir_tipofis, :ctedir_tipoent, :ctedir_ivafrontera,
-        :ctedir_secuencia, :ctedir_secuenciaent, :ctedir_reqgeo,
-        :ctedir_distancia, :ctedir_novalidavencimiento, :ctedir_edocred,
-        :ctedir_diascredito, :ctedir_limitecredi, :ctedir_tipopago,
-        :ctedir_tipodefacr, :s_maqedo
+        :ctedir_tipofis,
+        :ctedir_tipoent,
+        :ctedir_ivafrontera,
+        :ctedir_secuencia,
+        :ctedir_secuenciaent,
+        :ctedir_reqgeo,
+        :ctedir_distancia,
+        :ctedir_novalidavencimiento,
+        :ctedir_edocred,
+        :ctedir_diascredito,
+        :ctedir_limitecredi,
+        :ctedir_tipopago,
+        :ctedir_tipodefacr,
+        :s_maqedo
       ])
-      |> validate_required([
-        # Campos obligatorios NOT NULL de CTE_DIRECCION
-        :ctedir_codigo_k,
-        :ctedir_calle,
-        :ctedir_callenumext,
-        :ctedir_cp,
-        :mapedo_codigo_k,
-        :mapmun_codigo_k,
-        :maploc_codigo_k
-      ], message: "Este campo es obligatorio")
+      |> validate_required(
+        [
+          # Campos obligatorios NOT NULL de CTE_DIRECCION
+          :ctedir_codigo_k,
+          :ctedir_calle,
+          :ctedir_callenumext,
+          :ctedir_cp,
+          :mapedo_codigo_k,
+          :mapmun_codigo_k,
+          :maploc_codigo_k
+        ],
+        message: "Este campo es obligatorio"
+      )
       |> validate_length(:ctedir_cp, min: 5, max: 5, message: "El CP debe tener 5 dígitos")
       |> validate_format(:ctedir_cp, ~r/^\d{5}$/, message: "El CP debe contener solo números")
     end
@@ -144,132 +179,182 @@ defmodule PrettycoreWeb.ClienteFormLive do
     @primary_key false
     embedded_schema do
       # Identificación (requeridos)
-      field :ctecli_codigo_k, :string
-      field :ctecli_razonsocial, :string
-      field :ctecli_dencomercia, :string
-      field :ctecli_rfc, :string, default: "XAXX010101000"
+      field(:ctecli_codigo_k, :string)
+      field(:ctecli_razonsocial, :string)
+      field(:ctecli_dencomercia, :string)
+      field(:ctecli_rfc, :string, default: "XAXX010101000")
 
       # Fechas (requerido)
-      field :ctecli_fechaalta, :naive_datetime
+      field(:ctecli_fechaalta, :naive_datetime)
 
       # Crédito
-      field :ctecli_edocred, :integer, default: 0
-      field :ctecli_diascredito, :integer, default: 0
-      field :ctecli_limitecredi, :decimal, default: Decimal.new("0.0000")
+      field(:ctecli_edocred, :integer, default: 0)
+      field(:ctecli_diascredito, :integer, default: 0)
+      field(:ctecli_limitecredi, :decimal, default: Decimal.new("0.0000"))
 
       # Facturación
-      field :ctecli_tipodefact, :integer, default: 0
-      field :ctecli_tipofacdes, :integer, default: 0
-      field :ctecli_tipodefacr, :integer, default: 0
-      field :ctecli_formapago, :string
-      field :ctecli_metodopago, :string
-      field :ctecli_tipopago, :string, default: "99"
-      field :sat_uso_cfdi_k, :string, default: "G01"
-      field :ctecli_fereceptormail, :string
+      field(:ctecli_tipodefact, :integer, default: 0)
+      field(:ctecli_tipofacdes, :integer, default: 0)
+      field(:ctecli_tipodefacr, :integer, default: 0)
+      field(:ctecli_formapago, :string)
+      field(:ctecli_metodopago, :string)
+      field(:ctecli_tipopago, :string, default: "99")
+      field(:sat_uso_cfdi_k, :string, default: "G01")
+      field(:ctecli_fereceptormail, :string)
 
       # Catálogos obligatorios (NOT NULL)
-      field :ctetpo_codigo_k, :string
-      field :ctecan_codigo_k, :string
-      field :ctesca_codigo_k, :string
-      field :ctereg_codigo_k, :string
-      field :systra_codigo_k, :string
+      field(:ctetpo_codigo_k, :string)
+      field(:ctecan_codigo_k, :string)
+      field(:ctesca_codigo_k, :string)
+      field(:ctereg_codigo_k, :string)
+      field(:systra_codigo_k, :string)
 
       # Catálogos opcionales con foreign keys
-      field :ctepaq_codigo_k, :string
-      field :facadd_codigo_k, :string
-      field :ctepor_codigo_k, :string
-      field :condim_codigo_k, :string
-      field :ctecad_codigo_k, :string
-      field :cfgban_codigo_k, :string
-      field :sysemp_codigo_k, :string
-      field :faccom_codigo_k, :string
-      field :facads_codigo_k, :string
-      field :cteseg_codigo_k, :string
-      field :cfgmon_codigo_k, :string
-      field :catind_codigo_k, :string
-      field :catpfi_codigo_k, :string
+      field(:ctepaq_codigo_k, :string)
+      field(:facadd_codigo_k, :string)
+      field(:ctepor_codigo_k, :string)
+      field(:condim_codigo_k, :string)
+      field(:ctecad_codigo_k, :string)
+      field(:cfgban_codigo_k, :string)
+      field(:sysemp_codigo_k, :string)
+      field(:faccom_codigo_k, :string)
+      field(:facads_codigo_k, :string)
+      field(:cteseg_codigo_k, :string)
+      field(:cfgmon_codigo_k, :string)
+      field(:catind_codigo_k, :string)
+      field(:catpfi_codigo_k, :string)
 
       # Configuración regional
-      field :ctecli_pais, :string, default: "MEX"
-      field :cfgreg_codigo_k, :string, default: "601"
-      field :satexp_codigo_k, :string, default: "01"
+      field(:ctecli_pais, :string, default: "MEX")
+      field(:cfgreg_codigo_k, :string, default: "601")
+      field(:satexp_codigo_k, :string, default: "01")
 
       # Flags (valores por defecto según spec)
-      field :ctecli_generico, :integer, default: 0
-      field :ctecli_nocta, :string
-      field :ctecli_dscantimp, :integer, default: 1
-      field :ctecli_desglosaieps, :integer, default: 0
-      field :ctecli_periodorefac, :integer, default: 0
-      field :ctecli_cargaespecifica, :integer, default: 0
-      field :ctecli_caducidadmin, :integer, default: 0
-      field :ctecli_ctlsanitario, :integer, default: 0
-      field :ctecli_factablero, :integer, default: 0
-      field :ctecli_aplicacanje, :integer, default: 0
-      field :ctecli_aplicadev, :integer, default: 0
-      field :ctecli_desglosakit, :integer, default: 0
-      field :ctecli_facgrupo, :integer, default: 0
-      field :ctecli_timbracb, :integer, default: 0
-      field :ctecli_novalidavencimiento, :integer, default: 0
-      field :ctecli_cfdi_ver, :integer, default: 0
-      field :ctecli_aplicaregalo, :integer, default: 0
-      field :ctecli_noaceptafracciones, :integer, default: 0
-      field :ctecli_cxcliq, :integer, default: 0
+      field(:ctecli_generico, :integer, default: 0)
+      field(:ctecli_nocta, :string)
+      field(:ctecli_dscantimp, :integer, default: 1)
+      field(:ctecli_desglosaieps, :integer, default: 0)
+      field(:ctecli_periodorefac, :integer, default: 0)
+      field(:ctecli_cargaespecifica, :integer, default: 0)
+      field(:ctecli_caducidadmin, :integer, default: 0)
+      field(:ctecli_ctlsanitario, :integer, default: 0)
+      field(:ctecli_factablero, :integer, default: 0)
+      field(:ctecli_aplicacanje, :integer, default: 0)
+      field(:ctecli_aplicadev, :integer, default: 0)
+      field(:ctecli_desglosakit, :integer, default: 0)
+      field(:ctecli_facgrupo, :integer, default: 0)
+      field(:ctecli_timbracb, :integer, default: 0)
+      field(:ctecli_novalidavencimiento, :integer, default: 0)
+      field(:ctecli_cfdi_ver, :integer, default: 0)
+      field(:ctecli_aplicaregalo, :integer, default: 0)
+      field(:ctecli_noaceptafracciones, :integer, default: 0)
+      field(:ctecli_cxcliq, :integer, default: 0)
 
       # Sistema (valores automáticos)
-      field :s_maqedo, :integer, default: 0
+      field(:s_maqedo, :integer, default: 0)
 
       # Direcciones embebidas (múltiples)
-      embeds_many :direcciones, DireccionForm
+      embeds_many(:direcciones, DireccionForm)
     end
 
     def changeset(cliente, attrs) do
       cliente
       |> cast(attrs, [
         # Identificación
-        :ctecli_codigo_k, :ctecli_razonsocial, :ctecli_dencomercia, :ctecli_rfc,
+        :ctecli_codigo_k,
+        :ctecli_razonsocial,
+        :ctecli_dencomercia,
+        :ctecli_rfc,
         # Fechas
         :ctecli_fechaalta,
         # Crédito
-        :ctecli_edocred, :ctecli_diascredito, :ctecli_limitecredi,
+        :ctecli_edocred,
+        :ctecli_diascredito,
+        :ctecli_limitecredi,
         # Facturación
-        :ctecli_tipodefact, :ctecli_tipofacdes, :ctecli_tipodefacr,
-        :ctecli_formapago, :ctecli_metodopago, :ctecli_tipopago,
-        :sat_uso_cfdi_k, :ctecli_fereceptormail,
+        :ctecli_tipodefact,
+        :ctecli_tipofacdes,
+        :ctecli_tipodefacr,
+        :ctecli_formapago,
+        :ctecli_metodopago,
+        :ctecli_tipopago,
+        :sat_uso_cfdi_k,
+        :ctecli_fereceptormail,
         # Catálogos obligatorios
-        :ctetpo_codigo_k, :ctecan_codigo_k, :ctesca_codigo_k,
-        :ctereg_codigo_k, :systra_codigo_k,
-        # Catálogos opcionales
-        :ctepaq_codigo_k, :facadd_codigo_k, :ctepor_codigo_k,
-        :condim_codigo_k, :ctecad_codigo_k, :cfgban_codigo_k,
-        :sysemp_codigo_k, :faccom_codigo_k, :facads_codigo_k,
-        :cteseg_codigo_k, :cfgmon_codigo_k, :catind_codigo_k, :catpfi_codigo_k,
-        # Configuración regional
-        :ctecli_pais, :cfgreg_codigo_k, :satexp_codigo_k,
-        # Flags
-        :ctecli_generico, :ctecli_nocta, :ctecli_dscantimp,
-        :ctecli_desglosaieps, :ctecli_periodorefac, :ctecli_cargaespecifica,
-        :ctecli_caducidadmin, :ctecli_ctlsanitario, :ctecli_factablero,
-        :ctecli_aplicacanje, :ctecli_aplicadev, :ctecli_desglosakit,
-        :ctecli_facgrupo, :ctecli_timbracb, :ctecli_novalidavencimiento,
-        :ctecli_cfdi_ver, :ctecli_aplicaregalo, :ctecli_noaceptafracciones,
-        :ctecli_cxcliq, :s_maqedo
-      ])
-      |> cast_embed(:direcciones, required: true)
-      |> validate_length(:direcciones, min: 1, message: "Debe agregar al menos una dirección")
-      |> validate_required([
-        # Campos obligatorios NOT NULL
-        :ctecli_codigo_k,
-        :ctecli_fechaalta,
         :ctetpo_codigo_k,
         :ctecan_codigo_k,
         :ctesca_codigo_k,
         :ctereg_codigo_k,
-        :systra_codigo_k
-      ], message: "Este campo es obligatorio")
+        :systra_codigo_k,
+        # Catálogos opcionales
+        :ctepaq_codigo_k,
+        :facadd_codigo_k,
+        :ctepor_codigo_k,
+        :condim_codigo_k,
+        :ctecad_codigo_k,
+        :cfgban_codigo_k,
+        :sysemp_codigo_k,
+        :faccom_codigo_k,
+        :facads_codigo_k,
+        :cteseg_codigo_k,
+        :cfgmon_codigo_k,
+        :catind_codigo_k,
+        :catpfi_codigo_k,
+        # Configuración regional
+        :ctecli_pais,
+        :cfgreg_codigo_k,
+        :satexp_codigo_k,
+        # Flags
+        :ctecli_generico,
+        :ctecli_nocta,
+        :ctecli_dscantimp,
+        :ctecli_desglosaieps,
+        :ctecli_periodorefac,
+        :ctecli_cargaespecifica,
+        :ctecli_caducidadmin,
+        :ctecli_ctlsanitario,
+        :ctecli_factablero,
+        :ctecli_aplicacanje,
+        :ctecli_aplicadev,
+        :ctecli_desglosakit,
+        :ctecli_facgrupo,
+        :ctecli_timbracb,
+        :ctecli_novalidavencimiento,
+        :ctecli_cfdi_ver,
+        :ctecli_aplicaregalo,
+        :ctecli_noaceptafracciones,
+        :ctecli_cxcliq,
+        :s_maqedo
+      ])
+      |> cast_embed(:direcciones, required: true)
+      |> validate_length(:direcciones, min: 1, message: "Debe agregar al menos una dirección")
+      |> put_default_fechaalta()
+      |> validate_required(
+        [
+          # Campos obligatorios NOT NULL
+          :ctecli_codigo_k,
+          :ctecli_fechaalta,
+          :ctetpo_codigo_k,
+          :ctecan_codigo_k,
+          # TODO: Re-enable these when catalog data is available
+          # :ctesca_codigo_k,  # Subcanales - depends on canal selection
+          :ctereg_codigo_k
+          # :systra_codigo_k  # Transacciones
+        ],
+        message: "Este campo es obligatorio"
+      )
       |> validate_length(:ctecli_rfc, min: 12, max: 13)
       |> validate_format(:ctecli_rfc, ~r/^[A-Z&Ñ]{3,4}\d{6}[A-Z0-9]{3}$/,
         message: "formato RFC inválido"
       )
+    end
+
+    defp put_default_fechaalta(changeset) do
+      if is_nil(get_field(changeset, :ctecli_fechaalta)) do
+        put_change(changeset, :ctecli_fechaalta, Date.utc_today())
+      else
+        changeset
+      end
     end
   end
 
@@ -323,6 +408,61 @@ defmodule PrettycoreWeb.ClienteFormLive do
   end
 
   @impl true
+  def handle_params(params, _uri, socket) do
+    # Get tab from params, default to "basicos"
+    tab = Map.get(params, "tab", "basicos")
+    # Validate tab
+    valid_tabs = ["basicos", "clasificacion", "facturacion", "direcciones", "opcionales"]
+    current_tab = if tab in valid_tabs, do: tab, else: "basicos"
+
+    {:noreply, assign(socket, :current_tab, current_tab)}
+  end
+
+  @impl true
+  def handle_event(
+        "validate",
+        %{"_target" => target, "cliente_form" => params} = event_params,
+        socket
+      ) do
+    changeset =
+      %ClienteForm{}
+      |> ClienteForm.changeset(params)
+      |> Map.put(:action, :validate)
+
+    socket = assign(socket, :form, to_form(changeset))
+
+    # Check if the change was on a estado field
+    case target do
+      ["cliente_form", "direcciones", direccion_index, "mapedo_codigo_k"] ->
+        # Estado changed, load municipios
+        estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
+
+        if estado_codigo && estado_codigo != "" do
+          municipios = Catalogos.listar_municipios(estado_codigo)
+          {:noreply, socket |> assign(:municipios, municipios) |> assign(:localidades, [])}
+        else
+          {:noreply, socket |> assign(:municipios, []) |> assign(:localidades, [])}
+        end
+
+      ["cliente_form", "direcciones", direccion_index, "mapmun_codigo_k"] ->
+        # Municipio changed, load localidades
+        estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
+        municipio_codigo = get_in(params, ["direcciones", direccion_index, "mapmun_codigo_k"])
+
+        if estado_codigo && municipio_codigo && estado_codigo != "" && municipio_codigo != "" do
+          localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
+          {:noreply, assign(socket, :localidades, localidades)}
+        else
+          {:noreply, assign(socket, :localidades, [])}
+        end
+
+      _ ->
+        # Other field changed, just validate
+        {:noreply, socket}
+    end
+  end
+
+  # Fallback clause when _target is not present
   def handle_event("validate", %{"cliente_form" => params}, socket) do
     changeset =
       %ClienteForm{}
@@ -335,6 +475,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
   @impl true
   def handle_event("save", %{"cliente_form" => params}, socket) do
     changeset = ClienteForm.changeset(%ClienteForm{}, params)
+    IO.inspect("nuevo")
 
     case validate_and_extract(changeset) do
       {:ok, cliente_data} ->
@@ -349,15 +490,20 @@ defmodule PrettycoreWeb.ClienteFormLive do
 
         case Repo.one(password_query) do
           nil ->
+            IO.inspect(:error, "No se pudo autenticar. Intente de nuevo.")
+
             {:noreply,
              socket
              |> put_flash(:error, "No se pudo autenticar. Intente de nuevo.")
              |> assign(:form, to_form(changeset))}
 
           password ->
+            IO.inspect("Cliente")
             # Call API to create cliente
             case ClientesApi.crear_cliente(cliente_data, password) do
               {:ok, _response} ->
+                IO.inspect(:info, "Cliente creado exitosamente")
+
                 {:noreply,
                  socket
                  |> put_flash(:info, "Cliente creado exitosamente")
@@ -365,6 +511,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
 
               {:error, {:http_error, status, body}} ->
                 error_msg = extract_error_message(body, status)
+                IO.inspect(:error, "Error al crear cliente: #{error_msg}")
 
                 {:noreply,
                  socket
@@ -372,6 +519,8 @@ defmodule PrettycoreWeb.ClienteFormLive do
                  |> assign(:form, to_form(changeset))}
 
               {:error, reason} ->
+                IO.inspect("Error al crear cliente")
+
                 {:noreply,
                  socket
                  |> put_flash(:error, "Error de conexión: #{inspect(reason)}")
@@ -380,6 +529,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
         end
 
       {:error, %Ecto.Changeset{} = changeset} ->
+        IO.inspect(changeset)
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
   end
@@ -394,7 +544,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
     direcciones = Map.get(params, "direcciones", [])
 
     # Calcular el siguiente código de dirección
-    next_codigo = length(direcciones) + 1 |> to_string()
+    next_codigo = (length(direcciones) + 1) |> to_string()
 
     # Agregar nueva dirección
     new_direccion = %{
@@ -466,8 +616,37 @@ defmodule PrettycoreWeb.ClienteFormLive do
     estado_codigo = get_in(params, ["direcciones", direccion_index, "mapedo_codigo_k"])
 
     if estado_codigo && estado_codigo != "" do
+      # Load municipios for the selected state
       municipios = Catalogos.listar_municipios(estado_codigo)
-      {:noreply, socket |> assign(:municipios, municipios) |> assign(:localidades, [])}
+
+      # Reset municipio and localidad values for this direccion
+      current_form = socket.assigns.form
+      form_params = current_form.params || %{}
+      direcciones = Map.get(form_params, "direcciones", %{})
+
+      # Get the current direccion
+      direccion = Map.get(direcciones, direccion_index, %{})
+
+      # Reset municipio and localidad
+      updated_direccion =
+        direccion
+        |> Map.put("mapmun_codigo_k", "")
+        |> Map.put("maploc_codigo_k", "")
+
+      updated_direcciones = Map.put(direcciones, direccion_index, updated_direccion)
+      updated_params = Map.put(form_params, "direcciones", updated_direcciones)
+
+      # Create new changeset
+      changeset =
+        %ClienteForm{}
+        |> ClienteForm.changeset(updated_params)
+        |> Map.put(:action, :validate)
+
+      {:noreply,
+       socket
+       |> assign(:form, to_form(changeset))
+       |> assign(:municipios, municipios)
+       |> assign(:localidades, [])}
     else
       {:noreply, socket |> assign(:municipios, []) |> assign(:localidades, [])}
     end
@@ -484,8 +663,33 @@ defmodule PrettycoreWeb.ClienteFormLive do
     municipio_codigo = get_in(params, ["direcciones", direccion_index, "mapmun_codigo_k"])
 
     if estado_codigo && estado_codigo != "" && municipio_codigo && municipio_codigo != "" do
+      # Load localidades for the selected municipio
       localidades = Catalogos.listar_localidades(estado_codigo, municipio_codigo)
-      {:noreply, assign(socket, :localidades, localidades)}
+
+      # Reset localidad value for this direccion
+      current_form = socket.assigns.form
+      form_params = current_form.params || %{}
+      direcciones = Map.get(form_params, "direcciones", %{})
+
+      # Get the current direccion
+      direccion = Map.get(direcciones, direccion_index, %{})
+
+      # Reset localidad
+      updated_direccion = Map.put(direccion, "maploc_codigo_k", "")
+
+      updated_direcciones = Map.put(direcciones, direccion_index, updated_direccion)
+      updated_params = Map.put(form_params, "direcciones", updated_direcciones)
+
+      # Create new changeset
+      changeset =
+        %ClienteForm{}
+        |> ClienteForm.changeset(updated_params)
+        |> Map.put(:action, :validate)
+
+      {:noreply,
+       socket
+       |> assign(:form, to_form(changeset))
+       |> assign(:localidades, localidades)}
     else
       {:noreply, assign(socket, :localidades, [])}
     end
@@ -497,7 +701,9 @@ defmodule PrettycoreWeb.ClienteFormLive do
       case Catalogos.buscar_por_cp(cp) do
         {:ok, ubicacion} ->
           municipios = Catalogos.listar_municipios(ubicacion.estado_codigo)
-          localidades = Catalogos.listar_localidades(ubicacion.estado_codigo, ubicacion.municipio_codigo)
+
+          localidades =
+            Catalogos.listar_localidades(ubicacion.estado_codigo, ubicacion.municipio_codigo)
 
           current_form = socket.assigns.form
           params = current_form.params || %{}
@@ -523,7 +729,10 @@ defmodule PrettycoreWeb.ClienteFormLive do
            |> assign(:form, to_form(changeset))
            |> assign(:municipios, municipios)
            |> assign(:localidades, localidades)
-           |> put_flash(:info, "Ubicación encontrada: #{ubicacion.estado_nombre}, #{ubicacion.municipio_nombre}")}
+           |> put_flash(
+             :info,
+             "Ubicación encontrada: #{ubicacion.estado_nombre}, #{ubicacion.municipio_nombre}"
+           )}
 
         {:error, :not_found} ->
           {:noreply, put_flash(socket, :error, "No se encontró ubicación para el CP: #{cp}")}
@@ -538,7 +747,7 @@ defmodule PrettycoreWeb.ClienteFormLive do
 
   @impl true
   def handle_event("change_tab", %{"tab" => tab}, socket) do
-    {:noreply, assign(socket, :current_tab, tab)}
+    {:noreply, push_patch(socket, to: ~p"/admin/clientes/new/#{tab}")}
   end
 
   @impl true
