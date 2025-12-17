@@ -37,13 +37,28 @@ defmodule PrettycoreWeb.ClientesExcelController do
 
   # Parsea las columnas visibles desde los params de la URL
   defp parse_visible_columns(params) do
-    params
-    |> Enum.filter(fn {key, _value} -> String.starts_with?(key, "visible_columns[") end)
-    |> Enum.map(fn {key, value} ->
-      column_name = String.replace(key, ~r/visible_columns\[(.*)\]/, "\\1")
-      {column_name, value == "true"}
-    end)
-    |> Enum.into(%{})
+    visible_cols = case Map.get(params, "visible_columns") do
+      # Si viene como mapa anidado (Phoenix ya lo parseó)
+      %{} = nested_map ->
+        nested_map
+        |> Enum.map(fn {key, value} ->
+          {key, value == "true" || value == true}
+        end)
+        |> Enum.into(%{})
+
+      # Si viene en formato plano con keys "visible_columns[...]"
+      _ ->
+        params
+        |> Enum.filter(fn {key, _value} -> String.starts_with?(to_string(key), "visible_columns[") end)
+        |> Enum.map(fn {key, value} ->
+          column_name = String.replace(to_string(key), ~r/visible_columns\[(.*)\]/, "\\1")
+          {column_name, value == "true"}
+        end)
+        |> Enum.into(%{})
+    end
+
+    IO.inspect(visible_cols, label: "📊 Columnas visibles parseadas")
+    visible_cols
   end
 
   # Helper para obtener parámetro o usar valor por defecto
